@@ -5,6 +5,7 @@ on:
     paths:
       - 'src/**'
       - 'docs/**'
+      - 'blog/**'
   push:
     branches:
       - main
