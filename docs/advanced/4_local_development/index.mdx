@@ -234,6 +234,31 @@ Windmill CLI also has a `bootstrap` command (both for `wmill script` and `wmill 
 
 Lastly, it is possible to execute scripts locally and even plug them to any unit testing framework. More info on the [Run locally documentation page](../4_local_development/run_locally.mdx).
 
+### Live preview with `wmill dev`
+
+`wmill dev` starts a local live-reload server and opens a Windmill dev page that renders your local flow, script, or raw app. Edits on disk reload the page; edits in the page round-trip back to the local files (`flow.yaml`, inline scripts, `app.yaml`, etc.).
+
+```bash
+# Workspace picker — flows, scripts, and raw apps grouped by folder / user
+wmill dev
+
+# Jump straight into a flow
+wmill dev --path f/my_flows/etl
+
+# Auto-detected when run from inside a flow folder
+cd f/my_flows/etl__flow && wmill dev
+```
+
+The same command powers the [VS Code extension](../../cli_local_dev/1_vscode-extension/index.mdx) iframe and the [Claude Code](../../misc/9_guides/local_dev_with_ai/index.mdx) preview pane (via `--proxy-port`), so you get the same live editing experience whether you work from a browser, VS Code, or an AI coding assistant.
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	<DocCard
+		title="Dev & preview"
+		description="Live-reload preview, round-trip editing, and one-shot script / flow previews from the CLI."
+		href="/docs/advanced/cli/dev-preview"
+	/>
+</div>
+
 ### VS Code extension
 
 The Windmill VS Code extension allows you to build scripts and flows in the comfort of your VS Code or Cursor editor, while leveraging Windmill UIs for test & flows edition.

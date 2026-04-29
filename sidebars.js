@@ -1064,6 +1064,7 @@ const sidebars = {
 						'advanced/cli/sync',
 						'advanced/cli/wmill-yaml-reference',
 						'advanced/cli/generate-metadata',
+						'advanced/cli/dev-preview',
 						'advanced/cli/environment-specific-items',
 						'advanced/cli/gitsync-settings',
 						'advanced/cli/user',
