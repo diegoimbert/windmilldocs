@@ -11,21 +11,21 @@ import DocCard from '@site/src/components/DocCard';
 
 # Native Windows automation without Docker, WSL, or workarounds
 
-You manage Windows servers, Active Directory, MSSQL, and PowerShell runbooks. You need to automate server provisioning, user management, database maintenance, compliance checks — and you need version control, approval workflows, and audit trails around all of it.
+You manage Windows servers, Active Directory, MSSQL, and PowerShell runbooks. You need to automate server provisioning, user management, database maintenance, and compliance checks. You also need version control, approval workflows, and audit trails around all of it.
 
 The usual answer is "install Docker" or "set up WSL2." But your PowerShell scripts need access to AD, your MSSQL queries use Kerberos tickets from the domain, and your modules come from private Azure Artifacts feeds. Containerizing all of that means fighting your own infrastructure.
 
-Windmill runs as a native Windows service — `windmill-ee.exe` registered via `sc.exe`, executing PowerShell, C#, and SQL directly on your domain-joined servers. This post walks through what that enables: typed PowerShell with `[CmdletBinding()]`, MSSQL with Kerberos auth, Teams approvals, and AI agents that use all of the above as tools.
+Windmill runs as a native Windows service. `windmill-ee.exe` registers via `sc.exe` and executes PowerShell, C#, and SQL directly on your domain-joined servers. This post walks through what that enables: typed PowerShell with `[CmdletBinding()]`, MSSQL with Kerberos auth, Teams approvals, and AI agents that use all of the above as tools.
 
 {/* truncate */}
 
 ## Native Windows workers
 
-Windmill's Windows worker is a single executable — `windmill-ee.exe`. It runs on any Windows machine: servers, workstations, laptops, edge devices — anywhere Windows runs and you need automation close to the infrastructure. Three modes:
+Windmill's Windows worker is a single executable: `windmill-ee.exe`. It runs anywhere Windows runs: servers, workstations, laptops, edge devices. Three modes:
 
 - **Worker**: connects directly to the Windmill database, executes jobs
 - **Server**: runs the Windmill API and web UI
-- **Agent**: connects to a remote Windmill server over HTTPS — no direct database access, ideal for workers behind firewalls. See [agent workers](/docs/core_concepts/agent_workers) for how to generate tokens
+- **Agent**: connects to a remote Windmill server over HTTPS, with no direct database access. Ideal for workers behind firewalls. See [agent workers](/docs/core_concepts/agent_workers) for how to generate tokens
 
 ### Installing as a Windows service
 
@@ -73,7 +73,7 @@ sc.exe start WindmillWorker
 
 ### Mixed Windows/Linux fleet
 
-A single Windmill instance can run both Linux and Windows workers. Use [worker tags](/docs/core_concepts/worker_groups) to route jobs — tag your Windows workers with `powershell`, `csharp`, or `windows`, and flows dispatch steps to the right OS automatically.
+A single Windmill instance can run both Linux and Windows workers. Use [worker tags](/docs/core_concepts/worker_groups) to route jobs: tag your Windows workers with `powershell`, `csharp`, or `windows`, and flows dispatch steps to the right OS automatically.
 
 <div className="grid grid-cols-2 gap-6 mb-4">
 	<DocCard
@@ -115,11 +115,11 @@ $members = Get-ADGroupMember -Identity $GroupName -Server $Domain |
 $members | ConvertTo-Json
 ```
 
-`$GroupName` becomes a required text input, `$Domain` gets a default value — auto-generated in the Windmill UI. The JSON output is directly consumable by downstream flow steps.
+`$GroupName` becomes a required text input, `$Domain` gets a default value, and Windmill auto-generates the UI form. The JSON output is directly consumable by downstream flow steps.
 
 ### CmdletBinding and common parameters
 
-When a script declares `[CmdletBinding()]`, Windmill shows toggles for `-Verbose`, `-Debug`, and an `-ErrorAction` dropdown in the run form — the same common parameters you'd use in a PowerShell console. `Write-Verbose` and `Write-Debug` output appears in job logs with `VERBOSE:` / `DEBUG:` prefixes. Scripts without `[CmdletBinding()]` are unaffected.
+When a script declares `[CmdletBinding()]`, Windmill shows toggles for `-Verbose`, `-Debug`, and an `-ErrorAction` dropdown in the run form. These are the same common parameters you'd use in a PowerShell console. `Write-Verbose` and `Write-Debug` output appears in job logs with `VERBOSE:` / `DEBUG:` prefixes. Scripts without `[CmdletBinding()]` are unaffected.
 
 ```powershell
 [CmdletBinding()]
@@ -141,7 +141,7 @@ $result | ConvertTo-Json
 
 ### Private Azure Artifacts modules
 
-Configure your Azure Artifacts feed URL and PAT in [instance settings](/docs/advanced/imports#private-repository-azure-artifacts-feed), then use `Import-Module` as usual — Windmill checks the private feed first and falls back to PowerShell Gallery.
+Configure your Azure Artifacts feed URL and PAT in [instance settings](/docs/advanced/imports#private-repository-azure-artifacts-feed), then use `Import-Module` as usual. Windmill checks the private feed first and falls back to PowerShell Gallery.
 
 ```powershell
 param(
@@ -167,7 +167,7 @@ $results | ConvertTo-Json
 
 Windmill's [MSSQL integration](/docs/integrations/mssql) supports three auth methods: SQL auth (username/password), Azure AD/Entra (OAuth), and Windows Integrated Authentication (Kerberos).
 
-With Kerberos, the worker's service account credentials are used directly — no database passwords stored in Windmill. The worker inherits its domain identity, and MSSQL trusts it through AD.
+With Kerberos, the worker's service account credentials are used directly, with no database passwords stored in Windmill. The worker inherits its domain identity, and MSSQL trusts it through AD.
 
 Requirements:
 - Valid Kerberos ticket on the worker (via `kinit` or a keytab)
@@ -288,7 +288,7 @@ await wmill.requestInteractiveTeamsApproval({
 
 ### Azure AD/Entra ID SSO
 
-Windmill supports SSO via [Azure AD OAuth](/docs/misc/setup_oauth). The same identity can authenticate against MSSQL using `aad_token` — one login for platform access and database access.
+Windmill supports SSO via [Azure AD OAuth](/docs/misc/setup_oauth). The same identity can authenticate against MSSQL using `aad_token`, so one login covers both platform access and database access.
 
 ### Azure Blob Storage
 
@@ -319,9 +319,9 @@ keytab_path: /etc/security/keytabs/windmill.keytab
 
 ## AI agents on Windows infrastructure
 
-Most AI agent platforms can call REST APIs. Few can natively run PowerShell on domain-joined servers or query MSSQL with Kerberos auth.
+Running PowerShell against a domain-joined server or querying MSSQL with Kerberos auth isn't something most AI agent platforms can do.
 
-Windmill's [AI agent](/docs/core_concepts/ai_agents) flow steps use scripts as tools. Any Windmill script — PowerShell, C#, SQL, TypeScript — becomes a callable tool where typed parameters map to the tool's JSON schema. The agent sees what each tool does, what inputs it needs, and calls them to accomplish a goal.
+Windmill's [AI agent](/docs/core_concepts/ai_agents) flow steps use scripts as tools. Any Windmill script (PowerShell, C#, SQL, TypeScript) becomes a callable tool where typed parameters map to the tool's JSON schema. The agent sees what each tool does and what inputs it needs, then calls them to accomplish a goal.
 
 ### Scenario: AI IT ops assistant
 
@@ -332,9 +332,9 @@ An AI agent in a Windmill flow with these tools:
 - An MSSQL query that pulls application error data
 - A Teams notification script for escalation
 
-The agent receives a natural-language request — "check if user jsmith's account is locked and what errors their app generated today" — reasons about which tools to call, executes them on the Windows worker, and returns a structured report or escalates via Teams.
+The agent receives a natural-language request like "check if user jsmith's account is locked and what errors their app generated today". It reasons about which tools to call, executes them on the Windows worker, and returns a structured report or escalates via Teams.
 
-Each tool is a regular Windmill script. Here's the AD lookup tool — the agent calls it by name and fills in the `$Username` parameter:
+Each tool is a regular Windmill script. Here's the AD lookup tool. The agent calls it by name and fills in the `$Username` parameter:
 
 ```powershell
 [CmdletBinding()]
@@ -361,7 +361,7 @@ In the flow editor, the agent step wires these tools together with a system prom
 
 ![AI agent step in a Windmill flow with PowerShell, MSSQL, and Teams tools](./agent_step.png)
 
-The agent calls `get_ad_user_info`, sees the account is locked, calls `get_event_log_errors` to check for related authentication failures, runs `query_app_errors` for today's errors, and compiles a report. If it finds critical issues, it calls `send_teams_alert` to escalate. Each tool runs on the appropriate worker — PowerShell and MSSQL on the Windows worker with domain credentials, TypeScript on any available worker.
+The agent calls `get_ad_user_info`, sees the account is locked, calls `get_event_log_errors` to check for related authentication failures, runs `query_app_errors` for today's errors, and compiles a report. If it finds critical issues, it calls `send_teams_alert` to escalate. Each tool runs on the appropriate worker: PowerShell and MSSQL on the Windows worker with domain credentials, TypeScript on any available worker.
 
 ### Multi-provider and MCP
 
@@ -390,13 +390,13 @@ The typical migration path: PowerShell scripts scattered across servers on Task 
 
 In Windmill, each script becomes version-controlled, gets an auto-generated UI, and can be composed into flows with approval steps (via [Teams](/docs/integrations/teams)), error handling, and retries. Windows and Linux workers run in the same instance. Every execution is logged with inputs, outputs, duration, and who triggered it.
 
-The migration is incremental — start with one runbook, schedule it in Windmill, and let the Task Scheduler job run in parallel until you're confident.
+The migration is incremental: start with one runbook, schedule it in Windmill, and let the Task Scheduler job run in parallel until you're confident.
 
 ## How Windmill compares on Windows
 
-[Airflow](https://airflow.apache.org/) has an [open issue for Windows support](https://github.com/apache/airflow/issues/10388) since 2020 — not on the roadmap. [Prefect](https://www.prefect.io/) workers can run on Windows via pip, but the docs focus on Docker/Kubernetes and there's no service management. [n8n](https://n8n.io/) runs well via Node.js but is low-code and connector-focused. [Kestra](https://kestra.io/) is the closest — it runs as a JAR, has a PowerShell plugin, and supports a PROCESS runner — but lacks typed parameter inference, private Azure Artifacts, MSSQL Kerberos, and C# support.
+[Airflow](https://airflow.apache.org/) has had an [open issue for Windows support](https://github.com/apache/airflow/issues/10388) since 2020, and it's not on the roadmap. [Prefect](https://www.prefect.io/) workers can run on Windows via pip, but the docs focus on Docker/Kubernetes and there's no service management. [n8n](https://n8n.io/) runs well via Node.js but is low-code and connector-focused. [Kestra](https://kestra.io/) is the closest: it runs as a JAR, has a PowerShell plugin, and supports a PROCESS runner, but lacks typed parameter inference, private Azure Artifacts, MSSQL Kerberos, and C# support.
 
-Power Automate has strong Teams integration, but no self-hosted option, no version control, no code-first workflow definition, and premium licensing at $15/user/month — which means no GitOps, no PR reviews on flow changes, and no self-hosted deployment.
+Power Automate has strong Teams integration, but no self-hosted option, no version control, no code-first workflow definition, and premium licensing at $15/user/month. That means no GitOps, no PR reviews on flow changes, and no self-hosted deployment.
 
 | Capability | Windmill | Kestra | n8n | Airflow | Prefect | Power Automate |
 |---|---|---|---|---|---|---|
@@ -412,7 +412,7 @@ Power Automate has strong Teams integration, but no self-hosted option, no versi
 
 ## Getting started
 
-The Windmill server runs in Docker (Linux). Windows workers connect as native agents — no Docker on the Windows side.
+The Windmill server runs in Docker (Linux). Windows workers connect as native agents, with no Docker on the Windows side.
 
 1. Deploy the [Windmill server](/docs/advanced/self_host) (Docker Compose or Kubernetes)
 2. Download `windmill-ee.exe` on your Windows server
