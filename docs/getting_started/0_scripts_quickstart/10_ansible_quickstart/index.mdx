@@ -441,6 +441,42 @@ files:
     target: ./password_filename3
 ```
 
+### Playbook options
+
+Pass `ansible-playbook` flags through the `options` block in the script metadata:
+
+```yaml
+options:
+  - vvv
+  - forks: 10
+  - timeout: 30
+  - flush_cache
+  - force_handlers
+  - limit: webservers:!db1.example.com
+```
+
+Supported entries:
+
+| Entry | `ansible-playbook` flag |
+| --- | --- |
+| `vv` / `vvv` / `vvvv` (1 to 6 `v`s) | `-v` (verbosity) |
+| `verbosity: vvv` | same as above |
+| `forks: <int>` | `--forks` |
+| `timeout: <int>` | `--timeout` |
+| `flush_cache` | `--flush-cache` |
+| `force_handlers` | `--force-handlers` |
+| `limit: <pattern>` | `--limit` (target a subset of hosts) |
+
+The `limit` value may reference a script argument with `{{ argname }}` so a flow can pick the target host at runtime:
+
+```yaml
+options:
+  - limit: "{{ target_host }}"
+extra_vars:
+  target_host:
+    type: string
+```
+
 ### Delegate the environment setup to a git repo (EE)
 
 :::info EE feature
@@ -479,6 +515,55 @@ delegate_to_git_repo:
 ```
 
 If this is undefined, the worker will default to using the second YAML section like normal.
+
+#### Inventory from the cloned repo
+
+Point ansible at an inventory file (or directory) that lives inside the cloned repository:
+
+```yaml
+delegate_to_git_repo:
+  resource: u/user/git_repo_resource
+  playbook: playbooks/site.yml
+  inventories_location: inventories/dev.ini
+```
+
+The path is relative to the repository root. It is added to the `ansible-playbook` invocation as `-i`, alongside any inventories declared in the script metadata.
+
+#### Installing requirements.yml from the cloned repo
+
+If your repository ships its own `requirements.yml`, set `install_requirements: true` to have Windmill install the listed roles and collections after cloning, before the playbook runs:
+
+```yaml
+delegate_to_git_repo:
+  resource: u/user/git_repo_resource
+  playbook: playbooks/site.yml
+  install_requirements: true
+```
+
+The worker looks for `requirements.yml`, `requirements.yaml`, `collections/requirements.yml`, and `roles/requirements.yml` at the root of the cloned repo and runs `ansible-galaxy role install -r` and `ansible-galaxy collection install -r` on every match. If none are found, the step is skipped.
+
+This is independent of the `dependencies.galaxy` block in the script metadata: use whichever fits your workflow, or both.
+
+#### Dynamic field values
+
+The `playbook`, `commit`, and `inventories_location` fields accept `{{ argname }}` placeholders that are substituted from the script's arguments before the repo is cloned and the playbook runs. This lets a flow pick the playbook, branch, or inventory at runtime:
+
+```yaml
+delegate_to_git_repo:
+  resource: u/user/git_repo_resource
+  playbook: "playbooks/{{ playbook_name }}.yml"
+  inventories_location: "inventories/{{ env }}.ini"
+  commit: "{{ git_sha }}"
+extra_vars:
+  playbook_name:
+    type: string
+  env:
+    type: string
+  git_sha:
+    type: string
+```
+
+Only string, number, and boolean argument values can be substituted. The path fields reject absolute paths and `..` segments to prevent escaping the cloned repo.
 
 ## Instant preview & testing
 
