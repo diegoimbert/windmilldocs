@@ -11,7 +11,9 @@ const CACHE_EXPIRATION = 24 * 60 * 60 * 1000;
 
 const formatWage = (wage) => {
   if (!wage) return wage;
-  return wage.replace(/([$€£¥])\s?(\d+(?:\.\d+)?)(?!\s?k)/gi, '$1$2k');
+  let formatted = wage.replace(/([$€£¥])\s?(\d+(?:\.\d+)?)(?![\d.kK])/g, '$1$2K');
+  formatted = formatted.replace(/\/\s*monthly/i, '/ month');
+  return formatted;
 };
 
 export default function Careers() {
