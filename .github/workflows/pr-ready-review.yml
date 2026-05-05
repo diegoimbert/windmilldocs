@@ -96,6 +96,8 @@ jobs:
         run: |
           {
             echo 'REVIEW_PROMPT<<EOF'
+            cat REVIEW.md
+            echo ''
             cat .github/review-prompt-shared.md
             echo ''
             cat .claude/review-prompt.md

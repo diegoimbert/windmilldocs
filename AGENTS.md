@@ -8,8 +8,13 @@ Reusable, agent-agnostic skills live in `.agents/skills/<name>/SKILL.md`. Read t
 
 - `.agents/skills/doc-audits/` — cross-reference recent `feat:`/`fix:` commits in `../windmill` against this repo to find documentation gaps.
 - `.agents/skills/pricing-feature-audit/` — audit `src/components/pricing/FeatureList.js` for missing or wrongly-tier-flagged EE / Cloud / Team features.
+- `.agents/skills/local-review/` — run the same review locally that the CI auto-reviewers run on PRs (see `REVIEW.md` for the policy).
 
-Claude Code also auto-discovers these as slash commands via `.claude/skills/`.
+Claude Code auto-discovers these as slash commands via `.claude/skills/<name>`, which are symlinks to `.agents/skills/<name>` so there is exactly one copy of each skill.
+
+## Reviewing changes
+
+The canonical review policy lives in `REVIEW.md` (root). It applies equally to local reviews (via the `local-review` skill) and to the CI auto-reviewers (Claude / Codex / Pi), which concatenate `REVIEW.md` with CI-only addenda from `.github/review-prompt-shared.md`.
 
 ## Content
 
