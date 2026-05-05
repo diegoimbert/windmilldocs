@@ -2,6 +2,15 @@
 
 These guidelines ensure consistency and quality when writing or modifying Windmill documentation.
 
+## Skills
+
+Reusable, agent-agnostic skills live in `.agents/skills/<name>/SKILL.md`. Read the relevant skill before starting one of these tasks:
+
+- `.agents/skills/doc-audits/` — cross-reference recent `feat:`/`fix:` commits in `../windmill` against this repo to find documentation gaps.
+- `.agents/skills/pricing-feature-audit/` — audit `src/components/pricing/FeatureList.js` for missing or wrongly-tier-flagged EE / Cloud / Team features.
+
+Claude Code also auto-discovers these as slash commands via `.claude/skills/`.
+
 ## Content
 
 - The doc should focus on the user experience, not on the engineering behind it, unless it's important (e.g. feature related to performance)
@@ -112,3 +121,15 @@ Every non-doc page should include a `<script type="application/ld+json">` block 
 - Use absolute URLs (`https://www.windmill.dev/...`) in all schema fields
 - Keep a plain-text version of any rich/JSX content for schema fields (e.g. `textAnswer` for FAQs)
 - The Organization schema on the homepage (`src/pages/index.js`) is the canonical source for company-level structured data
+
+## Before pushing a PR
+
+Always run `npm run build` locally before pushing. It catches broken internal
+links, broken anchors, invalid MDX, and missing files referenced from
+`sidebars.js` — all of which will block the CI `npm check` workflow.
+
+```bash
+npm run build
+```
+
+Fix any errors (and ideally any warnings in files you changed) before pushing.
