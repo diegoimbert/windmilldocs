@@ -137,6 +137,14 @@ In your Ducklake settings, clicking the "Explore" button will open the database 
 
 ![Explore ducklake](./ducklake_images/ducklake_db_manager.png 'Explore ducklake')
 
+## Performance: Ducklake vs Snowflake
+
+import TpcDsBenchmarkSection from '@site/src/components/TpcDsBenchmarkSection.mdx';
+
+Most workloads under 1 TB do not need a managed data warehouse. Ducklake on a single-node DuckDB engine runs analytical queries at a fraction of the cost of Snowflake while keeping your data in your own S3 bucket.
+
+<TpcDsBenchmarkSection />
+
 ## What Ducklake does behind the scenes
 
 If you explore your catalog database, you will see that Ducklake created some tables for you. These metadata tables store information about your data and where it is located in S3 :

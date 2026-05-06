@@ -303,152 +303,26 @@ You can also schedule pipelines with [cron triggers](/docs/core_concepts/schedul
 
 ## Benchmark: Windmill + Ducklake vs Airflow + Snowflake
 
-import PipelineBenchmarkChart, {
-	PipelineStepComparison
-} from '@site/src/components/PipelineBenchmarkChart';
+import TpcDsBenchmarkSection from '@site/src/components/TpcDsBenchmarkSection.mdx';
 
-To put numbers behind the architecture, we ran the same data pipeline on both stacks and measured wall-clock time. Both pipelines start from the same pre-ingested ~3 million row dataset ([NYC Yellow Taxi trips, January 2024](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page)) and run 5 identical transformation and validation steps.
+Most startups don't need a terabyte-scale data warehouse. If your data fits in 10 GB to 1 TB, you can run analytical workloads on Ducklake at a fraction of the cost of Airflow + Snowflake while keeping full control over your data.
 
-### Pipeline steps
+<TpcDsBenchmarkSection />
 
-| Step | Name              | What it does                                                                                                         |
-| ---- | ----------------- | -------------------------------------------------------------------------------------------------------------------- |
-| 1    | Clean             | Filter out invalid rows (zero passengers, negative fares, zero-distance trips, missing location IDs) → `clean_trips` |
-| 2    | Enrich            | Add computed columns: trip duration, speed, time-of-day bucket, weekend flag → `enriched_trips`                      |
-| 3    | Aggregate hourly  | Group by hour of day → `hourly_stats` (24 rows)                                                                      |
-| 4    | Aggregate by zone | Group by pickup location → `zone_stats`                                                                              |
-| 5    | Finalize          | Verify row counts across all tables                                                                                  |
+### The real comparison: data sovereignty
 
-The transformations are semantically identical — same filters, same formulas, same output schemas.
+Beyond raw performance, consider what you give up with Airflow + Snowflake:
 
-### How each side works
+|                        | Windmill + Ducklake         | Airflow + Snowflake            |
+| ---------------------- | --------------------------- | ------------------------------ |
+| **Data location**      | Your S3 bucket              | Snowflake-managed storage      |
+| **Compute location**   | Your infrastructure         | Snowflake-managed clusters     |
+| **Data format**        | Open Parquet files          | Proprietary                    |
+| **Query visibility**   | Full control                | Runs on third-party infra      |
+| **Exit cost**          | None (standard Parquet)     | Data export fees               |
+| **Orchestration**      | Built-in, no extra cost     | Separate service ($100–500/mo) |
 
-**Windmill + Ducklake** runs as a Windmill flow (TypeScript + native DuckDB SQL steps). Each step is a DuckDB SQL script that attaches to Ducklake and creates each table in sequence. All compute and storage stays on your infrastructure — a single worker container (2 CPUs, 4 GB RAM) + PostgreSQL for Windmill metadata. No data leaves your environment.
-
-**Airflow + Snowflake** runs as an Airflow DAG (Python `@task` functions using `SnowflakeHook`). Each step sends SQL to a remote Snowflake MEDIUM warehouse. Compute is externalized to a third-party cloud service: every query travels over the network to Snowflake's infrastructure, where it is processed outside your control. This adds per-query compute costs (Snowflake bills by the second of warehouse uptime) and raises sovereignty concerns over the compute layer — your queries and intermediate results are executed on infrastructure you do not own.
-
-### Results
-
-export const windmillRun = {
-	platform: 'windmill_ducklake',
-	label: 'Windmill + Ducklake',
-	color: 'rgba(59, 130, 246, 1)',
-	total_wall_clock_seconds: 9.981,
-	steps: [
-		{
-			name: 'clean',
-			queue_seconds: 0.003,
-			execution_seconds: 4.189,
-			started_at_relative: 0.0,
-			completed_at_relative: 4.189
-		},
-		{
-			name: 'enrich',
-			queue_seconds: 0.006,
-			execution_seconds: 1.907,
-			started_at_relative: 4.203,
-			completed_at_relative: 6.11
-		},
-		{
-			name: 'aggregate_hourly',
-			queue_seconds: 0.004,
-			execution_seconds: 1.08,
-			started_at_relative: 6.121,
-			completed_at_relative: 7.201
-		},
-		{
-			name: 'aggregate_by_zone',
-			queue_seconds: 0.007,
-			execution_seconds: 0.901,
-			started_at_relative: 7.282,
-			completed_at_relative: 8.183
-		},
-		{
-			name: 'finalize',
-			queue_seconds: 0.002,
-			execution_seconds: 1.788,
-			started_at_relative: 8.193,
-			completed_at_relative: 9.981
-		}
-	]
-};
-
-export const airflowRun = {
-	platform: 'airflow_snowflake',
-	label: 'Airflow + Snowflake',
-	color: 'rgba(239, 68, 68, 1)',
-	total_wall_clock_seconds: 14.736,
-	steps: [
-		{
-			name: 'clean',
-			queue_seconds: 0.119,
-			execution_seconds: 4.351,
-			started_at_relative: 0.0,
-			completed_at_relative: 4.351
-		},
-		{
-			name: 'enrich',
-			queue_seconds: 0.18,
-			execution_seconds: 3.502,
-			started_at_relative: 5.094,
-			completed_at_relative: 8.596
-		},
-		{
-			name: 'aggregate_hourly',
-			queue_seconds: 0.113,
-			execution_seconds: 1.452,
-			started_at_relative: 9.163,
-			completed_at_relative: 10.615
-		},
-		{
-			name: 'aggregate_by_zone',
-			queue_seconds: 0.154,
-			execution_seconds: 1.493,
-			started_at_relative: 11.137,
-			completed_at_relative: 12.631
-		},
-		{
-			name: 'finalize',
-			queue_seconds: 0.153,
-			execution_seconds: 1.531,
-			started_at_relative: 13.204,
-			completed_at_relative: 14.736
-		}
-	]
-};
-
-Windmill + Ducklake completed the pipeline in **9.98 s** — 1.5× faster than Airflow + Snowflake at **14.74 s**.
-
-<PipelineBenchmarkChart
-	runs={[windmillRun, airflowRun]}
-	title="Total pipeline execution time"
-	xAxisLabel="Duration (seconds)"
-/>
-
-<br />
-
-The per-step breakdown shows where the difference comes from:
-
-<PipelineStepComparison
-	runs={[windmillRun, airflowRun]}
-	title="Per-step execution time"
-	xAxisLabel="Duration (seconds)"
-/>
-
-<br />
-
-| Step              | Windmill + Ducklake | Airflow + Snowflake |  Speedup |
-| ----------------- | ------------------: | ------------------: | -------: |
-| Clean             |              4.19 s |              4.35 s |    1.04× |
-| Enrich            |              1.91 s |              3.50 s |     1.8× |
-| Aggregate hourly  |              1.08 s |              1.45 s |     1.3× |
-| Aggregate by zone |              0.90 s |              1.49 s |     1.7× |
-| Finalize          |              1.79 s |              1.53 s |    0.86× |
-| **Total**         |          **9.98 s** |         **14.74 s** | **1.5×** |
-
-:::note
-This benchmark was run on a single node with 24 GB of RAM. Results may vary depending on node compute speed and S3 connectivity speed.
-:::
+With Ducklake, your data never leaves your environment. Queries execute on your nodes, against Parquet files in your S3 bucket. No vendor lock-in, no data egress fees, no loss of control.
 
 ## What's next
 

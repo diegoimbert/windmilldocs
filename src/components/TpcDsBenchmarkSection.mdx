@@ -1,0 +1,105 @@
+import TpcDsBenchmark, {
+	SF10_CONFIGS,
+	SF100_CONFIGS,
+	SF1000_CONFIGS,
+	AIRFLOW_PANDAS_SF10_CONFIGS
+} from '@site/src/components/TpcDsBenchmark';
+
+We ran the [TPC-DS](https://www.tpc.org/tpcds/) benchmark at three scale factors (10 GB, 100 GB, 1 TB) to compare Windmill + Ducklake against Airflow + Snowflake, the most common open-source orchestrator paired with a managed data warehouse.
+
+### Why TPC-DS?
+
+TPC-DS simulates a retail company's data warehouse, which mirrors a real ETL pipeline. The benchmark runs 52 tasks organized in 5 stages:
+
+| Stage | Tasks | What it does |
+| ----- | ----: | ------------ |
+| Ingest | 24 | Load raw data from 24 source tables (sales, returns, inventory, customers, products...) |
+| Validate | 8 | Check referential integrity and data quality across fact and dimension tables |
+| Denormalize | 3 | Join fact tables with dimensions to create analytics-ready tables |
+| Aggregate | 6 | Compute business metrics: daily sales, customer LTV, return rates, channel comparison... |
+| Query | 10 | Run 10 analytical queries (TPC-DS queries 3, 7, 19, 27, 34, 43, 46, 53, 67, 79) |
+
+### Pricing assumptions
+
+- Airflow + Snowflake: Snowflake Standard tier at $2/credit. Enterprise is $3-4/credit, Business Critical is $4-5/credit. Airflow orchestration cost excluded (adds $100-500/month for managed Airflow).
+- AWS EC2: On-demand pricing in us-east-1
+
+| Snowflake Warehouse | Credits/hour | $/hour |
+| ------------------- | -----------: | -----: |
+| Small               |            2 |     $4 |
+| Large               |            8 |    $16 |
+
+| AWS Instance   | vCPUs | Memory | $/hour |
+| -------------- | ----: | -----: | -----: |
+| m6i.4xlarge    |    16 |  64 GB |  $0.77 |
+| m6a.8xlarge    |    32 | 128 GB |  $1.38 |
+| m6a.16xlarge   |    64 | 256 GB |  $2.76 |
+| r6a.8xlarge    |    32 | 256 GB |  $1.81 |
+
+### SF10: 10 GB dataset
+
+At 10 GB, Windmill matches Snowflake's speed while costing 2-2.5x less.
+
+<TpcDsBenchmark
+	title="TPC-DS SF10 (10 GB)"
+	configs={SF10_CONFIGS}
+	datasetSize="10 GB"
+/>
+
+<br />
+
+With 2x m6a.8xlarge nodes, Windmill completes the benchmark in 67 seconds, 21% faster than Snowflake Small (85s). At comparable speed (2x m6i.4xlarge), Windmill costs $0.04 vs Snowflake's $0.10.
+
+### SF100: 100 GB dataset
+
+At 100 GB, the cost advantage becomes more significant. Windmill runs at 3x lower cost while delivering competitive performance.
+
+<TpcDsBenchmark
+	title="TPC-DS SF100 (100 GB)"
+	configs={SF100_CONFIGS}
+	datasetSize="100 GB"
+/>
+
+<br />
+
+Key findings:
+- Windmill 3x m6a.16xlarge (157s, $0.36) is 19% faster than Snowflake Large (194s, $0.86) while costing 2.4x less
+- Windmill 3x m6a.8xlarge (261s, $0.30) is 35% slower than Snowflake Large but costs 2.9x less
+- Windmill 1x m6a.16xlarge (391s, $0.30) runs 1.8x faster than Snowflake Small (711s, $0.79)
+- Per dollar spent, Windmill delivers 2.7x more throughput than Snowflake Small
+
+### SF1000: 1 TB dataset
+
+At terabyte scale, Snowflake's distributed architecture shows its strength. However, Windmill remains cost-competitive.
+
+<TpcDsBenchmark
+	title="TPC-DS SF1000 (1 TB)"
+	configs={SF1000_CONFIGS}
+	datasetSize="1 TB"
+/>
+
+<br />
+
+Snowflake Large completes in 28 minutes vs Windmill's 70 minutes, but Windmill still costs 15% less ($6.35 vs $7.43). If you're processing terabyte-scale data daily, Snowflake's performance advantage matters. For occasional large queries, Windmill's cost savings may be worth the extra time.
+
+:::note
+Benchmarks ran on AWS us-east-1. Snowflake pricing uses Standard tier ($2/credit). Enterprise and Business Critical tiers cost 50-150% more, making Windmill's cost advantage even greater. Airflow orchestration costs (managed Airflow or self-hosted) add to the total cost of ownership.
+:::
+
+### Why not Airflow + Pandas?
+
+Some teams try to avoid data warehouse costs by running Pandas locally. This approach breaks down quickly. We ran the same TPC-DS benchmark with Airflow + Pandas on a powerful local machine (AMD Ryzen 9 9955HX, 64 GB RAM).
+
+<TpcDsBenchmark
+	title="TPC-DS SF10 (10 GB): Pandas vs Ducklake"
+	configs={AIRFLOW_PANDAS_SF10_CONFIGS}
+	showCostTable={false}
+/>
+
+<br />
+
+At just 10 GB, Airflow + Pandas takes 47 minutes compared to Windmill's 67 seconds, a 42x slowdown. The Pandas run required limiting concurrency to 1 task at a time to avoid out-of-memory crashes. Even with 64 GB of RAM, Pandas loaded the store_sales DataFrame at ~25 GB due to decimal type overhead, forcing heavy swap usage.
+
+Beyond 10 GB, Pandas becomes unusable. Memory consumption grows linearly with data size, but performance degrades exponentially as the system swaps to disk. At 100 GB, you would need 500+ GB of RAM to avoid swapping, and even then you are still limited to single-threaded execution on one machine.
+
+Ducklake avoids these problems entirely. DuckDB processes data in streaming chunks, uses columnar Parquet compression, and parallelizes across all available cores. The data stays on S3, not in RAM.

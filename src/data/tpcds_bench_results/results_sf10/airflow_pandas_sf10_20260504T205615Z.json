@@ -1,0 +1,480 @@
+{
+  "competitor": "airflow",
+  "timestamp": "2026-05-04T20:56:15+00:00",
+  "tasks": [
+    {
+      "id": "ingest_catalog_sales",
+      "stage": "ingest",
+      "queued_at": 293.559,
+      "started_at": 294.553,
+      "completed_at": 475.656,
+      "queue_time_s": 0.994,
+      "execution_time_s": 181.103
+    },
+    {
+      "id": "ingest_store_returns",
+      "stage": "ingest",
+      "queued_at": 565.726,
+      "started_at": 566.055,
+      "completed_at": 587.216,
+      "queue_time_s": 0.329,
+      "execution_time_s": 21.161
+    },
+    {
+      "id": "ingest_store_sales",
+      "stage": "ingest",
+      "queued_at": 14.538,
+      "started_at": 14.883,
+      "completed_at": 292.85,
+      "queue_time_s": 0.344,
+      "execution_time_s": 277.967
+    },
+    {
+      "id": "ingest_web_returns",
+      "stage": "ingest",
+      "queued_at": 587.987,
+      "started_at": 588.311,
+      "completed_at": 594.086,
+      "queue_time_s": 0.324,
+      "execution_time_s": 5.776
+    },
+    {
+      "id": "ingest_web_sales",
+      "stage": "ingest",
+      "queued_at": 475.98,
+      "started_at": 476.313,
+      "completed_at": 565.455,
+      "queue_time_s": 0.333,
+      "execution_time_s": 89.143
+    },
+    {
+      "id": "query_q34",
+      "stage": "query",
+      "queued_at": 2383.444,
+      "started_at": 2384.619,
+      "completed_at": 2459.126,
+      "queue_time_s": 1.175,
+      "execution_time_s": 74.507
+    },
+    {
+      "id": "ingest_inventory",
+      "stage": "ingest",
+      "queued_at": 594.359,
+      "started_at": 594.679,
+      "completed_at": 600.166,
+      "queue_time_s": 0.32,
+      "execution_time_s": 5.487
+    },
+    {
+      "id": "agg_monthly_category",
+      "stage": "aggregate",
+      "queued_at": 1111.697,
+      "started_at": 1112.304,
+      "completed_at": 1131.673,
+      "queue_time_s": 0.608,
+      "execution_time_s": 19.369
+    },
+    {
+      "id": "query_q27",
+      "stage": "query",
+      "queued_at": 2459.708,
+      "started_at": 2460.035,
+      "completed_at": 2533.828,
+      "queue_time_s": 0.327,
+      "execution_time_s": 73.794
+    },
+    {
+      "id": "agg_customer_ltv",
+      "stage": "aggregate",
+      "queued_at": 1235.028,
+      "started_at": 1235.989,
+      "completed_at": 1379.855,
+      "queue_time_s": 0.962,
+      "execution_time_s": 143.866
+    },
+    {
+      "id": "query_q43",
+      "stage": "query",
+      "queued_at": 2533.853,
+      "started_at": 2534.84,
+      "completed_at": 2607.82,
+      "queue_time_s": 0.987,
+      "execution_time_s": 72.98
+    },
+    {
+      "id": "validate_store_sales",
+      "stage": "validate",
+      "queued_at": 601.235,
+      "started_at": 601.567,
+      "completed_at": 677.312,
+      "queue_time_s": 0.332,
+      "execution_time_s": 75.745
+    },
+    {
+      "id": "validate_catalog_sales",
+      "stage": "validate",
+      "queued_at": 677.743,
+      "started_at": 678.061,
+      "completed_at": 727.686,
+      "queue_time_s": 0.318,
+      "execution_time_s": 49.625
+    },
+    {
+      "id": "validate_web_sales",
+      "stage": "validate",
+      "queued_at": 728.196,
+      "started_at": 728.526,
+      "completed_at": 753.65,
+      "queue_time_s": 0.33,
+      "execution_time_s": 25.124
+    },
+    {
+      "id": "validate_store_returns",
+      "stage": "validate",
+      "queued_at": 754.063,
+      "started_at": 754.388,
+      "completed_at": 760.029,
+      "queue_time_s": 0.325,
+      "execution_time_s": 5.641
+    },
+    {
+      "id": "validate_catalog_returns",
+      "stage": "validate",
+      "queued_at": 760.846,
+      "started_at": 761.167,
+      "completed_at": 764.248,
+      "queue_time_s": 0.321,
+      "execution_time_s": 3.08
+    },
+    {
+      "id": "validate_web_returns",
+      "stage": "validate",
+      "queued_at": 765.143,
+      "started_at": 765.474,
+      "completed_at": 767.127,
+      "queue_time_s": 0.331,
+      "execution_time_s": 1.653
+    },
+    {
+      "id": "ingest_warehouse",
+      "stage": "ingest",
+      "queued_at": 0.0,
+      "started_at": 1.402,
+      "completed_at": 2.549,
+      "queue_time_s": 1.402,
+      "execution_time_s": 1.147
+    },
+    {
+      "id": "ingest_catalog_page",
+      "stage": "ingest",
+      "queued_at": 0.0,
+      "started_at": 1.41,
+      "completed_at": 2.579,
+      "queue_time_s": 1.41,
+      "execution_time_s": 1.169
+    },
+    {
+      "id": "ingest_promotion",
+      "stage": "ingest",
+      "queued_at": 0.0,
+      "started_at": 1.403,
+      "completed_at": 2.63,
+      "queue_time_s": 1.403,
+      "execution_time_s": 1.228
+    },
+    {
+      "id": "ingest_time_dim",
+      "stage": "ingest",
+      "queued_at": 0.0,
+      "started_at": 1.411,
+      "completed_at": 2.853,
+      "queue_time_s": 1.411,
+      "execution_time_s": 1.443
+    },
+    {
+      "id": "query_q46",
+      "stage": "query",
+      "queued_at": 1857.039,
+      "started_at": 1858.047,
+      "completed_at": 1930.151,
+      "queue_time_s": 1.008,
+      "execution_time_s": 72.105
+    },
+    {
+      "id": "query_q07",
+      "stage": "query",
+      "queued_at": 2003.551,
+      "started_at": 2003.867,
+      "completed_at": 2075.854,
+      "queue_time_s": 0.316,
+      "execution_time_s": 71.986
+    },
+    {
+      "id": "verify",
+      "stage": "verify",
+      "queued_at": 2682.639,
+      "started_at": 2682.961,
+      "completed_at": 2813.817,
+      "queue_time_s": 0.322,
+      "execution_time_s": 130.856
+    },
+    {
+      "id": "validate_dimensions",
+      "stage": "validate",
+      "queued_at": 601.235,
+      "started_at": 602.141,
+      "completed_at": 604.573,
+      "queue_time_s": 0.906,
+      "execution_time_s": 2.432
+    },
+    {
+      "id": "validate_inventory",
+      "stage": "validate",
+      "queued_at": 767.515,
+      "started_at": 767.841,
+      "completed_at": 769.025,
+      "queue_time_s": 0.326,
+      "execution_time_s": 1.184
+    },
+    {
+      "id": "ingest_date_dim",
+      "stage": "ingest",
+      "queued_at": 0.167,
+      "started_at": 1.613,
+      "completed_at": 3.36,
+      "queue_time_s": 1.446,
+      "execution_time_s": 1.747
+    },
+    {
+      "id": "denorm_store_sales",
+      "stage": "denormalize",
+      "queued_at": 769.682,
+      "started_at": 769.996,
+      "completed_at": 936.717,
+      "queue_time_s": 0.314,
+      "execution_time_s": 166.721
+    },
+    {
+      "id": "denorm_catalog_sales",
+      "stage": "denormalize",
+      "queued_at": 937.232,
+      "started_at": 937.669,
+      "completed_at": 1037.794,
+      "queue_time_s": 0.436,
+      "execution_time_s": 100.125
+    },
+    {
+      "id": "denorm_web_sales",
+      "stage": "denormalize",
+      "queued_at": 1038.127,
+      "started_at": 1038.45,
+      "completed_at": 1092.64,
+      "queue_time_s": 0.322,
+      "execution_time_s": 54.19
+    },
+    {
+      "id": "agg_daily_store",
+      "stage": "aggregate",
+      "queued_at": 1093.023,
+      "started_at": 1093.353,
+      "completed_at": 1111.587,
+      "queue_time_s": 0.329,
+      "execution_time_s": 18.234
+    },
+    {
+      "id": "agg_promo_roi",
+      "stage": "aggregate",
+      "queued_at": 1131.929,
+      "started_at": 1132.242,
+      "completed_at": 1154.584,
+      "queue_time_s": 0.313,
+      "execution_time_s": 22.342
+    },
+    {
+      "id": "agg_return_rate",
+      "stage": "aggregate",
+      "queued_at": 1154.716,
+      "started_at": 1155.067,
+      "completed_at": 1234.905,
+      "queue_time_s": 0.351,
+      "execution_time_s": 79.838
+    },
+    {
+      "id": "agg_channel_comparison",
+      "stage": "aggregate",
+      "queued_at": 1380.048,
+      "started_at": 1380.721,
+      "completed_at": 1525.745,
+      "queue_time_s": 0.673,
+      "execution_time_s": 145.025
+    },
+    {
+      "id": "query_q03",
+      "stage": "query",
+      "queued_at": 1930.805,
+      "started_at": 1931.137,
+      "completed_at": 2003.004,
+      "queue_time_s": 0.332,
+      "execution_time_s": 71.867
+    },
+    {
+      "id": "query_q53",
+      "stage": "query",
+      "queued_at": 2076.282,
+      "started_at": 2076.613,
+      "completed_at": 2148.165,
+      "queue_time_s": 0.331,
+      "execution_time_s": 71.552
+    },
+    {
+      "id": "query_q79",
+      "stage": "query",
+      "queued_at": 2245.729,
+      "started_at": 2246.982,
+      "completed_at": 2324.93,
+      "queue_time_s": 1.253,
+      "execution_time_s": 77.948
+    },
+    {
+      "id": "query_q67",
+      "stage": "query",
+      "queued_at": 2148.546,
+      "started_at": 2148.871,
+      "completed_at": 2244.836,
+      "queue_time_s": 0.325,
+      "execution_time_s": 95.965
+    },
+    {
+      "id": "ingest_household_demographics",
+      "stage": "ingest",
+      "queued_at": 0.0,
+      "started_at": 0.341,
+      "completed_at": 0.702,
+      "queue_time_s": 0.341,
+      "execution_time_s": 0.361
+    },
+    {
+      "id": "ingest_income_band",
+      "stage": "ingest",
+      "queued_at": 0.167,
+      "started_at": 1.584,
+      "completed_at": 3.167,
+      "queue_time_s": 1.417,
+      "execution_time_s": 1.583
+    },
+    {
+      "id": "ingest_call_center",
+      "stage": "ingest",
+      "queued_at": 0.167,
+      "started_at": 1.613,
+      "completed_at": 3.248,
+      "queue_time_s": 1.446,
+      "execution_time_s": 1.635
+    },
+    {
+      "id": "ingest_store",
+      "stage": "ingest",
+      "queued_at": 0.167,
+      "started_at": 1.621,
+      "completed_at": 3.277,
+      "queue_time_s": 1.454,
+      "execution_time_s": 1.656
+    },
+    {
+      "id": "ingest_web_page",
+      "stage": "ingest",
+      "queued_at": 0.167,
+      "started_at": 1.624,
+      "completed_at": 3.286,
+      "queue_time_s": 1.457,
+      "execution_time_s": 1.661
+    },
+    {
+      "id": "ingest_web_site",
+      "stage": "ingest",
+      "queued_at": 0.167,
+      "started_at": 1.627,
+      "completed_at": 3.324,
+      "queue_time_s": 1.46,
+      "execution_time_s": 1.697
+    },
+    {
+      "id": "ingest_item",
+      "stage": "ingest",
+      "queued_at": 0.0,
+      "started_at": 1.398,
+      "completed_at": 3.507,
+      "queue_time_s": 1.398,
+      "execution_time_s": 2.109
+    },
+    {
+      "id": "ingest_reason",
+      "stage": "ingest",
+      "queued_at": 0.768,
+      "started_at": 1.355,
+      "completed_at": 1.733,
+      "queue_time_s": 0.587,
+      "execution_time_s": 0.378
+    },
+    {
+      "id": "ingest_customer_demographics",
+      "stage": "ingest",
+      "queued_at": 0.0,
+      "started_at": 1.415,
+      "completed_at": 3.545,
+      "queue_time_s": 1.415,
+      "execution_time_s": 2.13
+    },
+    {
+      "id": "ingest_customer",
+      "stage": "ingest",
+      "queued_at": 0.0,
+      "started_at": 1.409,
+      "completed_at": 3.687,
+      "queue_time_s": 1.409,
+      "execution_time_s": 2.278
+    },
+    {
+      "id": "ingest_catalog_returns",
+      "stage": "ingest",
+      "queued_at": 0.0,
+      "started_at": 1.338,
+      "completed_at": 14.139,
+      "queue_time_s": 1.338,
+      "execution_time_s": 12.801
+    },
+    {
+      "id": "ingest_customer_address",
+      "stage": "ingest",
+      "queued_at": 0.0,
+      "started_at": 1.183,
+      "completed_at": 3.251,
+      "queue_time_s": 1.183,
+      "execution_time_s": 2.068
+    },
+    {
+      "id": "ingest_ship_mode",
+      "stage": "ingest",
+      "queued_at": 1.843,
+      "started_at": 2.45,
+      "completed_at": 3.515,
+      "queue_time_s": 0.607,
+      "execution_time_s": 1.064
+    },
+    {
+      "id": "query_q19",
+      "stage": "query",
+      "queued_at": 2608.617,
+      "started_at": 2609.439,
+      "completed_at": 2681.396,
+      "queue_time_s": 0.822,
+      "execution_time_s": 71.956
+    }
+  ],
+  "total_wall_clock_s": 2813.817,
+  "notes": "SF10 local run on 32-vCPU/60GiB host. Worker container limited to 8 CPU / 56 GiB. Heavy fact ingest+validate+denorm+aggregate were pooled at 1 concurrent slot due to OOM (pandas Decimals make store_sales DataFrame ~25 GiB). Queries run in 10-task fan-out but pooled at 1 after a first attempt with pool=2 OOM-killed q19/q27/q34/q43; those were cleared and re-ran successfully. total_wall_clock_s spans earliest queued to latest end across all task instances (includes the 4 failed attempts).",
+  "scale_factor": 10,
+  "runner": "airflow_pandas",
+  "dag_id": "tpcds_etl_pandas",
+  "run_id": "manual_20260504T200906Z"
+}

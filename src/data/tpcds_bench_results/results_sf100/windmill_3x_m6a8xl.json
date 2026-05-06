@@ -1,0 +1,475 @@
+{
+  "competitor": "windmill",
+  "timestamp": "2026-04-13T19:30:34+00:00",
+  "tasks": [
+    {
+      "id": "ingest_store_sales",
+      "stage": "ingest",
+      "queued_at": 0.052,
+      "started_at": 0.052,
+      "completed_at": 39.62,
+      "queue_time_s": 0.0,
+      "execution_time_s": 39.568
+    },
+    {
+      "id": "ingest_catalog_sales",
+      "stage": "ingest",
+      "queued_at": 0.057,
+      "started_at": 0.057,
+      "completed_at": 34.618,
+      "queue_time_s": 0.0,
+      "execution_time_s": 34.561
+    },
+    {
+      "id": "ingest_web_sales",
+      "stage": "ingest",
+      "queued_at": 0.063,
+      "started_at": 0.063,
+      "completed_at": 13.218,
+      "queue_time_s": 0.0,
+      "execution_time_s": 13.155
+    },
+    {
+      "id": "ingest_store_returns",
+      "stage": "ingest",
+      "queued_at": 0.069,
+      "started_at": 13.218,
+      "completed_at": 24.519,
+      "queue_time_s": 13.149,
+      "execution_time_s": 11.301
+    },
+    {
+      "id": "ingest_catalog_returns",
+      "stage": "ingest",
+      "queued_at": 0.074,
+      "started_at": 24.519,
+      "completed_at": 32.673,
+      "queue_time_s": 24.445,
+      "execution_time_s": 8.154
+    },
+    {
+      "id": "ingest_web_returns",
+      "stage": "ingest",
+      "queued_at": 0.079,
+      "started_at": 32.673,
+      "completed_at": 40.311,
+      "queue_time_s": 32.594,
+      "execution_time_s": 7.638
+    },
+    {
+      "id": "ingest_inventory",
+      "stage": "ingest",
+      "queued_at": 0.084,
+      "started_at": 34.618,
+      "completed_at": 50.876,
+      "queue_time_s": 34.534,
+      "execution_time_s": 16.258
+    },
+    {
+      "id": "ingest_customer",
+      "stage": "ingest",
+      "queued_at": 0.09,
+      "started_at": 39.62,
+      "completed_at": 41.814,
+      "queue_time_s": 39.53,
+      "execution_time_s": 2.194
+    },
+    {
+      "id": "ingest_customer_address",
+      "stage": "ingest",
+      "queued_at": 0.095,
+      "started_at": 40.311,
+      "completed_at": 41.409,
+      "queue_time_s": 40.216,
+      "execution_time_s": 1.098
+    },
+    {
+      "id": "ingest_customer_demographics",
+      "stage": "ingest",
+      "queued_at": 0.1,
+      "started_at": 41.409,
+      "completed_at": 41.97,
+      "queue_time_s": 41.309,
+      "execution_time_s": 0.561
+    },
+    {
+      "id": "ingest_household_demographics",
+      "stage": "ingest",
+      "queued_at": 0.105,
+      "started_at": 41.814,
+      "completed_at": 42.119,
+      "queue_time_s": 41.709,
+      "execution_time_s": 0.305
+    },
+    {
+      "id": "ingest_item",
+      "stage": "ingest",
+      "queued_at": 0.11,
+      "started_at": 41.97,
+      "completed_at": 44.355,
+      "queue_time_s": 41.86,
+      "execution_time_s": 2.385
+    },
+    {
+      "id": "ingest_store",
+      "stage": "ingest",
+      "queued_at": 0.115,
+      "started_at": 42.119,
+      "completed_at": 42.479,
+      "queue_time_s": 42.004,
+      "execution_time_s": 0.36
+    },
+    {
+      "id": "ingest_date_dim",
+      "stage": "ingest",
+      "queued_at": 0.12,
+      "started_at": 42.479,
+      "completed_at": 43.026,
+      "queue_time_s": 42.359,
+      "execution_time_s": 0.547
+    },
+    {
+      "id": "ingest_time_dim",
+      "stage": "ingest",
+      "queued_at": 0.125,
+      "started_at": 43.026,
+      "completed_at": 43.475,
+      "queue_time_s": 42.901,
+      "execution_time_s": 0.449
+    },
+    {
+      "id": "ingest_promotion",
+      "stage": "ingest",
+      "queued_at": 0.13,
+      "started_at": 43.475,
+      "completed_at": 43.865,
+      "queue_time_s": 43.345,
+      "execution_time_s": 0.39
+    },
+    {
+      "id": "ingest_warehouse",
+      "stage": "ingest",
+      "queued_at": 0.136,
+      "started_at": 43.865,
+      "completed_at": 44.136,
+      "queue_time_s": 43.729,
+      "execution_time_s": 0.271
+    },
+    {
+      "id": "ingest_catalog_page",
+      "stage": "ingest",
+      "queued_at": 0.142,
+      "started_at": 44.136,
+      "completed_at": 44.564,
+      "queue_time_s": 43.994,
+      "execution_time_s": 0.428
+    },
+    {
+      "id": "ingest_web_page",
+      "stage": "ingest",
+      "queued_at": 0.147,
+      "started_at": 44.355,
+      "completed_at": 44.68,
+      "queue_time_s": 44.208,
+      "execution_time_s": 0.325
+    },
+    {
+      "id": "ingest_web_site",
+      "stage": "ingest",
+      "queued_at": 0.152,
+      "started_at": 44.564,
+      "completed_at": 44.9,
+      "queue_time_s": 44.412,
+      "execution_time_s": 0.336
+    },
+    {
+      "id": "ingest_call_center",
+      "stage": "ingest",
+      "queued_at": 0.157,
+      "started_at": 44.68,
+      "completed_at": 44.951,
+      "queue_time_s": 44.523,
+      "execution_time_s": 0.271
+    },
+    {
+      "id": "ingest_income_band",
+      "stage": "ingest",
+      "queued_at": 0.163,
+      "started_at": 44.9,
+      "completed_at": 45.282,
+      "queue_time_s": 44.737,
+      "execution_time_s": 0.382
+    },
+    {
+      "id": "ingest_reason",
+      "stage": "ingest",
+      "queued_at": 0.168,
+      "started_at": 44.951,
+      "completed_at": 45.232,
+      "queue_time_s": 44.783,
+      "execution_time_s": 0.281
+    },
+    {
+      "id": "ingest_ship_mode",
+      "stage": "ingest",
+      "queued_at": 0.173,
+      "started_at": 45.232,
+      "completed_at": 45.467,
+      "queue_time_s": 45.059,
+      "execution_time_s": 0.235
+    },
+    {
+      "id": "validate_store_sales",
+      "stage": "validate",
+      "queued_at": 50.876,
+      "started_at": 50.876,
+      "completed_at": 74.143,
+      "queue_time_s": 0.0,
+      "execution_time_s": 23.267
+    },
+    {
+      "id": "validate_catalog_sales",
+      "stage": "validate",
+      "queued_at": 50.882,
+      "started_at": 50.882,
+      "completed_at": 64.849,
+      "queue_time_s": 0.0,
+      "execution_time_s": 13.967
+    },
+    {
+      "id": "validate_web_sales",
+      "stage": "validate",
+      "queued_at": 50.888,
+      "started_at": 50.888,
+      "completed_at": 57.735,
+      "queue_time_s": 0.0,
+      "execution_time_s": 6.847
+    },
+    {
+      "id": "validate_store_returns",
+      "stage": "validate",
+      "queued_at": 50.895,
+      "started_at": 57.735,
+      "completed_at": 60.173,
+      "queue_time_s": 6.84,
+      "execution_time_s": 2.438
+    },
+    {
+      "id": "validate_catalog_returns",
+      "stage": "validate",
+      "queued_at": 50.901,
+      "started_at": 60.173,
+      "completed_at": 61.753,
+      "queue_time_s": 9.272,
+      "execution_time_s": 1.58
+    },
+    {
+      "id": "validate_web_returns",
+      "stage": "validate",
+      "queued_at": 50.907,
+      "started_at": 61.753,
+      "completed_at": 62.972,
+      "queue_time_s": 10.846,
+      "execution_time_s": 1.219
+    },
+    {
+      "id": "validate_inventory",
+      "stage": "validate",
+      "queued_at": 50.913,
+      "started_at": 62.972,
+      "completed_at": 73.095,
+      "queue_time_s": 12.059,
+      "execution_time_s": 10.123
+    },
+    {
+      "id": "validate_dimensions",
+      "stage": "validate",
+      "queued_at": 50.919,
+      "started_at": 64.849,
+      "completed_at": 66.336,
+      "queue_time_s": 13.93,
+      "execution_time_s": 1.487
+    },
+    {
+      "id": "denorm_store_sales",
+      "stage": "denormalize",
+      "queued_at": 74.143,
+      "started_at": 74.143,
+      "completed_at": 153.593,
+      "queue_time_s": 0.0,
+      "execution_time_s": 79.45
+    },
+    {
+      "id": "denorm_catalog_sales",
+      "stage": "denormalize",
+      "queued_at": 74.149,
+      "started_at": 74.149,
+      "completed_at": 126.165,
+      "queue_time_s": 0.0,
+      "execution_time_s": 52.016
+    },
+    {
+      "id": "denorm_web_sales",
+      "stage": "denormalize",
+      "queued_at": 74.155,
+      "started_at": 74.155,
+      "completed_at": 101.877,
+      "queue_time_s": 0.0,
+      "execution_time_s": 27.722
+    },
+    {
+      "id": "agg_daily_store",
+      "stage": "aggregate",
+      "queued_at": 153.593,
+      "started_at": 153.593,
+      "completed_at": 185.987,
+      "queue_time_s": 0.0,
+      "execution_time_s": 32.394
+    },
+    {
+      "id": "agg_monthly_category",
+      "stage": "aggregate",
+      "queued_at": 153.601,
+      "started_at": 153.601,
+      "completed_at": 173.972,
+      "queue_time_s": 0.0,
+      "execution_time_s": 20.371
+    },
+    {
+      "id": "agg_customer_ltv",
+      "stage": "aggregate",
+      "queued_at": 153.608,
+      "started_at": 153.608,
+      "completed_at": 183.648,
+      "queue_time_s": 0.0,
+      "execution_time_s": 30.04
+    },
+    {
+      "id": "agg_channel_comparison",
+      "stage": "aggregate",
+      "queued_at": 153.616,
+      "started_at": 173.972,
+      "completed_at": 201.742,
+      "queue_time_s": 20.356,
+      "execution_time_s": 27.77
+    },
+    {
+      "id": "agg_promo_roi",
+      "stage": "aggregate",
+      "queued_at": 153.622,
+      "started_at": 183.648,
+      "completed_at": 209.625,
+      "queue_time_s": 30.026,
+      "execution_time_s": 25.977
+    },
+    {
+      "id": "agg_return_rate",
+      "stage": "aggregate",
+      "queued_at": 153.628,
+      "started_at": 185.987,
+      "completed_at": 197.265,
+      "queue_time_s": 32.359,
+      "execution_time_s": 11.278
+    },
+    {
+      "id": "q03",
+      "stage": "query",
+      "queued_at": 209.625,
+      "started_at": 209.625,
+      "completed_at": 217.618,
+      "queue_time_s": 0.0,
+      "execution_time_s": 7.993
+    },
+    {
+      "id": "q07",
+      "stage": "query",
+      "queued_at": 209.633,
+      "started_at": 209.633,
+      "completed_at": 225.775,
+      "queue_time_s": 0.0,
+      "execution_time_s": 16.142
+    },
+    {
+      "id": "q19",
+      "stage": "query",
+      "queued_at": 209.64,
+      "started_at": 209.64,
+      "completed_at": 221.79,
+      "queue_time_s": 0.0,
+      "execution_time_s": 12.15
+    },
+    {
+      "id": "q27",
+      "stage": "query",
+      "queued_at": 209.647,
+      "started_at": 217.618,
+      "completed_at": 233.674,
+      "queue_time_s": 7.971,
+      "execution_time_s": 16.056
+    },
+    {
+      "id": "q34",
+      "stage": "query",
+      "queued_at": 209.654,
+      "started_at": 221.79,
+      "completed_at": 233.043,
+      "queue_time_s": 12.136,
+      "execution_time_s": 11.253
+    },
+    {
+      "id": "q43",
+      "stage": "query",
+      "queued_at": 209.66,
+      "started_at": 225.775,
+      "completed_at": 232.497,
+      "queue_time_s": 16.115,
+      "execution_time_s": 6.722
+    },
+    {
+      "id": "q46",
+      "stage": "query",
+      "queued_at": 209.666,
+      "started_at": 232.497,
+      "completed_at": 249.728,
+      "queue_time_s": 22.831,
+      "execution_time_s": 17.231
+    },
+    {
+      "id": "q53",
+      "stage": "query",
+      "queued_at": 209.672,
+      "started_at": 233.043,
+      "completed_at": 242.179,
+      "queue_time_s": 23.371,
+      "execution_time_s": 9.136
+    },
+    {
+      "id": "q67",
+      "stage": "query",
+      "queued_at": 209.678,
+      "started_at": 233.674,
+      "completed_at": 260.921,
+      "queue_time_s": 23.996,
+      "execution_time_s": 27.247
+    },
+    {
+      "id": "q79",
+      "stage": "query",
+      "queued_at": 209.684,
+      "started_at": 242.179,
+      "completed_at": 259.373,
+      "queue_time_s": 32.495,
+      "execution_time_s": 17.194
+    },
+    {
+      "id": "stage_verify",
+      "stage": "unknown",
+      "queued_at": 260.921,
+      "started_at": 260.921,
+      "completed_at": 261.265,
+      "queue_time_s": 0.0,
+      "execution_time_s": 0.344
+    }
+  ],
+  "total_wall_clock_s": 261.265
+}
