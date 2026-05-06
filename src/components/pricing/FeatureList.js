@@ -351,7 +351,7 @@ export const sections = [
 				link: '/docs/misc/saml_and_scim'
 			},
 			{
-				name: 'External auth with JWT',
+				name: 'External auth with JWT (each token billed as 1/2 seat)',
 				tiers: {
 					'tier-free-selfhost': false,
 					'tier-enterprise-selfhost': true,

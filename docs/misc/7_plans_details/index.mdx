@@ -125,7 +125,7 @@ To adjust the number of seats, you can update your usage on the subscription pag
 Windmill employs lightweight [telemetry](#usage-checks) to automatically track and report the usage of memory and seats for your subscription. Even on self-hosted plans, telemetry associated to your license key is reported to Windmill.
 
 How the data is calculated:
-- Seats: number of users (1 developer, or 2 operators) who are active (from logging in to running or deploying a script) on the platform in the last 30 days, according to the [audit logs](../../core_concepts/14_audit_logs/index.mdx). User count is across all instances (dev, prod) but Windmill only counts once the same user.
+- Seats: number of users (1 developer, or 2 operators) who are active (from logging in to running or deploying a script) on the platform in the last 30 days, according to the [audit logs](../../core_concepts/14_audit_logs/index.mdx). Each [external JWT token](../../advanced/16_external_auth_with_jwt/index.mdx) used in the last 30 days also counts as 1/2 seat (same as an operator). User count is across all instances (dev, prod) but Windmill only counts once the same user.
 - Memory: we aggregate the limits of all production containers. Workers come in different sizes: small (1GB), standard (2GB), and large (> 2GB). For each [Compute Unit](pathname:///pricing#compute-units), you pay for, you get a quota of 2 worker-gb-month.
 
 Using a number of seats, workers, or memory greater than the terms of your subscription is technically possible, but if you do not adjust your subscription accordingly (via the [Customer Portal](#windmill-customer-portal)), we will ask you to take steps to correct this, with 3 options:
@@ -491,7 +491,7 @@ When minimal telemetry is disabled, the following is also collected:
 - job usage (language, total duration, count)
 
 How the data is calculated:
-- Seats: number of users (1 developer, or 2 operators) who are active (from logging in to running or deploying a script) on the platform in the last 30 days, according to the [audit logs](../../core_concepts/14_audit_logs/index.mdx). User count is across all instances (dev, prod) but Windmill only counts once the same user.
+- Seats: number of users (1 developer, or 2 operators) who are active (from logging in to running or deploying a script) on the platform in the last 30 days, according to the [audit logs](../../core_concepts/14_audit_logs/index.mdx). Each [external JWT token](../../advanced/16_external_auth_with_jwt/index.mdx) used in the last 30 days also counts as 1/2 seat (same as an operator). User count is across all instances (dev, prod) but Windmill only counts once the same user.
 - Memory: we aggregate the limits of all production containers. Workers come in different sizes: small (1GB), standard (2GB), and large (> 2GB). For each compute unit, you pay for, you get a quota of 2 worker-gb-month. [Non-prod instances](../../advanced/18_instance_settings/index.mdx#non-prod-instance) are not counted in the billing for computation usage. For development environments, a [dev license key](#license-keys) from the portal is an alternative to marking instances as non-prod manually.
 
 Using a number of seats, workers, or memory greater than the terms of your subscription is technically possible, but if you do not adjust your subscription accordingly (via the [Customer Portal](#windmill-customer-portal)), we will ask you to take steps to correct this, with 3 options:

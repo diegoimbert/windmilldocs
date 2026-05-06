@@ -358,7 +358,7 @@ You can adjust your subscription anytime via the [Customer Portal](#customer-por
 
 ### Seats
 
-A Seat is a user who is active on the platform. A regular user counts as one Seat, while an [operator](../../core_concepts/16_roles_and_permissions/index.mdx#operator) (who can only execute scripts, flows, and apps) counts as half a Seat. We only count active users, i.e. users who have logged in to the platform in the last 30 days according to the audit logs. Seats are counted across all instances (dev, prod) but Windmill only counts once the same user.
+A Seat is a user who is active on the platform. A regular user counts as one Seat, while an [operator](../../core_concepts/16_roles_and_permissions/index.mdx#operator) (who can only execute scripts, flows, and apps) counts as half a Seat. Each [external JWT token](../../advanced/16_external_auth_with_jwt/index.mdx) used in the last 30 days is also billed as half a Seat (same as an operator) — for seat counting, you can mix operators and external JWT tokens freely (e.g. 1 operator + 1 external JWT token = 1 Seat). We only count active users, i.e. users who have logged in to the platform in the last 30 days according to the audit logs. Seats are counted across all instances (dev, prod) but Windmill only counts once the same user.
 
 ### Telemetry and usage tracking
 

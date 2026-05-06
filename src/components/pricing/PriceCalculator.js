@@ -83,7 +83,7 @@ const SeatsSummary = ({ developers, operators }) => (
 			<span className="whitespace-nowrap text-sm text-gray-600 dark:text-gray-200 ml-4">
 				{operators.toLocaleString()}{' '}
 				<a href="#operator" className="custom-link text-gray-600 dark:text-gray-200">
-					{operators <= 1 ? 'operator' : 'operators'}
+					{operators <= 1 ? 'operator or ext JWT token' : 'operators or ext JWT tokens'}
 				</a>
 				{' '}= {operators/2} {operators/2 <= 1 ? 'seat' : 'seats'}
 			</span>
@@ -474,13 +474,13 @@ export default function PriceCalculator({ period, tier, selectedOption }) {
 												/>
 											</span>
 											<span className="text-sm font-semibold tracking-tight text-gray-600 dark:text-gray-200">
-												{' '}{operators <= 1 ? 'operator' : 'operators'}{' '}
+												{' '}{operators <= 1 ? 'operator or ext JWT token' : 'operators or ext JWT tokens'}{' '}
 												<span className="relative group">
 													<svg className="inline-block w-3 h-3 text-blue-800 hover:text-blue-400 dark:text-blue-300 dark:hover:text-blue-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 													</svg>
 													<span className="invisible group-hover:visible absolute z-10 w-96 p-2 mt-2 text-sm font-normal text-white bg-slate-800 rounded-lg shadow-lg">
-														An <a href="#operator" className="text-blue-400 hover:text-blue-500">operator</a> is a user who can only execute scripts, flows and apps, but not create and edit them. Operators are 1/2 price of developers (or 1/2 seats).
+														An <a href="#operator" className="text-blue-400 hover:text-blue-500">operator</a> is a user who can only execute scripts, flows and apps, but not create and edit them. Each <a href="/docs/advanced/external_auth_with_jwt" className="text-blue-400 hover:text-blue-500">external JWT token</a> in use also counts here. Operators and ext JWT tokens are 1/2 price of developers (or 1/2 seats).
 													</span>
 												</span>
 											</span>
@@ -807,7 +807,7 @@ export default function PriceCalculator({ period, tier, selectedOption }) {
 									<span className="whitespace-nowrap text-sm text-gray-600 dark:text-gray-200 ml-4">
 										{operators.toLocaleString()}{' '}
 										<a href="#operator" className="custom-link text-gray-600 dark:text-gray-200">
-											{operators <= 1 ? 'operator' : 'operators'}
+											{operators <= 1 ? 'operator or ext JWT token' : 'operators or ext JWT tokens'}
 										</a>
 										{' '}= {operators/2} {operators/2 <= 1 ? 'seat' : 'seats'}
 									</span>
