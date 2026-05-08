@@ -160,9 +160,20 @@ Once configured:
 
 ### Azure Key Vault backend
 
-Windmill can also store secrets in [Azure Key Vault](https://azure.microsoft.com/en-us/products/key-vault). Configuration requires the Key Vault URL and service principal credentials (tenant ID, client ID, client secret) with the necessary `Get`/`Set`/`Delete` permissions on the vault.
+Windmill can also store secrets in [Azure Key Vault](https://azure.microsoft.com/en-us/products/key-vault). Configuration requires the Key Vault URL and service principal credentials (tenant ID, client ID, and either a client secret or [Workload Identity Federation](#azure-workload-identity-federation)) with the necessary `Get`/`Set`/`Delete` permissions on the vault.
 
 The migration and fail-closed semantics are identical to the Vault backend.
+
+#### Azure Workload Identity Federation
+
+Instead of providing a long-lived client secret, you can leave the **Client Secret** field empty and authenticate with [Azure Workload Identity Federation](https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation). When the secret is omitted, Windmill reads the projected service-account JWT from the file at `AZURE_FEDERATED_TOKEN_FILE` and exchanges it with Microsoft Entra ID for an access token, so no secret is stored.
+
+The **Tenant ID** and **Client ID** of the Entra ID application are still entered in the Instance Settings form. The Windmill server additionally needs the following environment variables:
+
+- `AZURE_FEDERATED_TOKEN_FILE` (required): path to the projected token, e.g. `/var/run/secrets/azure/tokens/azure-identity-token`.
+- `AZURE_AUTHORITY_HOST` (optional): defaults to `https://login.microsoftonline.com`; override for sovereign clouds.
+
+On [Azure Kubernetes Service (AKS)](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) with the workload-identity webhook enabled, `AZURE_FEDERATED_TOKEN_FILE` and the projected token are injected automatically once the pod's service account is annotated and labeled for workload identity. The same flow works on any other Kubernetes cluster (EKS, GKE, self-hosted) that is federated to Entra ID via OIDC, as long as a projected token is mounted and `AZURE_FEDERATED_TOKEN_FILE` points to it.
 
 ### AWS Secrets Manager backend (Beta)
 
