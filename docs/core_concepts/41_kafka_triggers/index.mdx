@@ -31,6 +31,7 @@ The resource requires:
 | SASL_SSL | Username/password authentication with TLS encryption. |
 | SASL_GSSAPI | Kerberos (GSSAPI) authentication without encryption. |
 | SASL_SSL_GSSAPI | Kerberos (GSSAPI) authentication with TLS encryption. |
+| SASL_SSL_OAUTHBEARER | OAuth 2.0 / OIDC `client_credentials` authentication with TLS encryption. |
 
 ### Kerberos (GSSAPI) authentication
 
@@ -143,6 +144,39 @@ In containerized environments (Docker, Kubernetes) where reverse DNS may return 
 ```
 
 This tells GSSAPI to use the hostname as configured in your broker list without reverse DNS canonicalization.
+:::
+
+### OAUTHBEARER (OIDC) authentication
+
+For brokers that delegate authentication to an external identity provider (IdP), select `SASL_SSL_OAUTHBEARER`. Windmill performs the OAuth 2.0 `client_credentials` grant against the IdP's token endpoint and forwards the resulting bearer token to the broker.
+
+| Property | Description | Required |
+|----------|-------------|----------|
+| client_id | OAuth client ID registered with the IdP | Yes |
+| client_secret | OAuth client secret registered with the IdP | Yes |
+| token_endpoint_url | Full URL of the IdP token endpoint (e.g., `https://login.example.com/realms/kafka/protocol/openid-connect/token`) | Yes |
+| scope | Space-separated list of OAuth scopes to request from the IdP | No |
+| extensions | Comma-separated `key=value` pairs sent as SASL/OAUTHBEARER extensions | No |
+| ca | PEM-encoded CA certificate for verifying the broker | No |
+| certificate | PEM-encoded client certificate for mutual TLS | No |
+| key | PEM-encoded client private key | No |
+| key_password | Password for the client private key, if encrypted | No |
+
+:::info OIDC token flow
+Token acquisition happens on the **server** (`windmill-app` pod), not on workers. Tokens are cached and refreshed automatically by `librdkafka` before they expire, so the trigger maintains a long-lived consumer connection without re-issuing credentials on every message.
+:::
+
+#### Example
+
+```
+client_id          = my-kafka-client
+client_secret      = <secret>
+token_endpoint_url = https://login.example.com/realms/kafka/protocol/openid-connect/token
+scope              = kafka
+```
+
+:::warning TLS is required
+OAUTHBEARER must be paired with TLS (`SASL_SSL_OAUTHBEARER`). Sending bearer tokens over a plaintext connection would expose them on the wire, so the unencrypted variant is intentionally not offered.
 :::
 
 ## How to use
