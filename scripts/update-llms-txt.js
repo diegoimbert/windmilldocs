@@ -5,6 +5,8 @@ const SITE = 'https://www.windmill.dev';
 const REPO_ROOT = path.join(__dirname, '..');
 const SITEMAP = path.join(REPO_ROOT, 'build', 'sitemap.xml');
 const LLMS_TXT = path.join(REPO_ROOT, 'static', 'llms.txt');
+const BUILD_DIR = path.join(REPO_ROOT, 'build');
+const BUILD_DOCS_DIR = path.join(BUILD_DIR, 'docs');
 const FALLBACK_SECTION = 'Recently added';
 
 // URL path prefixes (relative to /docs/) to never auto-add: dense reference material
@@ -169,7 +171,11 @@ function readSitemapUrls() {
 
 function readExistingUrls(llms) {
 	return new Set(
-		[...llms.matchAll(/https:\/\/[^\s)>]+/g)].map((m) => m[0].replace(/[.,)]+$/, ''))
+		[...llms.matchAll(/https:\/\/[^\s)>]+/g)].map((m) => {
+			let u = m[0].replace(/[.,)]+$/, '');
+			if (u.endsWith('.md')) u = u.slice(0, -3);
+			return u;
+		})
 	);
 }
 
@@ -188,21 +194,155 @@ function descriptionFromFile(file) {
 	return extractFrontmatterField(readFileHead(file), 'description');
 }
 
-function formatEntry(label, url, file) {
-	const desc = descriptionFromFile(file);
-	return desc ? `- [${label}](${url}): ${desc}` : `- [${label}](${url})`;
+// Append `.md` to a /docs/ URL so it points to the clean markdown variant
+// generated alongside the HTML page. Per llmstxt.org: ".md appended" to the
+// page URL is the canonical pattern for linking AI consumers to clean content.
+function mdLinkUrl(url) {
+	if (!url.startsWith(SITE + '/docs/')) return url;
+	if (url.endsWith('.md')) return url;
+	return url + '.md';
 }
 
-// Rewrite existing `- Label: URL` lines under /docs/ into canonical
-// `- [Label](URL): description` format. Preserves hand-curated labels.
+function formatEntry(label, url, file) {
+	const desc = descriptionFromFile(file);
+	const linkUrl = mdLinkUrl(url);
+	return desc ? `- [${label}](${linkUrl}): ${desc}` : `- [${label}](${linkUrl})`;
+}
+
+// Strip MDX/JSX components and HTML wrappers while preserving fenced code
+// blocks (which may legitimately contain JSX/HTML/import syntax in examples).
+//
+// Two structural quirks to handle:
+//  - Multi-line ES6 imports (`import {\n  X,\n  Y,\n} from '...';`) — line-
+//    anchored stripping would leave orphan lines, so do a multi-line pass first.
+//  - JSX wrappers around code fences (e.g. `<Tabs>` / `<TabItem>` wrapping
+//    multiple ```code``` blocks). The fence-aware splitter separates the open
+//    and close tags into different segments, so a per-segment JSX-with-content
+//    regex misses them. Stripping standalone open/close tag lines as a final
+//    pass cleans these up without damaging fence contents.
+function cleanMarkdown(content) {
+	// Pre-pass over the whole content (not split): strip multi-line imports.
+	// Match across newlines until the closing `;` or `} from '...';`.
+	let pre = content.replace(
+		/^[ \t]*(?:import|export)\b[^;`]*?(?:;\s*$|}\s+from\s+['"][^'"]+['"]\s*;?\s*$)/gm,
+		''
+	);
+
+	const segments = pre.split(/(^```[\s\S]*?^```)/m);
+	const cleaned = segments
+		.map((seg, i) => {
+			if (i % 2 === 1) return seg; // code fence — leave verbatim
+			let s = seg;
+			s = s.replace(/^\s*(?:import|export)\s+[^\n;]*;?\s*$/gm, '');
+			s = s.replace(/<[A-Z][a-zA-Z0-9]*(?:\s[^>]*?)?\s*\/>/gs, '');
+			s = s.replace(/<([A-Z][a-zA-Z0-9]*)(?:\s[^>]*?)?>[\s\S]*?<\/\1>/g, '');
+			s = s.replace(
+				/<\/?(?:div|span|br|hr|img|video|source|iframe|details|summary|figure|figcaption|center|p)\b[^>]*>/gi,
+				''
+			);
+			return s;
+		})
+		.join('');
+
+	// Final pass on the reassembled content: drop lines that are JUST a JSX
+	// opening or closing tag (catches Tabs/TabItem wrappers around code fences
+	// whose open and close ended up in different segments).
+	const lines = cleaned.replace(/\r\n/g, '\n').split('\n');
+	const stripped = lines.filter(
+		(l) =>
+			!/^\s*<\/?[A-Z][a-zA-Z0-9]*(?:\s[^>]*)?\s*\/?>\s*$/.test(l)
+	);
+
+	return stripped
+		.map((l) => l.replace(/[ \t]+$/, ''))
+		.join('\n')
+		.replace(/\n{3,}/g, '\n\n')
+		.trim();
+}
+
+function stripFrontmatter(raw) {
+	return raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, '');
+}
+
+function readPageBody(file) {
+	try {
+		const raw = fs.readFileSync(file, 'utf-8');
+		return cleanMarkdown(stripFrontmatter(raw));
+	} catch {
+		return '';
+	}
+}
+
+function urlToMdRelPath(url) {
+	return url.replace(SITE + '/docs/', '') + '.md';
+}
+
+function composeMarkdownPage(title, description, body) {
+	// If body already has any H1, don't prepend a second one — but inject the
+	// description blockquote right after that H1 so reader/AI see Title → summary.
+	const h1Re = /^#\s+.+$/m;
+	const bodyHasH1 = h1Re.test(body);
+	if (bodyHasH1) {
+		if (!description) return body + '\n';
+		return body.replace(h1Re, (h1) => `${h1}\n\n> ${description}`) + '\n';
+	}
+	const desc = description ? `> ${description}\n\n` : '';
+	return `# ${title}\n\n${desc}${body}\n`;
+}
+
+// .md variants and llms-full.txt cover *every* doc, not just the curated set.
+// The denylist (integrations/, apps/, flows/, ...) is only for the llms.txt
+// index — keeping the .md files universal avoids 404s on canonical URLs and
+// lets AI consumers fetch any page they discover via the HTML site.
+function writeMarkdownVariants(urlToFile) {
+	let written = 0;
+	for (const [url, file] of urlToFile) {
+		const docId = urlToDocId(url);
+		const title = labelFromDocId(docId, file);
+		const description = descriptionFromFile(file) || '';
+		const body = readPageBody(file);
+		const outPath = path.join(BUILD_DOCS_DIR, urlToMdRelPath(url));
+		fs.mkdirSync(path.dirname(outPath), { recursive: true });
+		fs.writeFileSync(outPath, composeMarkdownPage(title, description, body));
+		written++;
+	}
+	return written;
+}
+
+function writeLLMsFullTxt(llms, urlToFile) {
+	const headerEnd = llms.indexOf('## Documentation structure');
+	const header = headerEnd === -1 ? llms : llms.slice(0, headerEnd).trim();
+
+	const sections = [];
+	const sortedEntries = [...urlToFile.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+	for (const [url, file] of sortedEntries) {
+		const docId = urlToDocId(url);
+		const title = labelFromDocId(docId, file);
+		const body = readPageBody(file);
+		sections.push(`## ${title}\n\nSource: ${url}\n\n${body}`);
+	}
+	const content = `${header}\n\n${sections.join('\n\n---\n\n')}\n`;
+	const outPath = path.join(BUILD_DIR, 'llms-full.txt');
+	fs.writeFileSync(outPath, content);
+	return { path: outPath, sections: sections.length, bytes: content.length };
+}
+
+// Rewrite existing `- Label: URL` or `- [Label](URL)` lines under /docs/ into
+// canonical `- [Label](URL.md): description` format. Preserves hand-curated
+// labels, picks up descriptions from frontmatter, appends .md per spec.
 function enrichExistingEntries(llms, urlToFile) {
 	return llms
 		.split('\n')
 		.map((line) => {
-			const m = line.match(/^- ([^:]+?):\s+(https:\/\/www\.windmill\.dev\/docs\/[^\s)]+)\s*$/);
+			const legacy = line.match(/^- ([^:]+?):\s+(https:\/\/www\.windmill\.dev\/docs\/[^\s)]+)\s*$/);
+			const canonical = line.match(
+				/^- \[([^\]]+)\]\((https:\/\/www\.windmill\.dev\/docs\/[^)]+)\)(?:: .*)?\s*$/
+			);
+			const m = legacy || canonical;
 			if (!m) return line;
 			const label = m[1].trim();
-			const url = m[2].replace(/[.,)]+$/, '');
+			let url = m[2].replace(/[.,)]+$/, '');
+			if (url.endsWith('.md')) url = url.slice(0, -3);
 			const file = urlToFile.get(url);
 			return formatEntry(label, url, file);
 		})
@@ -238,12 +378,12 @@ function removeStaleDocsLines(llms, sitemap) {
 	const lines = llms.split('\n');
 	const removed = [];
 	const kept = lines.filter((line) => {
-		// Match either `- Label: URL` (legacy) or `- [Label](URL)` (canonical)
 		const legacy = line.match(/^- [^:]+:\s+(https:\/\/www\.windmill\.dev\/docs\/[^\s)]+)/);
 		const canonical = line.match(/^- \[[^\]]+\]\((https:\/\/www\.windmill\.dev\/docs\/[^)]+)\)/);
 		const m = legacy || canonical;
 		if (!m) return true;
-		const url = m[1].replace(/[.,)]+$/, '');
+		let url = m[1].replace(/[.,)]+$/, '');
+		if (url.endsWith('.md')) url = url.slice(0, -3);
 		if (sitemap.has(url)) return true;
 		removed.push(url);
 		return false;
@@ -282,11 +422,6 @@ function main() {
 		.map((u) => ({ url: u, docId: urlToDocId(u), file: urlToFile.get(u) || null }))
 		.filter(({ docId }) => !isDenied(docId));
 
-	if (candidates.length === 0 && removed.length === 0 && !enrichmentChanged) {
-		console.log('llms.txt is up to date');
-		return;
-	}
-
 	const bySection = new Map();
 	for (const { url, docId, file } of candidates) {
 		const section = classify(docId, file);
@@ -306,8 +441,29 @@ function main() {
 		entries.sort();
 		llms = insertEntries(llms, section, entries);
 	}
-	fs.writeFileSync(LLMS_TXT, llms);
-	console.log(`Updated ${LLMS_TXT}`);
+
+	const llmsTxtChanged =
+		candidates.length > 0 || removed.length > 0 || enrichmentChanged;
+	if (llmsTxtChanged) {
+		fs.writeFileSync(LLMS_TXT, llms);
+		console.log(`Updated ${LLMS_TXT}`);
+	} else {
+		console.log('llms.txt is up to date');
+	}
+
+	// Also write to build/ so deploys get the fresh file without waiting for
+	// the CI auto-commit to round-trip through git.
+	if (fs.existsSync(BUILD_DIR)) {
+		fs.writeFileSync(path.join(BUILD_DIR, 'llms.txt'), llms);
+
+		const mdCount = writeMarkdownVariants(urlToFile);
+		console.log(`Wrote ${mdCount} markdown page variant(s) under ${BUILD_DOCS_DIR}/`);
+
+		const full = writeLLMsFullTxt(llms, urlToFile);
+		console.log(
+			`Wrote ${full.path} (${full.sections} sections, ${(full.bytes / 1024).toFixed(0)} KB)`
+		);
+	}
 }
 
 main();
