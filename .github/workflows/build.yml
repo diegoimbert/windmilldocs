@@ -14,6 +14,8 @@ on:
 jobs:
   npm_check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -22,3 +24,18 @@ jobs:
       - name: 'npm check'
         timeout-minutes: 5
         run: npm ci --legacy-peer-deps && npm run build
+      - name: Update llms.txt
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: node scripts/update-llms-txt.js
+      - name: Commit llms.txt
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          if git diff --quiet -- static/llms.txt; then
+            echo "No llms.txt changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add static/llms.txt
+          git commit -m "chore: auto-update llms.txt [skip ci]"
+          git push
