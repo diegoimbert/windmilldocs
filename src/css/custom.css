@@ -98,6 +98,11 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 	background-color: var(--ifm-code-background);
 	padding: var(--ifm-code-padding-vertical) var(--ifm-code-padding-horizontal);
 }
+
+code, pre, kbd, samp {
+	font-variant-ligatures: none;
+	font-feature-settings: "liga" 0, "calt" 0;
+}
 .api__description {
 	margin: 1rem 0;
 }

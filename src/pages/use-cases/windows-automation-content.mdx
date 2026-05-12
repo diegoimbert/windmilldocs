@@ -1,0 +1,668 @@
+---
+title: "How to automate Windows servers with Windmill"
+description: "How do I automate Windows servers without Docker? Native PowerShell, MSSQL Kerberos auth, C#/.NET 9 and Teams approvals on domain-joined hosts."
+---
+
+import React from 'react';
+import Link from '@docusaurus/Link';
+import { motion } from 'framer-motion';
+import { ArrowRight, Check, X, Terminal, Database, Bot, Shield, Workflow, Server, Network, Lock, GitBranch, BookOpen } from 'lucide-react';
+import { SiPowershell, SiMicrosoftsqlserver, SiMicrosoftteams, SiMicrosoftazure, SiDotnet, SiWindows, SiMicrosoft, SiAzureartifacts, SiApachekafka } from 'react-icons/si';
+import UseCaseFAQ from '../../components/use-cases/UseCaseFAQ';
+import UseCaseCarousel from '../../components/use-cases/UseCaseCarousel';
+import GithubStarCount from '../../landing/GithubStarCount';
+import HeroCTAButtons from '../../components/products/HeroCTAButtons';
+
+export const fadeIn = {
+	initial: { opacity: 0, y: 30 },
+	whileInView: { opacity: 1, y: 0 },
+	viewport: { once: true },
+	transition: { duration: 0.5 }
+};
+
+export const ecosystemIntegrations = [
+	{ icon: SiMicrosoft, color: '#0078D4', title: 'Entra ID / Azure AD SSO', desc: 'Sign in with corporate identity, sync groups, scope RBAC by AD group.', link: '/docs/misc/saml_and_scim' },
+	{ icon: SiMicrosoftteams, color: '#6264A7', title: 'Microsoft Teams', desc: 'Approval cards, channel alerts, slash commands tied to flows.', link: '/docs/integrations/teams' },
+	{ icon: SiMicrosoftsqlserver, color: '#CC2927', title: 'SQL Server (Kerberos)', desc: 'Windows Integrated Auth, no stored passwords, parameterized queries.', link: '/docs/integrations/mssql' },
+	{ icon: SiMicrosoftazure, color: '#0078D4', title: 'Azure Blob Storage', desc: 'Read and write blobs from PowerShell or C# with managed identity.', link: '/docs/integrations/microsoft-azure-blob' },
+	{ icon: SiAzureartifacts, color: '#CB2E6D', title: 'Azure Artifacts feeds', desc: 'Private NuGet and PowerShell module feeds resolved on the worker.', link: '/docs/getting_started/scripts_quickstart' },
+	{ icon: SiApachekafka, color: '#6B7280', title: 'Kafka with GSSAPI/Kerberos', desc: 'Consume from Kerberized Kafka clusters with keytab auth.', link: '/docs/core_concepts/kafka_triggers' },
+];
+
+export const comparisonRows = [
+	{ feature: 'Runs natively on Windows (no Docker / WSL)', windmill: true, powerAutomate: true, taskScheduler: true, jams: true, ansible: 'partial' },
+	{ feature: 'Domain auth (Kerberos, AD groups)', windmill: true, powerAutomate: 'partial', taskScheduler: true, jams: true, ansible: true },
+	{ feature: 'PowerShell as a first-class language', windmill: true, powerAutomate: 'partial', taskScheduler: true, jams: true, ansible: 'partial' },
+	{ feature: 'C# / .NET scripts', windmill: true, powerAutomate: false, taskScheduler: 'partial', jams: 'partial', ansible: false },
+	{ feature: 'MSSQL with Windows Integrated Auth', windmill: true, powerAutomate: 'partial', taskScheduler: 'partial', jams: true, ansible: 'partial' },
+	{ feature: 'Visual flow editor with approvals', windmill: true, powerAutomate: true, taskScheduler: false, jams: 'partial', ansible: false },
+	{ feature: 'Code-first authoring + Git sync', windmill: true, powerAutomate: false, taskScheduler: false, jams: 'partial', ansible: true },
+	{ feature: 'Self-hosted', windmill: true, powerAutomate: false, taskScheduler: true, jams: true, ansible: true },
+	{ feature: 'Open source', windmill: true, powerAutomate: false, taskScheduler: false, jams: false, ansible: true },
+	{ feature: 'Centralized observability across hosts', windmill: true, powerAutomate: 'partial', taskScheduler: false, jams: true, ansible: 'partial' },
+	{ feature: 'Mix Windows and Linux workers in one fleet', windmill: true, powerAutomate: false, taskScheduler: false, jams: true, ansible: true },
+	{ feature: 'AI agents calling Windows scripts as tools', windmill: true, powerAutomate: 'partial', taskScheduler: false, jams: false, ansible: false },
+];
+
+export function WindowsEcosystemHub() {
+	const steps = [
+		{ key: 'powershell', label: 'Query Active Directory', sub: 'PowerShell', Icon: SiPowershell, color: '#5391FE' },
+		{ key: 'mssql', label: 'Read user record', sub: 'SQL Server · Kerberos', Icon: SiMicrosoftsqlserver, color: '#CC2927' },
+		{ key: 'dotnet', label: 'Provision mailbox', sub: 'C# / .NET 9', Icon: SiDotnet, color: '#512BD4' },
+		{ key: 'azure', label: 'Upload audit log', sub: 'Azure Blob Storage', Icon: SiMicrosoftazure, color: '#0078D4' },
+		{ key: 'teams', label: 'Approve in Teams', sub: 'Microsoft Teams', Icon: SiMicrosoftteams, color: '#6264A7' },
+	];
+
+	const STEP_DURATION = 1.6;
+	const TOTAL = steps.length * STEP_DURATION;
+
+	return (
+		<div className="relative w-full max-w-[480px] rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl overflow-hidden">
+			<div className="flex items-center gap-2 px-4 py-3 bg-gray-50 dark:bg-gray-800/60 border-b border-gray-200 dark:border-gray-700">
+				<SiWindows className="w-4 h-4 text-[#00A4EF]" />
+				<span className="text-xs font-mono text-gray-600 dark:text-gray-300">flow · onboard-employee</span>
+				<span className="ml-auto text-[10px] uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500">windows worker</span>
+			</div>
+
+			<div className="p-5 flex flex-col gap-2">
+				{steps.map((s, i) => {
+					const start = i * STEP_DURATION;
+					const runStart = start / TOTAL;
+					const doneStart = (start + STEP_DURATION * 0.8) / TOTAL;
+					return (
+						<React.Fragment key={s.key}>
+							<motion.div
+								className="rounded-lg border bg-white dark:bg-gray-900 px-3 py-2.5 flex items-center gap-3"
+								initial={{ borderColor: 'rgb(229,231,235)' }}
+								animate={{
+									borderColor: [
+										'rgb(229,231,235)',
+										'rgb(229,231,235)',
+										s.color,
+										'rgb(16,185,129)',
+										'rgb(16,185,129)',
+										'rgb(229,231,235)',
+									],
+									boxShadow: [
+										'0 0 0 rgba(0,0,0,0)',
+										'0 0 0 rgba(0,0,0,0)',
+										`0 0 14px ${s.color}55`,
+										'0 0 14px rgba(16,185,129,0.35)',
+										'0 0 0 rgba(0,0,0,0)',
+										'0 0 0 rgba(0,0,0,0)',
+									],
+								}}
+								transition={{
+									duration: TOTAL,
+									times: [0, Math.max(0, runStart - 0.001), runStart, doneStart, Math.min(1, doneStart + 0.05), 1],
+									repeat: Infinity,
+									ease: 'linear',
+								}}
+							>
+								<div
+									className="w-8 h-8 rounded-md flex items-center justify-center shrink-0"
+									style={{ backgroundColor: `${s.color}1a` }}
+								>
+									<s.Icon className="w-5 h-5" style={{ color: s.color }} />
+								</div>
+								<div className="flex-1 min-w-0">
+									<div className="text-sm font-semibold text-gray-900 dark:text-white truncate">{s.label}</div>
+									<div className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{s.sub}</div>
+								</div>
+								<div className="relative w-16 h-5 shrink-0">
+									<motion.span
+										className="absolute inset-0 flex items-center justify-end text-[10px] font-mono text-gray-400 dark:text-gray-500"
+										animate={{ opacity: [1, 1, 0, 0, 0, 1] }}
+										transition={{
+											duration: TOTAL,
+											times: [0, Math.max(0, runStart - 0.001), runStart, doneStart, Math.min(1, doneStart + 0.05), 1],
+											repeat: Infinity,
+											ease: 'linear',
+										}}
+									>
+										queued
+									</motion.span>
+									<motion.span
+										className="absolute inset-0 flex items-center justify-end gap-1 text-[10px] font-semibold"
+										style={{ color: s.color }}
+										animate={{ opacity: [0, 0, 1, 0, 0, 0] }}
+										transition={{
+											duration: TOTAL,
+											times: [0, Math.max(0, runStart - 0.001), runStart, doneStart, Math.min(1, doneStart + 0.05), 1],
+											repeat: Infinity,
+											ease: 'linear',
+										}}
+									>
+										running
+									</motion.span>
+									<motion.span
+										className="absolute inset-0 flex items-center justify-end gap-1 text-[10px] font-semibold text-emerald-500"
+										animate={{ opacity: [0, 0, 0, 1, 1, 0] }}
+										transition={{
+											duration: TOTAL,
+											times: [0, Math.max(0, runStart - 0.001), runStart, doneStart, Math.min(1, doneStart + 0.05), 1],
+											repeat: Infinity,
+											ease: 'linear',
+										}}
+									>
+										<Check className="w-3 h-3" />
+										done
+									</motion.span>
+								</div>
+							</motion.div>
+							{i < steps.length - 1 && (
+								<div className="flex justify-start pl-7">
+									<div className="w-px h-3 bg-gray-200 dark:bg-gray-700" />
+								</div>
+							)}
+						</React.Fragment>
+					);
+				})}
+			</div>
+		</div>
+	);
+}
+
+export function Cell({ value }) {
+	if (value === true) return <Check className="w-5 h-5 text-emerald-500 mx-auto" />;
+	if (value === false) return <X className="w-5 h-5 text-gray-300 dark:text-gray-600 mx-auto" />;
+	return <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">Partial</span>;
+}
+
+export default function WindowsAutomationContent({ title, description }) {
+	return (
+		<div className="pt-32 max-w-full">
+			{/* ── Hero ── */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 pb-8">
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+					<motion.div {...fadeIn}>
+						<div className="mb-4 flex items-center gap-3">
+							<GithubStarCount />
+							<Link
+								to="/pricing"
+								className="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/40 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/60 !no-underline transition-colors"
+							>
+								Self-Hosted Enterprise
+							</Link>
+						</div>
+						<h1 className="!text-4xl sm:!text-6xl !font-semibold !tracking-tight text-gray-900 dark:text-white mb-6">
+							Native Windows automation, without Docker or WSL
+						</h1>
+						<p className="text-xl text-gray-600 dark:text-gray-100 mb-8">
+							Run PowerShell, MSSQL and C# on domain-joined servers with full access to{' '}
+							<Link to="/docs/misc/windows_workers" className="text-blue-400 hover:underline !no-underline">Active Directory and Kerberos</Link>.
+							A code-first replacement for Task Scheduler and Power Automate. Native Windows workers are a{' '}
+							<Link to="/pricing" className="text-blue-400 hover:underline !no-underline">Self-Hosted Enterprise</Link> feature.
+						</p>
+						<HeroCTAButtons />
+						<div className="mt-8 flex flex-col gap-3">
+							<div className="flex items-center gap-3 text-base text-gray-600 dark:text-gray-100">
+								<span className="text-blue-500 font-bold">✓</span>
+								<span>PowerShell, C#/.NET 9, Python, TypeScript and SQL on the same worker</span>
+							</div>
+							<div className="flex items-center gap-3 text-base text-gray-600 dark:text-gray-100">
+								<span className="text-blue-500 font-bold">✓</span>
+								<span>MSSQL with Kerberos, no service-account passwords stored</span>
+							</div>
+							<div className="flex items-center gap-3 text-base text-gray-600 dark:text-gray-100">
+								<span className="text-blue-500 font-bold">✓</span>
+								<span>Mix Windows and Linux workers in one fleet, route jobs by tag</span>
+							</div>
+							<div className="flex items-center gap-3 text-base text-gray-600 dark:text-gray-100">
+								<span className="text-blue-500 font-bold">✓</span>
+								<span>Teams approvals, Entra ID SSO and audit logs out of the box</span>
+							</div>
+						</div>
+					</motion.div>
+
+					<motion.div {...fadeIn} className="hidden md:flex items-center justify-center">
+						<WindowsEcosystemHub />
+					</motion.div>
+				</div>
+			</div>
+
+			{/* ── Problem statement ── */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<motion.div {...fadeIn}>
+					<h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+						Why Windows automation breaks inside containers
+					</h2>
+					<div className="space-y-4 text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+						<p>
+							PowerShell scripts that touch Active Directory need the worker to be domain-joined.
+							SQL Server with Kerberos needs a real Windows token, not a forwarded one. Modules
+							published to private Azure Artifacts feeds expect the user's certificate store. As
+							soon as you put the worker inside Docker or WSL, all of that breaks, and you end
+							up rebuilding auth shims that fight Microsoft's stack instead of using it.
+						</p>
+						<p>
+							Windmill runs the worker as a native Windows service, executing PowerShell, C# and
+							SQL directly on the host. Active Directory, Kerberos, NTLM, certificate-bound
+							credentials, GPO-managed services and private feeds all keep working, because
+							nothing intercepts them. Server-side, Windmill stays exactly the same: one orchestrator,
+							one queue, one observability surface, with mixed Windows and Linux workers picking
+							up jobs by tag.
+						</p>
+					</div>
+				</motion.div>
+			</div>
+
+			{/* ── Capabilities intro ── */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<motion.div {...fadeIn} className="mb-4">
+					<h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+						Built for the Microsoft stack
+					</h2>
+					<p className="text-lg text-gray-600 dark:text-gray-300">
+						PowerShell, C#, SQL Server, Teams and Entra ID as first-class primitives. <Link to="/docs/misc/windows_workers" className="text-blue-600 dark:text-blue-400 hover:underline">Learn more about Windows workers</Link>.
+					</p>
+				</motion.div>
+			</div>
+
+			{/* ── Capability 1: Native Windows workers ── */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+					<motion.div {...fadeIn}>
+						<div className="flex items-center gap-3 flex-wrap mb-4">
+							<h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+								Native Windows workers
+							</h3>
+							<Link
+								to="/pricing"
+								className="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/60 !no-underline transition-colors"
+							>
+								Enterprise
+							</Link>
+						</div>
+						<p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+							Install the Windmill worker via <code>sc.exe</code> or NSSM. Jobs run as native Windows processes with full access to domain credentials, Kerberos tickets, private module feeds and the local certificate store. No Docker, no WSL, no auth shims. Requires a <Link to="/pricing" className="text-blue-600 dark:text-blue-400 hover:underline">Self-Hosted Enterprise</Link> license.
+						</p>
+						<Link
+							to="/platform/workers"
+							className="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline !no-underline"
+						>
+							<BookOpen className="w-4 h-4" />
+							Learn more about workers
+						</Link>
+					</motion.div>
+					<motion.div {...fadeIn} className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-900 shadow-lg overflow-hidden">
+						<div className="flex items-center gap-2 px-4 py-2 bg-gray-800 border-b border-gray-700">
+							<div className="w-3 h-3 rounded-full bg-red-500" />
+							<div className="w-3 h-3 rounded-full bg-yellow-500" />
+							<div className="w-3 h-3 rounded-full bg-green-500" />
+							<span className="ml-2 text-xs text-gray-400 font-mono">PS C:\windmill</span>
+						</div>
+						<pre className="p-5 text-sm leading-relaxed text-gray-100 font-mono overflow-x-auto !mb-0 !bg-gray-900">{`> sc.exe create windmill-worker `}<span className="text-blue-400">binPath=</span>{` "C:\\windmill\\windmill-ee.exe" \`
+    `}<span className="text-blue-400">DisplayName=</span>{` "Windmill Worker" \`
+    `}<span className="text-blue-400">start=</span>{` auto \`
+    `}<span className="text-blue-400">obj=</span>{` "CORP\\svc-windmill" `}<span className="text-blue-400">password=</span>{` ********
+[SC] CreateService SUCCESS
+
+> sc.exe start windmill-worker
+SERVICE_NAME: windmill-worker
+        STATE              : 4  RUNNING
+        WIN32_EXIT_CODE    : 0  (0x0)`}</pre>
+					</motion.div>
+				</div>
+			</div>
+
+			{/* ── Capability 2: PowerShell first-class ── */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+					<motion.div {...fadeIn} className="md:order-2">
+						<h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+							PowerShell as a first-class language
+						</h3>
+						<p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+							Write scripts with <code>[CmdletBinding()]</code>, typed parameters and common parameters (Verbose, Debug, ErrorAction). Windmill auto-generates the input form, runs the script and captures the output object stream. Import modules from PSGallery or private Azure Artifacts feeds the way PowerShell expects.
+						</p>
+						<Link
+							to="/use-cases/scripts"
+							className="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline !no-underline"
+						>
+							<BookOpen className="w-4 h-4" />
+							Learn more about scripts
+						</Link>
+					</motion.div>
+					<motion.div {...fadeIn} className="md:order-1">
+						<video
+							className="rounded-2xl border border-gray-200 dark:border-gray-700 w-full shadow-lg"
+							src="/img/use-cases/windows-automation/powershell-script.webm"
+							autoPlay
+							loop
+							muted
+							playsInline
+						/>
+					</motion.div>
+				</div>
+			</div>
+
+			{/* ── Capability 3: MSSQL with Kerberos ── */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+					<motion.div {...fadeIn}>
+						<h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+							MSSQL with Kerberos
+						</h3>
+						<p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+							Resources hold a host, database and Kerberos config. No service-account passwords are stored in Windmill. Query SQL Server, run stored procedures and stream results into the rest of your flow with parameterized queries.
+						</p>
+						<Link
+							to="/docs/integrations/mssql"
+							className="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline !no-underline"
+						>
+							<BookOpen className="w-4 h-4" />
+							Learn more about MSSQL integration
+						</Link>
+					</motion.div>
+					<motion.div {...fadeIn} className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-900 shadow-lg overflow-hidden">
+						<div className="flex items-center gap-2 px-4 py-2 bg-gray-800 border-b border-gray-700">
+							<div className="w-3 h-3 rounded-full bg-red-500" />
+							<div className="w-3 h-3 rounded-full bg-yellow-500" />
+							<div className="w-3 h-3 rounded-full bg-green-500" />
+							<span className="ml-2 text-xs text-gray-400 font-mono">mssql-kerberos.ps1</span>
+						</div>
+						<pre className="p-5 text-sm leading-relaxed text-gray-100 font-mono overflow-x-auto !mb-0 !bg-gray-900">{`# Resource: mssql/prod-finance
+#   host:     sql-prod.corp.local
+#   database: Finance
+#   auth:     kerberos    # uses the worker's domain identity
+
+`}<span className="text-blue-400">Invoke-Sqlcmd</span>{` -ServerInstance $r.host \`
+    -Database $r.database \`
+    -Query "SELECT TOP 10 invoice_id, amount
+            FROM dbo.invoices
+            WHERE status = `}<span className="text-emerald-400">@status</span>{`" \`
+    -Variable @{ status = `}<span className="text-emerald-400">"PENDING"</span>{` }`}</pre>
+					</motion.div>
+				</div>
+			</div>
+
+			{/* ── Capability 4: C# / .NET 9 ── */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+					<motion.div {...fadeIn} className="md:order-2">
+						<h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+							C# / .NET 9 scripts
+						</h3>
+						<p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+							Author scripts in C# with full <code>async/await</code>, NuGet dependency management and typed inputs. Use the same Azure SDKs your team already runs in production for Blob Storage, Service Bus or Graph API calls. Compiled and cached on the worker, with per-script lockfiles to keep runs reproducible.
+						</p>
+						<Link
+							to="/docs/getting_started/scripts_quickstart/csharp"
+							className="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline !no-underline"
+						>
+							<BookOpen className="w-4 h-4" />
+							Learn more about C# scripts
+						</Link>
+					</motion.div>
+					<motion.div {...fadeIn} className="md:order-1 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-900 shadow-lg overflow-hidden">
+						<div className="flex items-center gap-2 px-4 py-2 bg-gray-800 border-b border-gray-700">
+							<div className="w-3 h-3 rounded-full bg-red-500" />
+							<div className="w-3 h-3 rounded-full bg-yellow-500" />
+							<div className="w-3 h-3 rounded-full bg-green-500" />
+							<span className="ml-2 text-xs text-gray-400 font-mono">azure-blob-upload.cs</span>
+						</div>
+						<pre className="p-5 text-sm leading-relaxed text-gray-100 font-mono overflow-x-auto !mb-0 !bg-gray-900">{`// nuget: Azure.Storage.Blobs@12.19.1
+`}<span className="text-blue-400">using</span>{` Azure.Storage.Blobs;
+`}<span className="text-blue-400">using</span>{` Azure.Identity;
+
+`}<span className="text-blue-400">public async Task&lt;string&gt;</span>{` main(`}<span className="text-blue-400">string</span>{` container, `}<span className="text-blue-400">string</span>{` blob) {
+    `}<span className="text-blue-400">var</span>{` cred = `}<span className="text-blue-400">new</span>{` DefaultAzureCredential();
+    `}<span className="text-blue-400">var</span>{` client = `}<span className="text-blue-400">new</span>{` BlobClient(
+        `}<span className="text-emerald-400">"https://storage.corp.local/"</span>{`,
+        cred);
+    `}<span className="text-blue-400">await</span>{` client.UploadAsync(blob);
+    `}<span className="text-blue-400">return</span>{` `}<span className="text-emerald-400">{`$"uploaded {blob}"`}</span>{`;
+}`}</pre>
+					</motion.div>
+				</div>
+			</div>
+
+			{/* ── Capability 5: AI agents ── */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+					<motion.div {...fadeIn}>
+						<h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+							AI agents on Windows infrastructure
+						</h3>
+						<p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+							A Windmill <Link to="/use-cases/ai-agents" className="text-blue-600 dark:text-blue-400 hover:underline">AI agent</Link> running on the same domain-joined host can query Active Directory, restart a Windows service, pull a row from SQL Server and post the result to Teams in a single run, with every action audited.
+						</p>
+						<Link
+							to="/use-cases/ai-agents"
+							className="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline !no-underline"
+						>
+							<BookOpen className="w-4 h-4" />
+							Learn more about AI agents
+						</Link>
+					</motion.div>
+					<motion.div {...fadeIn}>
+						<video
+							className="rounded-2xl border border-gray-200 dark:border-gray-700 w-full shadow-lg"
+							src="/img/money-pages/ai-agent-visual-builder.webm"
+							autoPlay
+							loop
+							muted
+							playsInline
+						/>
+					</motion.div>
+				</div>
+			</div>
+
+			{/* ── Capability 6: Teams approvals ── */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+					<motion.div {...fadeIn} className="md:order-2">
+						<h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+							Teams approvals and alerts
+						</h3>
+						<p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+							Approval cards carry input fields and Resume/Cancel buttons. Route success and failure alerts to channels with the same resource your scripts already use. Pairs with Entra ID SSO so approvers are real domain users, not service accounts.
+						</p>
+						<Link
+							to="/docs/integrations/teams"
+							className="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline !no-underline"
+						>
+							<BookOpen className="w-4 h-4" />
+							Learn more about Teams integration
+						</Link>
+					</motion.div>
+					<motion.div {...fadeIn} className="md:order-1">
+						<img
+							src="/img/use-cases/windows-automation/teams_approval.png"
+							alt="Microsoft Teams interactive approval card from a Windmill flow"
+							className="rounded-2xl border border-gray-200 dark:border-gray-700 w-full shadow-lg"
+						/>
+					</motion.div>
+				</div>
+			</div>
+
+			{/* ── Microsoft ecosystem integrations ── */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<motion.div {...fadeIn} className="mb-12">
+					<h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+						Plugs into the rest of your Microsoft estate
+					</h2>
+					<p className="text-lg text-gray-600 dark:text-gray-300">
+						Resources, triggers and integrations cover the rest of the stack so a single flow can span identity,
+						messaging, storage and queueing without leaving Windmill.
+					</p>
+				</motion.div>
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+					{ecosystemIntegrations.map((item) => (
+						<Link
+							key={item.title}
+							to={item.link}
+							className="group rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 p-6 hover:border-blue-300 dark:hover:border-blue-700 transition-colors !no-underline"
+						>
+							<div className="flex items-center gap-3 mb-2">
+								<item.icon className="w-5 h-5" style={{ color: item.color }} />
+								<span className="text-base font-semibold text-gray-900 dark:text-white">{item.title}</span>
+							</div>
+							<p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-0">{item.desc}</p>
+						</Link>
+					))}
+				</div>
+			</div>
+
+			{/* ── Mixed fleet ── */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<motion.div {...fadeIn} className="rounded-3xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/40 dark:to-gray-900 p-8 sm:p-12 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+					<div>
+						<h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+							Windows and Linux workers in the same Windmill instance
+						</h2>
+						<p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+							Tag a script <code>windows</code> and it runs on a domain-joined Windows host. Tag it <code>linux</code> and it runs in your existing container fleet. The same flow can step from a PowerShell AD lookup, into a Python data transform on Linux, into a Teams approval, with one queue, one set of resources and one audit trail.
+						</p>
+						<Link
+							to="/docs/core_concepts/worker_groups"
+							className="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline !no-underline"
+						>
+							<BookOpen className="w-4 h-4" />
+							Learn more about worker groups
+						</Link>
+					</div>
+					<div className="grid grid-cols-2 gap-4">
+						<div className="rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-5">
+							<div className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-3">windows tag</div>
+							<ul className="text-sm text-gray-700 dark:text-gray-200 space-y-2 mb-0 pl-0 list-none">
+								<li>· PowerShell + AD</li>
+								<li>· MSSQL Kerberos</li>
+								<li>· C#/.NET 9</li>
+								<li>· Windows services (sc.exe)</li>
+							</ul>
+						</div>
+						<div className="rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-5">
+							<div className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">linux tag</div>
+							<ul className="text-sm text-gray-700 dark:text-gray-200 space-y-2 mb-0 pl-0 list-none">
+								<li>· Python data jobs</li>
+								<li>· TypeScript / Deno</li>
+								<li>· Bash + cron</li>
+								<li>· Containerized tooling</li>
+							</ul>
+						</div>
+					</div>
+				</motion.div>
+			</div>
+
+			{/* ── Comparison ── */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<motion.div {...fadeIn} className="mb-10">
+					<h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+						How Windmill compares on Windows
+					</h2>
+					<p className="text-lg text-gray-600 dark:text-gray-300">
+						Most Windows automation tools come from one of three eras: built-in (Task Scheduler), low-code RPA
+						(Power Automate Desktop), or legacy enterprise schedulers (JAMS, ActiveBatch, Stonebranch). Windmill
+						is the developer-first option that covers what each of them does, while staying open source and
+						code-first.
+					</p>
+				</motion.div>
+				<motion.div {...fadeIn} className="overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-700">
+					<table className="w-full text-sm !table !mb-0 !border-collapse [&_th]:!border-0 [&_td]:!border-0 [&_tr]:!border-0 [&_tbody]:!border-0">
+						<thead className="bg-gray-50 dark:bg-gray-800/60">
+							<tr>
+								<th className="px-6 py-4 text-left font-semibold text-gray-900 dark:text-white">Capability</th>
+								<th className="px-4 py-4 text-center font-semibold text-blue-600 dark:text-blue-400 w-28">
+									<span className="inline-flex items-center gap-2 justify-center">
+										<img src="/img/windmill.svg" alt="Windmill" className="w-4 h-4" />
+										Windmill
+									</span>
+								</th>
+								<th className="px-4 py-4 text-center font-semibold text-gray-700 dark:text-gray-300 w-28">Power Automate</th>
+								<th className="px-4 py-4 text-center font-semibold text-gray-700 dark:text-gray-300 w-28">Task Scheduler</th>
+								<th className="px-4 py-4 text-center font-semibold text-gray-700 dark:text-gray-300 w-28">JAMS / ActiveBatch</th>
+								<th className="px-4 py-4 text-center font-semibold text-gray-700 dark:text-gray-300 w-28">Ansible (Win)</th>
+							</tr>
+						</thead>
+						<tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
+							{comparisonRows.map((row) => (
+								<tr key={row.feature}>
+									<td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{row.feature}</td>
+									<td className="px-4 py-4 text-center"><Cell value={row.windmill} /></td>
+									<td className="px-4 py-4 text-center"><Cell value={row.powerAutomate} /></td>
+									<td className="px-4 py-4 text-center"><Cell value={row.taskScheduler} /></td>
+									<td className="px-4 py-4 text-center"><Cell value={row.jams} /></td>
+									<td className="px-4 py-4 text-center"><Cell value={row.ansible} /></td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</motion.div>
+				<p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
+					"Partial" means the capability exists with significant constraints (extra licensing, third-party module, or limited surface).
+				</p>
+			</div>
+
+			{/* ── More use cases ── */}
+			<UseCaseCarousel
+				current="windows-automation"
+				subtitle="Windows automation is one piece. The same platform powers data pipelines, internal apps, AI agents and scheduled workflows on Linux and Windows alike."
+			/>
+
+			{/* ── FAQ ── */}
+			<UseCaseFAQ faqs={[
+				{
+					question: 'How is Windmill different from Power Automate Desktop?',
+					textAnswer: 'Power Automate Desktop is a low-code RPA tool: drag-and-drop actions for UI automation, sold per user and tied to Microsoft 365. Windmill is a code-first orchestrator: PowerShell, C#, Python and SQL as native scripts, version-controlled in Git, runnable from APIs and schedules. For unattended automation across servers, Power Automate forces premium per-user licensing and a cloud roundtrip; Windmill runs on your domain-joined hosts with no per-user fee.',
+				},
+				{
+					question: 'Is Windmill a Task Scheduler replacement?',
+					textAnswer: 'Yes. Task Scheduler runs scripts on a single host with no central observability, no version control, no approvals and no audit log. Windmill replaces it with one orchestrator that schedules, runs and audits jobs across every Windows host in your fleet, with retries, error handlers, alerting and a UI. Existing PowerShell scripts run with no rewrite.',
+				},
+				{
+					question: 'How does Windmill compare to enterprise job schedulers like JAMS, ActiveBatch or Stonebranch?',
+					textAnswer: 'Legacy enterprise schedulers nail batch scheduling on Windows but lock you into proprietary GUIs, per-job licensing and slow change management. Windmill covers the same scheduling, retries, error handling and centralized observability while staying code-first and open source: scripts live in Git, the platform self-hosts on commodity infra, and Enterprise pricing is published. Teams typically migrate when they want a modern dev loop (CLI, AI coding tools, local dev) without giving up Windows-native execution.',
+				},
+				{
+					question: 'Where does Ansible fit alongside Windmill?',
+					textAnswer: 'Ansible is great at agentless config management: pushing desired state to a fleet of Windows hosts via WinRM. Windmill is an orchestrator for ongoing operations: scheduled jobs, event-driven flows, approvals, internal apps and AI agents that call PowerShell or SQL as tools. Many teams keep Ansible for provisioning and run day-two automation in Windmill, with Windmill triggering Ansible playbooks where useful.',
+				},
+				{
+					question: 'Do I need Docker on the Windows server?',
+					textAnswer: 'No. The worker installs as a native Windows service via sc.exe or NSSM and runs PowerShell, C# and SQL directly on the host. The Windmill server itself can run anywhere (typically a Linux box in the same network) and the Windows worker connects out to it. Agent workers are also available if you want HTTPS-only egress with no direct database access.',
+				},
+				{
+					question: 'Is native Windows worker support Enterprise-only?',
+					textAnswer: 'Yes. Native Windows worker execution requires a Windmill Enterprise license. The server itself is open source under the AGPLv3 license; the Windows-native worker runtime ships in the Enterprise build. See the pricing page for details.',
+				},
+				{
+					question: 'Can I mix Windows and Linux workers in one fleet?',
+					textAnswer: 'Yes. Worker groups carry tags, and each script or flow step picks workers by tag. A single flow can step from a PowerShell AD query on a windows-tagged worker, into a Python transform on a linux-tagged worker, into a Teams approval, sharing one queue, one set of resources, one audit trail.',
+				},
+				{
+					question: 'Will my existing PowerShell scripts run as-is?',
+					textAnswer: 'Yes, with two small adjustments. Wrap parameters in CmdletBinding() so Windmill can auto-generate the input form, and reference modules through a Windmill resource if you depend on private feeds. Otherwise the script is unchanged: same modules, same auth, same output objects.',
+				},
+			]} />
+
+			{/* ── CTA ── */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<motion.div {...fadeIn} className="text-center py-16 px-8 rounded-3xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-gray-900 border border-blue-200 dark:border-blue-800">
+					<h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Bring Windows servers under one orchestrator</h2>
+					<p className="text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto text-lg">
+						Install the worker as a Windows service, point it at your Windmill instance, run the first PowerShell script in minutes.
+					</p>
+					<div className="flex flex-col sm:flex-row gap-4 justify-center">
+						<a
+							href="https://app.windmill.dev"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors !no-underline"
+						>
+							Try Windmill free
+							<ArrowRight className="w-4 h-4" />
+						</a>
+						<Link
+							to="/pricing"
+							className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-medium hover:border-gray-400 dark:hover:border-gray-500 transition-colors !no-underline"
+						>
+							View pricing
+						</Link>
+					</div>
+				</motion.div>
+			</div>
+		</div>
+	);
+}

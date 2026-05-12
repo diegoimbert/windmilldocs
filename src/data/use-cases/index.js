@@ -4,6 +4,7 @@ import { dataPipelinesUseCase } from './data-pipelines';
 import { aiAgentsUseCase } from './ai-agents';
 import { scheduledTasksUseCase } from './scheduled-tasks';
 import { scriptsUseCase } from './scripts';
+import { windowsAutomationUseCase } from './windows-automation';
 
 export const useCases = [
 	scriptsUseCase,
@@ -12,4 +13,5 @@ export const useCases = [
 	dataPipelinesUseCase,
 	aiAgentsUseCase,
 	scheduledTasksUseCase,
+	windowsAutomationUseCase,
 ];
