@@ -74,3 +74,7 @@ wmill docs "what are resources?" --json | jq .answer
 ```
 
 Documentation search is an [Enterprise Edition](/pricing) feature — on a Community Edition instance, the command prints a message indicating EE is required.
+
+## Using the CLI with AI coding assistants
+
+If you drive the CLI from Claude Code, Codex, Cursor, or a similar AI coding assistant, you can give the agent up-to-date `wmill` command reference by adding the [Context7](https://context7.com) plugin and pointing it at the Windmill CLI docs index at [`context7.com/windmill-labs/windmill-cli-docs`](https://context7.com/windmill-labs/windmill-cli-docs). See [Local development with AI](../../misc/9_guides/local_dev_with_ai/index.mdx) for the full local AI workflow, including `wmill init`, the VS Code extension, and the MCP server.

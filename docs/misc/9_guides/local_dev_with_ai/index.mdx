@@ -114,6 +114,16 @@ The extension also allows you to run your scripts and flows locally from the edi
 	/>
 </div>
 
+## Context7 plugin
+
+If you use the [Context7](https://context7.com) plugin in Claude Code, Codex, Cursor, or any other Context7-aware client, you can point it at the dedicated Windmill CLI docs index so the agent has up-to-date `wmill` command reference available inline:
+
+```
+https://context7.com/windmill-labs/windmill-cli-docs
+```
+
+This is useful when iterating on shell scripts or CI pipelines that call `wmill sync`, `wmill script run`, `wmill flow run`, etc. The agent can resolve flags and subcommands without you copy-pasting from the docs. A broader Context7 index covering the full Windmill documentation site is also available at [`context7.com/websites/windmill_dev`](https://context7.com/websites/windmill_dev).
+
 ## MCP server
 
 Windmill's [MCP server](../../../core_concepts/51_mcp/index.mdx) allows AI tools to interact directly with a Windmill workspace. It supports:
