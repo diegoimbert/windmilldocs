@@ -480,7 +480,7 @@ export default function PriceCalculator({ period, tier, selectedOption }) {
 														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 													</svg>
 													<span className="invisible group-hover:visible absolute z-10 w-96 p-2 mt-2 text-sm font-normal text-white bg-slate-800 rounded-lg shadow-lg">
-														An <a href="#operator" className="text-blue-400 hover:text-blue-500">operator</a> is a user who can only execute scripts, flows and apps, but not create and edit them. Each <a href="/docs/advanced/external_auth_with_jwt" className="text-blue-400 hover:text-blue-500">external JWT token</a> in use also counts here. Operators and ext JWT tokens are 1/2 price of developers (or 1/2 seats).
+														An <a href="#operator" className="text-blue-400 hover:text-blue-500">operator</a> is a user who can only execute scripts, flows and apps, but not create and edit them. Each unique <a href="/docs/advanced/external_auth_with_jwt" className="text-blue-400 hover:text-blue-500">external JWT</a> user (counted per username/email + scope + instance, active in the last 30 days) also counts here. Operators and ext JWT users are 1/2 price of developers (or 1/2 seats).
 													</span>
 												</span>
 											</span>

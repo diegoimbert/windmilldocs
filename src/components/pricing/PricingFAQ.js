@@ -8,7 +8,7 @@ const faqs = [
 	{
 		id: 'pricing-explained',
 		question: "What is the logic behind Windmill's pricing?",
-		textAnswer: "Windmill's pricing is based on compute units (2 worker-gb-month each) and user seats. Operators and external JWT tokens count as half a seat each. Billing uses minute granularity for auto-scaling. This ensures pricing scales linearly with your usage and team size.",
+		textAnswer: "Windmill's pricing is based on compute units (2 worker-gb-month each) and user seats. Operators and external JWT users count as half a seat each. A unique external JWT user is counted per (username/email, scope, instance) tuple. Billing uses minute granularity for auto-scaling. This ensures pricing scales linearly with your usage and team size.",
 		answer: (
 			<span>
 				Windmill's pricing is designed to align with the value we deliver to our customers. Our pricing model reflects the core value of Windmill, which is primarily related to the amount of compute resources used, and the number of users accessing the platform. We've structured our pricing to scale with your usage, ensuring you're paying for the actual value you derive from our platform.
@@ -25,12 +25,12 @@ const faqs = [
 					className="text-blue-600 hover:text-blue-800 dark:text-blue-500 dark:hover:text-blue-600"
 				>
 					operator
-				</Link>{' '}(who can only execute scripts, flows, and apps) counts as half a seat. Each <Link
+				</Link>{' '}(who can only execute scripts, flows, and apps) counts as half a seat. For <Link
 					to="/docs/advanced/external_auth_with_jwt"
 					className="text-blue-600 hover:text-blue-800 dark:text-blue-500 dark:hover:text-blue-600"
 				>
-					external JWT token
-				</Link>{' '}in use is also billed as half a seat. This allows for flexible team structures and cost-effective scaling of your user base. We only count active users, i.e. users who have logged in to the platform in the last 30 days according to the audit logs.
+					external JWT
+				</Link>{' '}authentication, a unique JWT user is counted per (username/email, scope, instance) tuple used in the last 30 days - the same email with two different scopes, or on two different instances, counts as two JWT users. Each unique JWT user is billed as half a seat. This allows for flexible team structures and cost-effective scaling of your user base. We only count active users, i.e. users who have logged in to the platform in the last 30 days according to the audit logs.
 				<br /><br />
 				Our billing is meant to be fair and transparent: we only count the actual memory allocated to your workers in your production instance, with minute granularity if you use auto-scaling. This approach ensures that you're only charged for the resources actively contributing to your production environment. If you scale your workers up and down, the compute units will be accounted with minute granularity. For instance, you can run 10 workers with 2GB each for half a month at the same price as 5 workers with 2GB each for the full month.
 				<br /><br />
@@ -55,8 +55,8 @@ const faqs = [
 	},
 	{
 		id: 'operator',
-		question: 'What is an operator? How are external JWT tokens billed?',
-		textAnswer: 'An operator is a user who can only execute scripts, flows and apps, but not create or edit them. Operators count as half a seat. External JWT tokens (used for external auth) are also billed as half a seat each. 1 developer seat or 2 operator/JWT seats count as 1 seat for billing.',
+		question: 'What is an operator? How are external JWT users billed?',
+		textAnswer: 'An operator is a user who can only execute scripts, flows and apps, but not create or edit them. Operators count as half a seat. For external JWT authentication, a unique JWT user is counted per (username/email, scope, instance) tuple used in the last 30 days - so the same email with two different scopes, or on two different instances, counts as two JWT users. Each unique JWT user is billed as half a seat. 1 developer seat or 2 operator/JWT seats count as 1 seat for billing.',
 		answer: (
 			<span>
 				An{' '}
@@ -73,17 +73,17 @@ const faqs = [
 				Operators are 1/2 price of developers (or 1/2 seats) as long as they are operators in all workspaces they are members of. Operators are not set as the instance-level.
 				<br />
 				<br />
-				Each{' '}
+				For{' '}
 				<Link
 					to="/docs/advanced/external_auth_with_jwt"
 					className="text-blue-600 hover:text-blue-800 dark:text-blue-500 dark:hover:text-blue-600"
 				>
-					external JWT token
+					external JWT
 				</Link>{' '}
-				in use is billed the same way as an operator (1/2 seat). For seat counting, you can mix operators and external JWT tokens freely — for example, 1 operator + 1 external JWT token = 1 seat.
+				authentication, a unique JWT user is counted per (username/email, scope, instance) tuple used in the last 30 days - so the same email with two different scopes, or on two different instances, counts as two JWT users. Each unique JWT user is billed the same way as an operator (1/2 seat). For seat counting, you can mix operators and external JWT users freely - for example, 1 operator + 1 external JWT user = 1 seat.
 				<br />
 				<br />
-				On the billing side, 1 developer seat or 2 operator/ext JWT seats count as 1 seat, there is no need to differentiate between developers, operators and external JWT tokens when purchasing the license.
+				On the billing side, 1 developer seat or 2 operator/ext JWT seats count as 1 seat, there is no need to differentiate between developers, operators and external JWT users when purchasing the license.
 			</span>
 		)
 	},
@@ -274,13 +274,13 @@ const faqs = [
 				<br />
 				Seats reported to Windmill are the number of users (1 developer, or 2 operators) who are
 				active (from logging in to running or deploying a script) on the platform in the last 30
-				days, according to the audit logs. User count is across all instances (dev, prod) but
-				Windmill only counts once the same user. Each <Link
+				days, according to the audit logs. Regular and operator user counts are across all instances (dev, prod) but
+				Windmill only counts once the same user. For <Link
 					to="/docs/advanced/external_auth_with_jwt"
 					className="text-blue-600 hover:text-blue-800 dark:text-blue-500 dark:hover:text-blue-600"
 				>
-					external JWT token
-				</Link>{' '}used in the last 30 days also counts as half a seat (same as an operator).
+					external JWT
+				</Link>{' '}authentication, a unique JWT user is counted per (username/email, scope, instance) tuple used in the last 30 days - the same email with two different scopes, or on two different instances, counts as two JWT users. Each unique JWT user counts as half a seat (same as an operator).
 				<br />
 				<br />
 				The number of compute units considered is the number of production compute units, not of development

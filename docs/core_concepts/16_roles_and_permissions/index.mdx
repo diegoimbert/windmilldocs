@@ -22,7 +22,7 @@ Recap of how are permissioned items (scripts, flows, apps, resources, variables,
 
 Users are uniquely identified globally by their email. They also have a unique username with respect to each workspace they are members of.
 
-In terms of billing for Windmill [Enterprise Edition](/pricing), we only count active users, i.e. users who have at least logged in to the platform in the last 30 days according to the audit logs. [Operators](#operator) (i.e. users who are Operators in all workspaces they are members of) are counted as half of a regular seat. Each [external JWT token](../../advanced/16_external_auth_with_jwt/index.mdx) used in the last 30 days is also billed as half a seat (same as an operator). Logging in once in 30 days is enough to be considered 'Active'.
+In terms of billing for Windmill [Enterprise Edition](/pricing), we only count active users, i.e. users who have at least logged in to the platform in the last 30 days according to the audit logs. [Operators](#operator) (i.e. users who are Operators in all workspaces they are members of) are counted as half of a regular seat. For [external JWT](../../advanced/16_external_auth_with_jwt/index.mdx) authentication, a unique JWT user is counted per (username/email, scope, instance) tuple used in the last 30 days - the same email with two different scopes, or on two different instances, counts as two JWT users. Each unique JWT user is billed as half a seat (same as an operator). Logging in once in 30 days is enough to be considered 'Active'.
 
 ## Workspace
 
@@ -94,7 +94,7 @@ From the workspace settings, you can configure the operator visibility settings 
 - [Folders](../8_groups_and_folders/index.mdx#folders)
 - [Workers](../9_worker_groups/index.mdx)
 
-Regarding to [Pricing](/pricing), operators are counted as half of a regular seat ([developers](#developer)) as long as they are operators in all workspaces they are members of. Operators are not set as the instance-level. On the billing side, 1 developer seat or 2 operator/[external JWT token](../../advanced/16_external_auth_with_jwt/index.mdx) seats count as 1 seat, and each external JWT token in use also counts as half a seat (same as an operator). There is no need to differentiate between developers, operators and external JWT tokens when purchasing the license.
+Regarding to [Pricing](/pricing), operators are counted as half of a regular seat ([developers](#developer)) as long as they are operators in all workspaces they are members of. Operators are not set as the instance-level. On the billing side, 1 developer seat or 2 operator/[external JWT](../../advanced/16_external_auth_with_jwt/index.mdx) user seats count as 1 seat. Each unique external JWT user (counted per username/email + scope + instance, active in the last 30 days) also counts as half a seat. There is no need to differentiate between developers, operators and external JWT users when purchasing the license.
 
 ### Service accounts
 

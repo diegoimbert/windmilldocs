@@ -9,7 +9,7 @@ This way, you control what permissions your users have without having to create 
 
 This feature is [Enterprise Edition](/pricing) and [Whitelabel](../../misc/8_white_labelling/index.mdx) only.
 
-For [billing](/pricing), each external JWT token used in the last 30 days counts as half a [Seat](../../core_concepts/16_roles_and_permissions/index.mdx#users) - the same as an [operator](../../core_concepts/16_roles_and_permissions/index.mdx#operator). Operators and external JWT tokens are interchangeable in seat counting (e.g. 1 operator + 1 external JWT token = 1 Seat).
+For [billing](/pricing), a unique external JWT user is counted per (username/email, scope, instance) tuple used in the last 30 days. The same email used with two different scopes, or on two different instances, counts as two JWT users. Each unique JWT user counts as half a [Seat](../../core_concepts/16_roles_and_permissions/index.mdx#users) - the same as an [operator](../../core_concepts/16_roles_and_permissions/index.mdx#operator). Operators and external JWT users are interchangeable in seat counting (e.g. 1 operator + 1 external JWT user = 1 Seat).
 
 For JWT verification, the first option is to pass as an environment variable called `JWT_EXT_PUBLIC_KEY` the public key in PEM format (RS256).
 The second option is to pass as `JWT_EXT_JWKS_URL` the url of the JWKs endpoint to retrieve the public keys from which the JWTs will be matched on the `kid` field.
