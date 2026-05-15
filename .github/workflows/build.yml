@@ -6,6 +6,7 @@ on:
       - 'src/**'
       - 'docs/**'
       - 'blog/**'
+      - '.github/workflows/build.yml'
   push:
     branches:
       - main
@@ -21,8 +22,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: 'npm'
       - name: 'npm check'
-        timeout-minutes: 5
+        timeout-minutes: 7
         run: npm ci --legacy-peer-deps && npm run build
       - name: Commit llms.txt
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
