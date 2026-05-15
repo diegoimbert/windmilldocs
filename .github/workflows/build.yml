@@ -23,6 +23,15 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
+      - name: Cache Docusaurus build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            .docusaurus
+            node_modules/.cache
+          key: docusaurus-${{ runner.os }}-${{ hashFiles('docs/**', 'blog/**', 'src/**', 'docusaurus.config.js', 'sidebars.js', 'package-lock.json') }}
+          restore-keys: |
+            docusaurus-${{ runner.os }}-
       - name: 'npm check'
         timeout-minutes: 7
         run: npm ci --legacy-peer-deps && npm run build
