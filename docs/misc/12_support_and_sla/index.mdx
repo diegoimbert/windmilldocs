@@ -56,7 +56,8 @@ If you require support or have any questions, you can reach out to our support t
 
 - Email: contact@windmill.dev.
 - Discord: [Windmill Discord Community](https://discord.com/invite/V7PM2YHsPB).
-- Dedicated Slack or Discord channel on enterprise plan.
+- Dedicated [Slack](#slack-support-channel) or [Discord](#discord-support-channel) channel on enterprise plan.
+- Microsoft Teams: install the Windmill Support app (see [Microsoft Teams support bridge](#microsoft-teams-support-bridge) below, [Enterprise](/pricing) only).
 - Schedule a meeting: [Book a meeting](https://www.windmill.dev/book-demo) with the founder.
 - Feature request and issue tracking [Dashboard](https://portal.windmill.dev/issues) (enterprise only feature).
 
@@ -69,6 +70,56 @@ Our support team is committed to ensuring your success with Windmill, and we are
 		href="/docs/misc/getting_help"
 	/>
 </div>
+
+## Slack support channel
+
+[Enterprise](/pricing) customers can request a dedicated Slack Connect channel hosted in the Windmill workspace. The channel is named `windmill-<your-org>` and your team joins via Slack Connect invites sent to your contact emails.
+
+### How to set it up
+
+1. In the [Windmill customer portal](https://portal.windmill.dev), open **Contact support** and select the **Slack** tab.
+2. Confirm or add the contact emails that should receive invites.
+3. Click **Create Slack channel**. The channel is created, invites are sent to each email, and the Windmill support team is added automatically.
+4. Accept the Slack Connect invite from your inbox. Once accepted, you can invite additional teammates from your workspace directly.
+
+Windmill support engineers reply natively in Slack. No bridge or third-party forwarding.
+
+## Discord support channel
+
+[Enterprise](/pricing) customers can also request a dedicated channel in the Windmill Discord server. The channel is named `ext-<your-org>` and an invite URL is returned for sharing with your team.
+
+### How to set it up
+
+1. In the [Windmill customer portal](https://portal.windmill.dev), open **Contact support** and select the **Discord** tab.
+2. Click **Create Discord channel**. The channel is created and an invite URL is returned.
+3. Share the invite URL with your team. The link joins them to the Windmill Discord server with access scoped to your private channel only.
+4. Click **Regenerate invite** in the same tab if you need a fresh invite link.
+
+Windmill support engineers reply natively in Discord. No bridge or third-party forwarding.
+
+## Microsoft Teams support bridge
+
+Windmill support runs over email, Slack, and Discord. Some [Enterprise](/pricing) customers have security requirements that prevent joining external Slack or Discord workspaces, so they can connect a Microsoft Teams channel directly to Windmill support instead. Customers stay in Teams, support engineers stay in Discord, and messages flow both ways automatically.
+
+### How to set it up
+
+1. Have your Teams admin install the Windmill Support app to a channel from the Microsoft Teams Store. Until publication completes, contact us for a sideloadable `.zip` package.
+2. From the [Windmill customer portal](https://portal.windmill.dev), open the **Teams support bridge** section and click **Generate link code**. Codes are valid for 15 minutes and single-use.
+3. In the Teams channel where the bot was installed, post the 6-digit code as a message that **@-mentions Windmill Support**, like `@Windmill Support 123456`. The @-mention is required so the bot receives the message. The bot replies with a "Connected" card.
+4. From that point on, any message in the channel that **@-mentions Windmill Support** is forwarded to a Windmill support engineer. Replies from the engineer appear in the same Teams thread.
+
+### What we see and don't see
+
+- Only messages where the bot is **@-mentioned** are forwarded. Plain channel chatter without an @-mention stays private to your team.
+- Channel members can attach files via `@Windmill Support /file`, which opens a one-time secure upload page in a browser tab. The upload link is valid for 15 minutes and can only be used once.
+- Type `@Windmill Support /help` (or just `Hi` / `Hello`) in the channel any time to see a privacy refresher card explaining what is and isn't forwarded.
+- The bridge does not access Microsoft Graph, calendar data, files outside of explicit `/file` uploads, or any messages that don't @-mention the bot.
+
+### Disconnecting
+
+Open the **Teams support bridge** section in the [Windmill customer portal](https://portal.windmill.dev), find the connected channel, and click **Disconnect**. Forwarding stops immediately and the bot reports the channel as no longer connected the next time someone @-mentions it.
+
+To reconnect, generate a fresh link code and paste it back in the same channel - the bridge will re-link without needing to remove and re-add the app.
 
 ## Feature request and issue dashboard
 
