@@ -359,7 +359,14 @@ This enables parallel development workflows where multiple developers can work o
 
 ## Adding secondary sync repositories
 
-You can add secondary sync repositories if you need to. Just go to Git sync settings, press `+ Add secondary sync repo` and follow the same instructions as for the first one. Note that having multiple bidirectional repositories is not currently supported, secondary repositories can only act as read-only copies of the workspace.
+You can add secondary sync repositories if you need to. Just go to Git sync settings, press `+ Add secondary sync repo` and follow the same instructions as for the first one.
+
+Windmill pushes workspace changes to secondary repositories the same way it does to the primary one, each with their own [path](#path-filters) and [type](#type-filters) filters. The difference is the direction of sync: only the primary repository supports pulling changes from git back into the workspace (true bidirectional sync). Secondary repositories receive pushes from Windmill but are never read back into the workspace, so their git copy stays in sync with the workspace but cannot be used to modify it.
+
+The two main use cases for secondary repositories are:
+
+- **Read-only backup storage**: keep an additional copy of the workspace in another repository for backup or mirroring.
+- **Partitioning the workspace**: use per-repository [include/exclude path filters](#path-filters) to sync different folders to different repositories. For example, configure one secondary repository per team, each filtered to that team's folders, so every team gets an isolated repository with its own CI/CD pipelines.
 
 ## Repository operations
 
