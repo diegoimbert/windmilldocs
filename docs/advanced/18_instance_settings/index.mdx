@@ -119,7 +119,9 @@ This setting is only available on [Enterprise Edition](/pricing).
 
 ### Audit log retention (days)
 
-How long to keep audit log entries in the database. Default: 365 days (EE), 14 days (CE). Audit logs are internally partitioned by day for performance — expired partitions are dropped automatically rather than deleted row by row.
+How long to keep audit log entries in the database. Default: 365 days (EE), 14 days (CE). Audit logs are internally partitioned by day for performance - expired partitions are dropped automatically rather than deleted row by row.
+
+If you enable [Store audit logs in object storage](#store-audit-logs-in-object-storage), the bucket holds the durable long-term history, so you can safely lower this value to only what you need for the in-app [audit log](../../core_concepts/14_audit_logs/index.mdx) view. Windmill never deletes the exported audit logs from object storage.
 
 ### Instance object storage
 
@@ -170,6 +172,14 @@ This setting is only available on [Enterprise Edition](/pricing).
 | Bucket | The name of your Google Cloud Storage bucket |
 | Service Account Key | The service account key for your Google Cloud Storage bucket in JSON format |
 
+
+### Store audit logs in object storage
+
+When enabled and [instance object storage](#instance-object-storage) is configured, [audit logs](../../core_concepts/14_audit_logs/index.mdx) are also exported as newline-delimited JSON (NDJSON) to a dedicated `logs/audit/` folder in the bucket, partitioned by day (`logs/audit/dt=YYYY-MM-DD/`). The export is incremental and runs in the background off the audit log hot path.
+
+Only audit logs created after the setting is enabled are exported (no historical backfill), and Windmill never deletes the exported files from object storage. This is the recommended setup to forward audit logs to a [SIEM](https://en.wikipedia.org/wiki/Security_information_and_event_management) for long-term security analysis. See [exporting audit logs to object storage](../../core_concepts/14_audit_logs/index.mdx#exporting-audit-logs-to-object-storage) for details.
+
+This setting is only available on [Enterprise Edition](/pricing).
 
 ### Private Hub base url
 

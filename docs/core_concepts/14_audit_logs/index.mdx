@@ -32,7 +32,9 @@ Audit logs can be filtered by Date, Username, Action (Create, Update, Delete, Ex
 
 ## Retention policy
 
-For self-hosted Windmill instances, you can set the retention period via [instance settings](../../advanced/18_instance_settings/index.mdx#retention-period-in-secs), accessible in the top right corner of the workspace settings. Instance settings are accessible only to [superadmins](../16_roles_and_permissions/index.mdx#superadmin). Audit logs are maintained in Postgres and output to the FileSystem as logs.
+For self-hosted Windmill instances, you can set how long audit log entries are kept in the database via the [Audit log retention (days)](../../advanced/18_instance_settings/index.mdx#audit-log-retention-days) [instance setting](../../advanced/18_instance_settings/index.mdx), accessible in the top right corner of the workspace settings. Instance settings are accessible only to [superadmins](../16_roles_and_permissions/index.mdx#superadmin). It defaults to 365 days on [Enterprise Edition](/pricing) and 14 days on the Community Edition. Audit logs are maintained in Postgres and output to the FileSystem as logs.
+
+If you also [export audit logs to object storage](#exporting-audit-logs-to-object-storage), the database is no longer the only durable copy, so you can set the database retention much lower (for example a few days, enough to keep the in-app audit log view useful) while keeping a complete long-term history in your bucket. Windmill never deletes the exported audit logs from object storage.
 
 On Windmill's cloud service, audit log retention varies by plan:
 
@@ -48,10 +50,28 @@ On Windmill's cloud service, audit log retention varies by plan:
 	/>
 </div>
 
+## Exporting audit logs to object storage
+
+On [Enterprise Edition](/pricing), audit logs can be continuously exported to your [instance object storage](../38_object_storage_in_windmill/index.mdx#instance-object-storage) bucket (S3, Azure Blob or Google Cloud Storage). Enable it with the [Store audit logs in object storage](../../advanced/18_instance_settings/index.mdx#store-audit-logs-in-object-storage) instance setting once instance object storage is configured.
+
+Audit logs are written as newline-delimited JSON (NDJSON) to a dedicated `logs/audit/` folder, partitioned by day:
+
+```text
+logs/audit/dt=YYYY-MM-DD/audit_<min_id>_<max_id>.ndjson
+```
+
+Key properties:
+
+- The export is incremental and runs in the background off the audit log hot path, so it adds no overhead to the requests that generate audit logs. In a [highly available](../../advanced/22_high_availability/index.mdx) deployment a single server performs the export at a time.
+- No history is backfilled: only audit logs created after the setting is enabled are exported. No audit log committed after enabling is ever skipped.
+- Windmill never deletes the exported files from object storage, including when database retention expires or when the [Delete logs from s3 periodically](../38_object_storage_in_windmill/index.mdx) cleanup runs (that cleanup only applies to job and service logs, not the `logs/audit/` folder).
+
+This is the recommended setup when you forward audit logs to a [SIEM](https://en.wikipedia.org/wiki/Security_information_and_event_management) for long-term security analysis: point your SIEM (or its collector) at the day-partitioned NDJSON files in the bucket. Because the bucket then holds the durable, complete history, you can safely lower the database [Audit log retention (days)](../../advanced/18_instance_settings/index.mdx#audit-log-retention-days) to only what you need for the in-app audit log view.
+
 ## Viewing jobs metadata from the audit logs
 
 You can retrieve the job ID from the job and then access all the job metadata, including the job arguments by fetching the information from the job itself which is stored for as long as the configured retention period.
 
 ## Backing up audit logs
 
-To back up the audit logs, simply backup the Postgres database or store the logs in a cold archive. In the cloud environment, we employ both methods for backup.
+To back up the audit logs, simply backup the Postgres database or store the logs in a cold archive. In the cloud environment, we employ both methods for backup. On Enterprise self-hosted instances, [exporting audit logs to object storage](#exporting-audit-logs-to-object-storage) provides a durable, long-term archive that is independent of the database retention period.
