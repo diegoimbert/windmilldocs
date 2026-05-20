@@ -9,8 +9,8 @@ const clientTestimonials = [
 			name: 'Frederic Louks',
 			company: 'Zoom',
 			position: 'Demo Platform Product Manager',
-			dark: '/images/brands/zoom-dark.webp',
-			light: '/images/brands/zoom-light.webp',
+			dark: '/images/brands/zoom-dark.svg',
+			light: '/images/brands/zoom.svg',
 			anchor: 'zoom',
 			profile_picture: '/contributors/frederic_louks.jpg'
 		},
@@ -55,7 +55,7 @@ const clientTestimonials = [
 			company: 'Panther Labs',
 			position: 'Platform Manager',
 			dark: '/images/brands/panther-dark.svg',
-			light: '/images/brands/panther-light.svg',
+			light: '/images/brands/panther.svg',
 			anchor: 'panther-labs',
 			profile_picture: '/contributors/bj_maldonado.jpeg'
 		},

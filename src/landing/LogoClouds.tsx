@@ -6,8 +6,8 @@ export default function LogoClouds() {
 	const logos = [
 		{
 			url: '/case-studies/zoom',
-			dark: '/images/brands/zoom-dark.webp',
-			light: '/images/brands/zoom-light.webp',
+			dark: '/images/brands/zoom-dark.svg',
+			light: '/images/brands/zoom.svg',
 			name: 'Zoom',
 			internal: true,
 			hoverSrc: '/images/brands/zoom.svg'
@@ -29,17 +29,19 @@ export default function LogoClouds() {
 		{
 			url: '/case-studies/cfa-institute',
 			dark: '/images/brands/cfa-institute-dark.svg',
-			light: '/images/brands/cfa-institute-light.svg',
+			light: '/images/brands/cfa-institute.svg',
 			name: 'CFA Institute',
 			internal: true,
+			hoverSrc: '/images/brands/cfa-institute.svg',
+			hoverSrcDark: '/images/brands/cfa-institute-dark-hover.svg'
 		},
 		{
 			url: '/case-studies/axians',
-			dark: '/images/brands/axians-light.svg',
-			light: '/images/brands/axians.svg',
+			dark: '/images/brands/axians-vinci-white.svg',
+			light: '/images/brands/axians-vinci.svg',
 			name: 'Axians',
 			internal: true,
-			hoverSrc: '/images/brands/axians.svg'
+			hoverSrc: '/images/brands/axians-vinci.svg'
 		},
 		{
 			url: 'https://www.photoroom.com',
@@ -58,7 +60,7 @@ export default function LogoClouds() {
 		{
 			url: '/case-studies/panther-labs',
 			dark: '/images/brands/panther-dark.svg',
-			light: '/images/brands/panther-light.svg',
+			light: '/images/brands/panther.svg',
 			name: 'Panther Labs',
 			internal: true
 		},
@@ -110,8 +112,14 @@ export default function LogoClouds() {
 										loading="lazy"
 									/>
 									<img
-										className="w-full h-auto max-w-[150px] max-h-[75px] object-contain absolute opacity-0 transition-opacity group-hover:opacity-100"
+										className="w-full h-auto max-w-[150px] max-h-[75px] object-contain absolute opacity-0 transition-opacity group-hover:opacity-100 block dark:hidden"
 										src={logo.hoverSrc}
+										alt={logo.name}
+										loading="lazy"
+									/>
+									<img
+										className="w-full h-auto max-w-[150px] max-h-[75px] object-contain absolute opacity-0 transition-opacity group-hover:opacity-100 hidden dark:block"
+										src={logo.hoverSrcDark || logo.hoverSrc}
 										alt={logo.name}
 										loading="lazy"
 									/>

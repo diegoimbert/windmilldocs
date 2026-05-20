@@ -1,9 +1,9 @@
 export const axiansCaseStudy = {
 	id: 9,
 	company: 'Axians',
-	logo: '/images/brands/axians.svg',
-	logoDark: '/images/brands/axians-light.svg',
-	grayscale: true,
+	logo: '/images/brands/axians-vinci.svg',
+	logoDark: '/images/brands/axians-vinci-white.svg',
+	grayscale: false,
 	title: 'How Axians scales multi-tenant orchestration with usage-based pricing',
 	description: "Axians needed to scale automation across 150 enterprise customers without committing to massive upfront licensing costs. Windmill's multi-tenant workspace model with transparent usage-based pricing enabled gradual customer onboarding, with costs growing proportionally as adoption increases.",
 	category: 'IT Infrastructure',

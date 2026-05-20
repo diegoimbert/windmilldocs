@@ -33,7 +33,7 @@ export default function CaseStudyCard({ caseStudy, title, description, from }) {
 					<img
 						src={getLogoPath()}
 						alt={`${caseStudy.company} logo`}
-						className={`h-24 w-full object-contain${caseStudy.grayscale ? ' grayscale' : ''}`}
+						className={`max-h-20 max-w-[180px] w-auto object-contain mx-auto${caseStudy.grayscale ? ' grayscale' : ''}`}
 					/>
 				</div>
 			</div>
