@@ -604,7 +604,7 @@ When minimal telemetry is enabled, the following is sent:
 When minimal telemetry is disabled, the following is also collected:
 - job usage (language, total duration, count)
 
-You can "Send usage" to manually send usage data to Windmill and monitor it from the [Customer portal](../../misc/7_plans_details/index.mdx#windmill-customer-portal). You can also "Download usage" to get an encrypted copy of the telemetry data as a `.enc` file. This is useful for air-gapped instances that cannot send telemetry directly — the encrypted file can be sent manually to Windmill.
+You can "Send usage" to manually send usage data to Windmill and monitor it from the [Customer portal](../../misc/7_plans_details/index.mdx#windmill-customer-portal). You can also "Download usage" to get a signed copy of the telemetry data as a JSON file named `windmill-telemetry-{date}-{signature}.json`. This is useful for air-gapped instances that cannot send telemetry directly: the file can be inspected before being sent manually to Windmill, and the signature lets Windmill verify it has not been tampered with.
 
 ## GitHub Enterprise App
 
