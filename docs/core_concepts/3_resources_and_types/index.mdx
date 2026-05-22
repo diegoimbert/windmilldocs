@@ -19,6 +19,8 @@ Each Resource has a **Resource Type** (RT for short) - for example [MySQL](https
 needs to implement. Schemas implement the
 [JSON Schema specification](https://json-schema.org/).
 
+This is how Windmill connects to any third-party system: pick one of the 200+ resource types available on the [Hub](https://hub.windmill.dev/resources), or [define your own](#create-a-resource-type) for anything internal or not yet covered. There are no vendor-branded connectors - the resource type is the integration.
+
 ![Recap Resources and Types](./recap_resources_and_types.png 'Recap Resources and Types')
 
 While resources store configuration and credentials for connections, [Assets](../52_assets/index.mdx) track data flows and visualize datasets. Assets automatically detect when you reference [S3 objects](../38_object_storage_in_windmill/index.mdx#workspace-object-storage) (`s3://storage/path/to/file.csv`) or resources (`res://path/to/resource`) directly in your code, creating a visual representation of your data pipeline. This helps you understand how data moves through your workflows and identify dependencies between different data sources.
