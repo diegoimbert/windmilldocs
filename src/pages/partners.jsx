@@ -42,6 +42,11 @@ const roles = {
       name: "Fintech",
       colors: "bg-pink-50 text-pink-700 hover:text-pink-800",
       link: "/docs/misc/partners#deploy-windmill-for-a-specific-industry"
+    },
+    "Aviation": {
+      name: "Aviation",
+      colors: "bg-sky-50 text-sky-700 hover:text-sky-800",
+      link: "/docs/misc/partners#deploy-windmill-for-a-specific-industry"
     }
   };
 
@@ -77,6 +82,14 @@ const people = [
   email: 'david@type-driven.com',
   profile: 'https://www.linkedin.com/in/david-peter-498423280/',
   imageUrl: '/images/partners/davidpeter.jpg'
+},
+{
+    name: 'Dreamix',
+    description: 'Dreamix is an EU-based custom software development company with 20+ years of experience and 300+ experts - handling the full software development lifecycle, from discovery to production support. As a Windmill integration partner, Dreamix implements workflow automation for mid-market and enterprise clients across ERP integrations, internal tooling, and data pipeline automation.',
+    roles: ['Common tree', 'Version control and permissioning', 'Aviation'],
+    email: 'business@dreamix.eu',
+    profile: 'https://dreamix.eu/',
+    imageUrl: '/images/partners/dreamix.png'
 },
 {
     name: 'José Governo Pais Neto',
