@@ -330,12 +330,12 @@ HTTP route responses include permissive CORS headers by default so that routes c
 
 `OPTIONS` preflight requests are handled automatically by the HTTP trigger handler.
 
-To override any of these defaults for a route, set the corresponding header on the response returned by your runnable using the [`windmill_headers`](../4_webhooks/index.mdx#custom-response-headers) mechanism. Only headers that are **not** already present in the response are filled in with the defaults above, so you can restrict origins or allowed headers on a per-route basis:
+To override any of these defaults for a route, set the corresponding header on the response returned by your runnable using the [`wm_headers`](../4_webhooks/index.mdx#custom-response-headers) mechanism (or its longer alias `windmill_headers`). Only headers that are **not** already present in the response are filled in with the defaults above, so you can restrict origins or allowed headers on a per-route basis:
 
 ```ts
 export async function main() {
   return {
-    windmill_headers: {
+    wm_headers: {
       "Access-Control-Allow-Origin": "https://app.example.com",
       "Access-Control-Allow-Methods": "GET, POST",
       "Access-Control-Allow-Headers": "content-type, x-api-key"
