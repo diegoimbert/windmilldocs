@@ -476,7 +476,9 @@ API keys are read-only (GET requests only). The full API reference is published 
 
 ## Usage checks
 
-Windmill employs lightweight telemetry to automatically track and report the usage of memory and seats for your subscription. Even on self-hosted plans, telemetry associated to your license key is reported to Windmill. On [Enterprise Edition](../19_enterprise_onboarding/index.mdx#billing), telemetry cannot be fully disabled but can be reduced to a minimal mode (see [Instance settings - Telemetry](../../advanced/18_instance_settings/index.mdx#telemetry)).
+Windmill employs lightweight telemetry to automatically track and report the usage of memory and seats for your subscription. The telemetry endpoint is `stats.windmill.dev`: [Enterprise Edition](/pricing) instances are required to send telemetry tied to their license key to that endpoint so we can verify usage stays within the subscription terms. Telemetry cannot be fully disabled but can be reduced to a minimal mode (see [Instance settings - Telemetry](../../advanced/18_instance_settings/index.mdx#telemetry)).
+
+For [air-gapped Enterprise Edition](../19_enterprise_onboarding/index.mdx#air-gapped-environments) instances that cannot reach `stats.windmill.dev`, the same telemetry can be exported as a signed JSON file from [Instance settings - Telemetry](../../advanced/18_instance_settings/index.mdx#telemetry) ("Download usage") and uploaded to the [Customer Portal](#windmill-customer-portal). The signature lets Windmill verify the file has not been tampered with, and the file can be inspected before being shared.
 
 When minimal telemetry is enabled, only the following is sent:
 - version of your instance
