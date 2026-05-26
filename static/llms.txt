@@ -187,6 +187,7 @@ OpenAPI: https://app.windmill.dev/openapi.html
 - [Windmill on Azure](https://www.windmill.dev/docs/advanced/self_host/azure_entra_id.md): How do I deploy Windmill on Azure with AKS and optionally use Entra ID (Workload Identity) for passwordless PostgreSQL authentication?
 - [Wmill yaml reference](https://www.windmill.dev/docs/advanced/cli/wmill-yaml-reference.md): What are all the options in wmill.yaml? Reference for every configuration key used by the Windmill CLI, including defaults, effects, and deprecated keys.
 - [Workspace management](https://www.windmill.dev/docs/advanced/cli/workspace-management.md): How do I manage workspaces using the Windmill CLI?
+- [Datatable](https://www.windmill.dev/docs/advanced/cli/datatable.md): How do I query and manage data tables using the Windmill CLI?
 
 ### Enterprise features
 - [Plans and pricing](https://www.windmill.dev/docs/misc/plans_details.md): What are Windmill's pricing plans? Free, Team and Enterprise tiers for cloud and self-hosted deployments.

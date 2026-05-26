@@ -1072,6 +1072,7 @@ const sidebars = {
 						'advanced/cli/script',
 						'advanced/cli/flow',
 						'advanced/cli/job',
+						'advanced/cli/datatable',
 						'advanced/cli/app',
 						'advanced/cli/resource',
 						'advanced/cli/variable',
