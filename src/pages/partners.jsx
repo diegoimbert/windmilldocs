@@ -85,7 +85,7 @@ const people = [
 },
 {
     name: 'Dreamix',
-    description: 'Dreamix is an EU-based custom software development company with 20+ years of experience and 300+ experts - handling the full software development lifecycle, from discovery to production support. As a Windmill integration partner, Dreamix implements workflow automation for mid-market and enterprise clients across ERP integrations, internal tooling, and data pipeline automation.',
+    description: 'Dreamix is an EU-based software development company with 20+ years of experience and 300+ experts - handling the full software development lifecycle. Dreamix implements workflow automation for mid-market and enterprise clients across ERP integrations, internal tooling, and data pipeline automation.',
     roles: ['Common tree', 'Version control and permissioning', 'Aviation'],
     email: 'business@dreamix.eu',
     profile: 'https://dreamix.eu/',
