@@ -64,6 +64,7 @@ The canonical review policy lives in `REVIEW.md` (root). It applies equally to l
 - If a new page is added, make sure it appears in sidebars.js and check if its worth adding to core_concepts/index.mdx
 - New features shall have a dedicated changelog page and directory, like [this](./changelog/2025-08-19-kubernetes-native-autoscaling/index.md)
 - Changelogs should have tags (in Sentence case). In particular follow the color titles referenced in @src/theme/BlogPostItem/Container/index.js: (like 'App editor', 'Flow editor', 'Enterprise')
+- Changelog `index.md` files contain frontmatter only — do NOT add any markdown body after the closing `---`. Body content is ignored by the changelog renderer; everything users see comes from the `title`, `description`, and `features` fields. Put any extra context into `description` (which can be longer for changelog entries since it doubles as the page summary) rather than as prose below the frontmatter.
 - Major features shall be referenced in the [features list](./src/components/pricing/FeatureList.js), in particular if they are Enterprise features
 
 ## Cross-referencing and backlinks
@@ -103,7 +104,7 @@ The canonical review policy lives in `REVIEW.md` (root). It applies equally to l
 - **Prefer question-based descriptions** to match how users and AI systems query for information (e.g. "How do I deploy Windmill on Kubernetes?" rather than "Guide to deploying Windmill on Kubernetes")
 - For integration pages, use the pattern: "How do I connect X to Windmill? [What you can do]."
 - For docs pages, use a question that the page answers (e.g. "How do I set up workers in Windmill? Configure worker groups, assign tags, and scale compute.")
-- For changelog entries, summarize the feature in one sentence
+- For changelog entries, summarize the feature in one or two sentences. Since the changelog renderer ignores any body content after the frontmatter, the description is the only prose users will see — keep it factual but include enough context (what changed, where it appears, key constraints) to stand on its own.
 
 ### JSON-LD structured data
 Every non-doc page should include a `<script type="application/ld+json">` block inside `<Head>` for search engine and AI extraction. Follow these patterns:
