@@ -274,9 +274,9 @@ Configure [custom registries](../../advanced/6_imports/index.mdx) for private de
 
 For environments without internet access, we provide extended license keys (e.g., 2-month validity) with manual renewal.
 
-Share [telemetry](#telemetry-and-usage-tracking) manually on a regular basis (typically monthly). The telemetry endpoint is: `http://stats.windmill.dev/`
+Export [telemetry](#telemetry-and-usage-tracking) on a regular basis (typically monthly) from [Instance settings](../../advanced/18_instance_settings/index.mdx#telemetry) > Telemetry > "Download usage". This produces a signed JSON file (`windmill-telemetry-{date}-{signature}.json`) that you can inspect before uploading it to the [Customer Portal](#customer-portal). The signature lets Windmill verify the file has not been tampered with.
 
-Contact us to arrange air-gapped deployment and extended license keys.
+If that workflow still does not meet your requirements, contact us to arrange an alternative.
 
 ### Performance benchmarks
 
@@ -364,7 +364,7 @@ A Seat is a user who is active on the platform. A regular user counts as one Sea
 
 On self-hosted instances, Windmill does not deal with any customer data. Lightweight telemetry is collected for [license compliance](../../misc/19_enterprise_onboarding/index.mdx#billing). The telemetry endpoint is `stats.windmill.dev`.
 
-On Enterprise Edition, telemetry cannot be fully disabled but can be reduced using the "Minimal telemetry" toggle in [Instance settings](../../advanced/18_instance_settings/index.mdx#telemetry). When minimal telemetry is enabled, only the following is sent:
+On Enterprise Edition, telemetry cannot be fully disabled but can be reduced using the "Minimal telemetry" toggle in [Instance settings](../../advanced/18_instance_settings/index.mdx#telemetry). If you have fully air-gapped requirements, [contact us](#air-gapped-environments) to arrange an alternative. When minimal telemetry is enabled, only the following is sent:
 
 - version of your instance
 - instance base URL
