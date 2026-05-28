@@ -76,12 +76,12 @@ Windmill embeds:
   [RBAC permissions](../../core_concepts/16_roles_and_permissions/index.mdx),
   [OAuth handling](../2_setup_oauth/index.mdx) for fetching and
   refreshing credentials
-- **[webhooks](../../core_concepts/4_webhooks/index.mdx)** for every scripts and flows to
-  be triggered externally and an open api to be easily embedded into your
+- **[webhooks](../../core_concepts/4_webhooks/index.mdx)** for every script and flow to
+  be triggered externally and an open API to be easily embedded into your
   current infrastructure
 - a **[scheduler](../../core_concepts/1_scheduling/index.mdx)** to trigger Scripts and
   Flows. Combined with state storage, it can be used to watch for external
-  events - for example triggering a Flow only if the external state is different
+  events - for example, triggering a Flow only if the external state is different
   from the one stored previously
 - a **[CLI](../../advanced/3_cli/index.mdx)** and [Git sync](../../advanced/11_git_sync/index.mdx) to automatically commit and push scripts, flows, and apps to a given repository.
 
@@ -95,7 +95,7 @@ Examples of what can be built with Windmill include:
 - **Scripts** that are deployed automatically into UIs, webhook endpoints and scheduled jobs.
 - **Applicative workflows** such as the ones of Temporal, Airflow or Retool. Applicative workflows allow external APIs (Salesforce, Hubspot, Google Sheets), internal APIs and databases to talk to each other. Their logic can be complex and include approval steps and conditional branching.
 - **Data-oriented ETLs** as you would find in tools such as Airflow, Dagster and Prefect. One notable difference is our TypeScript support thanks to Deno. Most common ETLs would be syncing transformed data to data warehouses (Snowflake, BigQuery, Redshift) and building reports out of data stores in the same data warehouses. And of course you can include more applicative steps in those ETLs.
-- **Powerful apps and dashboards** that are internal or external-facing, using either a low-code builder similar to Retool or full react views / svelte. In either case, those apps do a mix of frontend logic and calling the scripts and flows directly.
+- **Powerful apps and dashboards** that are internal or external-facing, using either a low-code builder similar to Retool or full React views / Svelte. In either case, those apps do a mix of frontend logic and calling the scripts and flows directly.
 
 You can find plenty of examples and inspirations on the
 [Hub](https://hub.windmill.dev) or on our [Blog](/blog).
@@ -126,9 +126,9 @@ with:
   build UIs.
 - _Retool_ for building admin panels, and its other open-source
   alternatives: _Tooljet_, _Appsmith_.
-- _Airplane_ (†) and _Superblocks_ have comparable set of features, but not
-  open-source nor self-hostable, limited workflow engines, not made for
-  scalability and have no open APIs.
+- _Airplane_ (†) and _Superblocks_ have comparable sets of features, but they
+  are not open-source or self-hostable, have limited workflow engines, are not
+  made for scalability and have no open APIs.
 
 You will find more details on our view over our space and competitors in the
 [Windmill compared to competitors](../../compared_to/peers.mdx) page.
