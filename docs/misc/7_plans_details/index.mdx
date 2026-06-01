@@ -193,7 +193,7 @@ Below are examples from your setup [docker-compose.yml](https://github.com/windm
 
 #### Basic setup (3 CUs)
 
-Calculation: 2 workers × 1 CU each + 1 native worker with NUM_WORKERS=8 = 3 CUs
+Calculation: 2 workers × 1 CU each + 1 native worker with 8 subworkers = 3 CUs
 
 ```yaml
 services:
@@ -208,7 +208,7 @@ services:
   
   windmill_worker_native:
     deploy:
-      replicas: 1  # 1 worker with subworkers NUM_WORKERS=8 = 1 CU
+      replicas: 1  # 1 native worker with 8 subworkers = 1 CU
       resources:
         limits:
           memory: 2048M
@@ -219,7 +219,7 @@ services:
 
 #### Medium setup (8 CUs)
 
-Calculation: 3 workers × 1 CU each + 1 native worker with NUM_WORKERS=8 = 8 CUs
+Calculation: 3 workers × 1 CU each + 1 native worker with 8 subworkers = 8 CUs
 
 ```yaml
 services:
@@ -248,7 +248,7 @@ services:
 
   windmill_worker_native:
     deploy:
-      replicas: 1  # 1 worker with NUM_WORKERS=8 = 1 CU
+      replicas: 1  # 1 native worker with 8 subworkers = 1 CU
       resources:
         limits:
           memory: 2048M
@@ -261,7 +261,7 @@ services:
 
 Note: for now, setups of cloud EE instances are handled directly by the Windmill team. Please reach out to us if you need to configure your setup.
 
-Calculation: 2 workers × 1 CU each + 4 workers × 3 CUs each + 1 native worker with NUM_WORKERS=8 = 16 CUs
+Calculation: 2 workers × 1 CU each + 4 workers × 3 CUs each + 1 native worker with 8 subworkers = 16 CUs
 
 ```yaml
 services:
@@ -299,7 +299,7 @@ services:
 
 #### Large setup (Self-hosted - 12 CUs)
 
-Calculation: 2 workers × 1 CU each + 4 workers × 2 CUs each + 1 native worker with NUM_WORKERS=8 = 12 CUs
+Calculation: 2 workers × 1 CU each + 4 workers × 2 CUs each + 1 native worker with 8 subworkers = 12 CUs
 
 ```yaml
 services:
@@ -326,7 +326,7 @@ services:
 
   windmill_worker_native:
     deploy:
-      replicas: 1  # 1 worker with NUM_WORKERS=8 = 1 CU
+      replicas: 1  # 1 native worker with 8 subworkers = 1 CU
       resources:
         limits:
           memory: 2048M
