@@ -1,0 +1,406 @@
+---
+title: How 1KOMMA5° made Windmill the glue layer of their GTM stack
+description: 1KOMMA5°'s CRM team built their GTM orchestration layer on Windmill, enabling custom marketing, growth and customer support strategies through Git-backed integrations, Datadog observability and AI-assisted contribution from non-developers.
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import React from 'react';
+import Link from '@docusaurus/Link';
+import CaseStudySidebar from '@site/src/components/case-studies/CaseStudySidebar';
+import CaseStudyBackLink from '@site/src/components/case-studies/CaseStudyBackLink';
+import { onekomma5CaseStudy } from '@site/src/data/case-studies/1komma5';
+
+export default function Onekomma5Content({ title, description }) {
+	const [diagramExpanded, setDiagramExpanded] = React.useState(false);
+	const [contribDiagramExpanded, setContribDiagramExpanded] = React.useState(false);
+	return (
+		<div className="pt-32 max-w-full">
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<CaseStudyBackLink />
+
+				{/* Floated sidebar + flowing body — body reclaims full width once it passes the sidebar's bottom */}
+				<div className="lg:block">
+					<div className="lg:float-left lg:w-72 lg:mr-12 lg:mb-8">
+						<CaseStudySidebar
+							logo={{
+								light: "/images/brands/1komma5-light.png",
+								dark: "/images/brands/1komma5-dark.png",
+								alt: "1KOMMA5° logo",
+								className: "h-44 w-auto object-contain mb-6"
+							}}
+							industry="Climate tech"
+							companySize="2000+"
+							description="European climate tech group building the operating system for the renewable energy home, combining solar, batteries, heat pumps, EV chargers and dynamic electricity tariffs."
+							useCases={["CRM orchestration", "Customer support automation", "Email marketing sync", "Operations automation"]}
+							selfHosted={onekomma5CaseStudy.selfHosted}
+							website={{ url: "https://1komma5.com", label: "1komma5.com" }}
+							featuring={{
+								name: "Patrick Nüser",
+								role: "Senior Software Engineer at 1KOMMA5°",
+								linkedin: "https://www.linkedin.com/in/patrick-nueser/"
+							}}
+						/>
+					</div>
+
+					{/* Main content — flows next to sidebar, then full-width below */}
+					<div>
+						{/* Header section */}
+						<div className="mb-12">
+							<div className="mb-6 flex items-center justify-between">
+								<span className="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400">
+									Case Study
+								</span>
+								<span className="text-sm text-gray-500 dark:text-gray-400">
+									{new Date(onekomma5CaseStudy.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+								</span>
+							</div>
+							<h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-white mb-4">
+								{title}
+							</h1>
+							<p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
+								{description}
+							</p>
+						</div>
+
+						{/* Content sections */}
+						<div className="space-y-12">
+<section>
+<h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">About</h2>
+	<p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+		<a href="https://1komma5.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">1KOMMA5°</a> is a European climate tech group building the operating system for the renewable energy home, combining solar panels, batteries, heat pumps, EV chargers and dynamic electricity tariffs into a single optimized energy system. Behind the consumer-facing products, the company runs a high-volume go-to-market engine: thousands of leads flow in every day from web forms, partners, and inbound calls, and dozens of integrations connect the CRM with the rest of the operational stack.
+	</p>
+	<p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+		The CRM team is responsible for the integrations and automations that hold this engine together. They run a self-hosted Windmill instance on Google Cloud Platform that sits at the center of the GTM stack, orchestrating data flow between their CRM and the rest of the marketing, growth and customer support tooling.
+	</p>
+</section>
+
+<section>
+<h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The problem</h2>
+<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+	Like most growing companies, 1KOMMA5° relies on a constellation of best-of-breed SaaS tools. Their CRM is the source of truth for leads and accounts, but every other part of the funnel lives somewhere else: meeting bookings, telephony, web forms, email marketing and customer support each run on dedicated platforms before escalating to engineering's issue tracker.
+</p>
+<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+	Their CRM ships with its own workflow engine and a custom scripting language, but Patrick's team quickly hit its limits when their integration footprint started to scale.
+</p>
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
+	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
+		"The built-in workflow engine in our CRM lacks observability, logging and tracing. We made it a clear strategy to get business logic out of the CRM and into Windmill."
+	</p>
+	<cite className="text-sm text-gray-500 dark:text-gray-400">
+		Patrick Nüser, Senior Software Engineer at 1KOMMA5°
+	</cite>
+</blockquote>
+<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+	The CRM team is a tech team. They wanted the same engineering rigor on their automations as on the rest of the product: pull request reviews, unit tests, version control, and a real deployment story. The off-the-shelf low-code workflow engines on the market did not check those boxes.
+</p>
+<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+	When Patrick led the platform selection, the requirements were specific:
+</p>
+<ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4">
+	<li><Link to="/platform/self-host" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">Self-hostable</Link> inside their GCP environment, with no data leaving their infrastructure</li>
+	<li>First-class <Link to="/platform/deployment-versioning" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">Git integration</Link> so every workflow change goes through code review</li>
+	<li>Code-first, with proper unit testing and CI</li>
+	<li>Deep <Link to="/platform/observability" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">observability</Link> into job execution, queue depth, and error rates</li>
+	<li>Architecture that the team could actually reason about, not a black box</li>
+</ul>
+<p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+	After evaluating n8n, Make, Zapier and a few lower-level alternatives, the team picked Windmill.
+</p>
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
+	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
+		"Self-hosted into our GCP infrastructure, architectural concepts that are well explained, and Git integration. Since we are a tech team, we wanted to follow our tech best practices: pull request reviews, unit testing, and so on. Windmill does this better than the competition, the dev-focused approach."
+	</p>
+	<cite className="text-sm text-gray-500 dark:text-gray-400">
+		Patrick Nüser
+	</cite>
+</blockquote>
+</section>
+
+<section>
+<h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The solution</h2>
+
+<div className="space-y-8">
+	<div>
+		<h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+			Windmill as the glue layer of the GTM stack
+		</h3>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+			Every third-party service in the stack pushes events into Windmill through <Link to="/platform/triggers" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">webhooks</Link>. From there, <Link to="/platform/flow-editor" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">flows</Link> transform the payloads and write the result into the CRM. The relationship is bidirectional: when records change in the CRM, Windmill triggers calls back into telephony, scheduling, or whichever system needs to react.
+		</p>
+		<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
+			<p className="text-gray-700 dark:text-gray-300 italic mb-2">
+				"You have all these services with a special function or purpose, and then you need glue. You need to glue them together, and the business logic has to live somewhere. Most of that ends up in Windmill."
+			</p>
+			<cite className="text-sm text-gray-500 dark:text-gray-400">
+				Patrick Nüser
+			</cite>
+		</blockquote>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+			Concretely, that means Windmill powers lead routing between scheduled meetings and the CRM, telephony call activity sync, the form intake pipeline, multi-instance email marketing sync driven by pub/sub events, and the customer support bridge that automatically opens engineering tickets when a support issue reaches a specific state.
+		</p>
+		<figure
+			className={diagramExpanded
+				? "fixed inset-0 z-[1000] m-0 p-8 bg-black flex flex-col items-center justify-center cursor-zoom-out text-gray-100"
+				: "my-8 text-gray-900 dark:text-gray-100 max-w-3xl mx-auto cursor-zoom-in"}
+			onClick={() => setDiagramExpanded(!diagramExpanded)}
+			role="button"
+			tabIndex={0}
+			onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') setDiagramExpanded(!diagramExpanded); }}
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 640" fill="none" stroke="currentColor" strokeWidth="1.25" className={diagramExpanded ? "max-w-[95vw] max-h-[85vh] w-auto h-auto" : "w-full h-auto"} role="img" aria-label="1KOMMA5° GTM stack with Windmill as central orchestration layer">
+				<title>1KOMMA5° GTM stack with Windmill at the center</title>
+				<defs>
+					<marker id="km5-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+						<path d="M0,0 L10,5 L0,10 z" fill="currentColor" stroke="none"/>
+					</marker>
+				</defs>
+
+				{/* Section labels */}
+				<text x="130" y="42" fontSize="14" fontWeight="600" fill="currentColor" stroke="none" opacity="0.5" letterSpacing="2" textAnchor="middle">INBOUND</text>
+				<text x="800" y="42" fontSize="14" fontWeight="600" fill="currentColor" stroke="none" opacity="0.5" letterSpacing="2" textAnchor="middle">DOWNSTREAM</text>
+				<text x="460" y="615" fontSize="14" fontWeight="600" fill="currentColor" stroke="none" opacity="0.5" letterSpacing="2" textAnchor="middle">OBSERVABILITY</text>
+
+				{/* Inbound nodes */}
+				<g>
+					<rect x="30" y="84" width="200" height="72" rx="10" strokeOpacity="0.35"/>
+					<text x="130" y="118" textAnchor="middle" fill="currentColor" stroke="none" fontWeight="600" fontSize="16">Scheduling</text>
+					<text x="130" y="138" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">Meeting bookings</text>
+
+					<rect x="30" y="224" width="200" height="72" rx="10" strokeOpacity="0.35"/>
+					<text x="130" y="258" textAnchor="middle" fill="currentColor" stroke="none" fontWeight="600" fontSize="16">Telephony</text>
+					<text x="130" y="278" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">Call activity</text>
+
+					<rect x="30" y="364" width="200" height="72" rx="10" strokeOpacity="0.35"/>
+					<text x="130" y="398" textAnchor="middle" fill="currentColor" stroke="none" fontWeight="600" fontSize="16">Web forms</text>
+					<text x="130" y="418" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">Form submissions</text>
+				</g>
+
+				{/* Downstream nodes */}
+				<g>
+					<rect x="700" y="70" width="200" height="72" rx="10" strokeOpacity="0.35"/>
+					<text x="800" y="104" textAnchor="middle" fill="currentColor" stroke="none" fontWeight="600" fontSize="16">CRM</text>
+					<text x="800" y="124" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">Source of truth</text>
+
+					<rect x="700" y="170" width="200" height="72" rx="10" strokeOpacity="0.35"/>
+					<text x="800" y="204" textAnchor="middle" fill="currentColor" stroke="none" fontWeight="600" fontSize="16">Email marketing</text>
+					<text x="800" y="224" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">Campaigns</text>
+
+					<rect x="700" y="270" width="200" height="72" rx="10" strokeOpacity="0.35"/>
+					<text x="800" y="304" textAnchor="middle" fill="currentColor" stroke="none" fontWeight="600" fontSize="16">Customer support</text>
+					<text x="800" y="324" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">Ticketing</text>
+
+					<rect x="700" y="370" width="200" height="72" rx="10" strokeOpacity="0.35"/>
+					<text x="800" y="404" textAnchor="middle" fill="currentColor" stroke="none" fontWeight="600" fontSize="16">Issue tracker</text>
+					<text x="800" y="424" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">Engineering tickets</text>
+				</g>
+
+				{/* Windmill core */}
+				<g>
+					<rect x="365" y="80" width="190" height="380" rx="12" strokeWidth="1.75" fill="currentColor" fillOpacity="0.04"/>
+					<image href="/img/windmill.svg" x="415" y="150" width="90" height="90" preserveAspectRatio="xMidYMid meet"/>
+					<text x="460" y="278" textAnchor="middle" fill="currentColor" stroke="none" fontWeight="700" fontSize="24">Windmill</text>
+					<line x1="395" y1="302" x2="525" y2="302" strokeOpacity="0.2"/>
+					<text x="460" y="332" textAnchor="middle" fill="currentColor" stroke="none" fontSize="14" opacity="0.7">Self-hosted on GCP</text>
+					<text x="460" y="354" textAnchor="middle" fill="currentColor" stroke="none" fontSize="14" opacity="0.7">Flows + scripts</text>
+					<text x="460" y="376" textAnchor="middle" fill="currentColor" stroke="none" fontSize="14" opacity="0.7">Git-backed</text>
+				</g>
+
+				{/* Inbound arrows */}
+				<text x="297" y="112" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">webhook</text>
+				<text x="297" y="252" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">webhook</text>
+				<text x="297" y="392" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">webhook</text>
+				<path d="M 234 120 L 361 120" markerEnd="url(#km5-arr)"/>
+				<path d="M 234 260 L 361 260" markerEnd="url(#km5-arr)"/>
+				<path d="M 234 400 L 361 400" markerEnd="url(#km5-arr)"/>
+
+				{/* Outbound arrows */}
+				<text x="623" y="98" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">sync</text>
+				<text x="623" y="198" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">pub/sub sync</text>
+				<text x="623" y="298" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">ticket bridge</text>
+				<text x="623" y="398" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">escalations</text>
+				<path d="M 559 106 L 696 106" markerEnd="url(#km5-arr)"/>
+				<path d="M 559 206 L 696 206" markerEnd="url(#km5-arr)"/>
+				<path d="M 559 306 L 696 306" markerEnd="url(#km5-arr)"/>
+				<path d="M 559 406 L 696 406" markerEnd="url(#km5-arr)"/>
+
+				{/* Datadog */}
+				<rect x="360" y="510" width="200" height="72" rx="10" strokeOpacity="0.35"/>
+				<circle cx="388" cy="546" r="18" fill="#ffffff" stroke="none"/>
+				<image href="/third_party_logos/datadog.svg" x="372" y="530" width="32" height="32" preserveAspectRatio="xMidYMid meet"/>
+				<text x="416" y="542" fill="currentColor" stroke="none" fontWeight="600" fontSize="16">Datadog</text>
+				<text x="416" y="561" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">Metrics + alerting</text>
+				<path d="M 460 464 L 460 506" strokeDasharray="3 4" markerEnd="url(#km5-arr)"/>
+				<text x="568" y="488" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">error/success handlers</text>
+			</svg>
+			<figcaption className="text-center text-sm text-gray-500 dark:text-gray-400 mt-3">
+				Windmill at the center of 1KOMMA5°'s GTM stack. Inbound services push webhooks, downstream systems sync bidirectionally, Datadog ingests metrics from global error and success handlers.
+			</figcaption>
+		</figure>
+	</div>
+
+	<div>
+		<h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+			Datadog observability through global error and success handlers
+		</h3>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+			Pulling business logic out of the CRM was only valuable if the team could actually see what was happening. Windmill's <Link to="/platform/observability" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">global error and success handlers</Link> made it possible to ship every job outcome into Datadog as a custom metric.
+		</p>
+		<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
+			<p className="text-gray-700 dark:text-gray-300 italic mb-2">
+				"In Datadog we send metrics through global error and success handlers. We have a lot of jobs, so we can immediately see if something goes wrong. Small changes in error rate already indicate that something is off."
+			</p>
+			<cite className="text-sm text-gray-500 dark:text-gray-400">
+				Patrick Nüser
+			</cite>
+		</blockquote>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+			On top of that, the team monitors Windmill itself: queue depth, worker wait time, and execution latency are all wired into the same dashboards as the rest of their infrastructure. When an automation regresses, oncall finds out before the business does.
+		</p>
+	</div>
+
+	<div>
+		<h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+			Git-backed workflows and a real engineering loop
+		</h3>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+			Every script and flow lives in a Git repository. Changes go through pull requests, get reviewed, run through CI, and only then deploy to the production workspace through <Link to="/platform/deployment-versioning" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">Git sync</Link>. The team works locally from VS Code and Cursor and uses the <Link to="/platform/local-dev" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">Windmill CLI</Link> to push and pull state.
+		</p>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+			This is the workflow they already use everywhere else in the codebase, and it gives them the same safety net on automation that they have on application code: reviewability, history, and the ability to roll back.
+		</p>
+	</div>
+
+	<div>
+		<h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+			Enabling non-developers to contribute through AI and forks
+		</h3>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+			Patrick reserves about 20% of his team's time on a question that matters more and more: how do you let non-developers contribute to a code-first automation platform? With Windmill, the answer turned out to be a combination of <Link to="/platform/deployment-versioning" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">workspace forks</Link>, the <Link to="/platform/local-dev" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">CLI</Link>, the <Link to="/docs/core_concepts/mcp" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">Windmill MCP server</Link>, and AI coding agents like Cursor and Claude Code.
+		</p>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+			A non-developer pairs an AI agent with the MCP server or the CLI, works against a fork as a safe staging environment, and once the change is ready it lands in GitHub as a pull request that the engineering team reviews. The flow looks like a normal contribution from the outside, just with a different person at the keyboard.
+		</p>
+		<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
+			<p className="text-gray-700 dark:text-gray-300 italic mb-2">
+				"Forks plus the GitHub integration give us a nice way to automatically have pull requests and kick off a review cycle once a feature has been completed by a non-developer. Specifying the OpenFlow specification as part of the context was the game changer."
+			</p>
+			<cite className="text-sm text-gray-500 dark:text-gray-400">
+				Patrick Nüser
+			</cite>
+		</blockquote>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+			The team built four internal skills tailored to their conventions and pipes them into the AI agent's context. Results are good enough that Patrick reviewed and shipped an app written by a non-developer the morning of our interview.
+		</p>
+		<figure
+			className={contribDiagramExpanded
+				? "fixed inset-0 z-[1000] m-0 p-8 bg-black flex flex-col items-center justify-center cursor-zoom-out text-gray-100"
+				: "my-8 text-gray-900 dark:text-gray-100 max-w-5xl mx-auto cursor-zoom-in"}
+			onClick={() => setContribDiagramExpanded(!contribDiagramExpanded)}
+			role="button"
+			tabIndex={0}
+			onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') setContribDiagramExpanded(!contribDiagramExpanded); }}
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 420" fill="none" stroke="currentColor" strokeWidth="1.25" className={contribDiagramExpanded ? "max-w-[95vw] max-h-[85vh] w-auto h-auto" : "w-full h-auto"} role="img" aria-label="Non-developer contribution flow with AI agents, forks, and GitHub pull requests">
+				<title>Non-developer contribution loop at 1KOMMA5°</title>
+				<defs>
+					<marker id="km5-arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+						<path d="M0,0 L10,5 L0,10 z" fill="currentColor" stroke="none"/>
+					</marker>
+				</defs>
+
+				{/* Context cluster (top left) */}
+				<text x="110" y="22" textAnchor="middle" fontSize="12" fontWeight="600" fill="currentColor" stroke="none" opacity="0.5" letterSpacing="1.5">AGENT CONTEXT</text>
+				<rect x="20" y="32" width="180" height="30" rx="6" strokeOpacity="0.35"/>
+				<text x="110" y="52" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12">Windmill MCP server</text>
+				<rect x="20" y="68" width="180" height="30" rx="6" strokeOpacity="0.35"/>
+				<text x="110" y="88" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12">OpenFlow specification</text>
+				<rect x="20" y="104" width="180" height="30" rx="6" strokeOpacity="0.35"/>
+				<text x="110" y="124" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12">4 internal skills</text>
+
+				{/* Arrow from context to Box 1 */}
+				<path d="M 110 138 L 110 196" strokeDasharray="3 4" markerEnd="url(#km5-arr2)"/>
+				<text x="118" y="170" fill="currentColor" stroke="none" fontSize="13" opacity="0.6">feeds</text>
+
+				{/* Main pipeline boxes */}
+				<g>
+					{/* Box 1: Non-developer + AI agent */}
+					<rect x="20" y="200" width="180" height="120" rx="10" strokeOpacity="0.35"/>
+					<circle cx="50" cy="234" r="14" strokeOpacity="0.6"/>
+					<circle cx="50" cy="230" r="5" fill="currentColor" stroke="none" opacity="0.7"/>
+					<path d="M 38 246 Q 50 240 62 246" strokeOpacity="0.6"/>
+					<text x="74" y="230" fill="currentColor" stroke="none" fontWeight="600" fontSize="13">Non-developer</text>
+					<text x="74" y="248" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">paired with</text>
+					<line x1="32" y1="266" x2="188" y2="266" strokeOpacity="0.2"/>
+					<text x="110" y="288" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12" fontWeight="600">AI coding agent</text>
+					<text x="110" y="306" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">Cursor / Claude Code</text>
+
+					{/* Box 2: Fork workspace */}
+					<rect x="310" y="200" width="180" height="120" rx="10" strokeOpacity="0.35"/>
+					<image href="/img/windmill.svg" x="330" y="218" width="28" height="28" preserveAspectRatio="xMidYMid meet"/>
+					<text x="368" y="230" fill="currentColor" stroke="none" fontWeight="600" fontSize="13">Fork workspace</text>
+					<text x="368" y="248" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">safe staging</text>
+					<line x1="322" y1="266" x2="478" y2="266" strokeOpacity="0.2"/>
+					<text x="400" y="288" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">Isolated copy of</text>
+					<text x="400" y="306" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">production workspace</text>
+
+					{/* Box 3: GitHub PR */}
+					<rect x="600" y="200" width="180" height="120" rx="10" strokeOpacity="0.35"/>
+					<image href="/third_party_logos/github.svg" x="614" y="220" width="28" height="28" preserveAspectRatio="xMidYMid meet" className={contribDiagramExpanded ? "invert" : "dark:invert"}/>
+					<text x="652" y="230" fill="currentColor" stroke="none" fontWeight="600" fontSize="13">Pull request</text>
+					<text x="652" y="248" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">on GitHub</text>
+					<line x1="612" y1="266" x2="768" y2="266" strokeOpacity="0.2"/>
+					<text x="690" y="288" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">Engineering review</text>
+					<text x="690" y="306" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">+ CI checks</text>
+
+					{/* Box 4: Production workspace */}
+					<rect x="890" y="200" width="170" height="120" rx="10" strokeOpacity="0.35" strokeWidth="1.75" fill="currentColor" fillOpacity="0.04"/>
+					<image href="/img/windmill.svg" x="910" y="218" width="28" height="28" preserveAspectRatio="xMidYMid meet"/>
+					<text x="948" y="230" fill="currentColor" stroke="none" fontWeight="600" fontSize="13">Production</text>
+					<text x="948" y="248" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">workspace</text>
+					<line x1="902" y1="266" x2="1048" y2="266" strokeOpacity="0.2"/>
+					<text x="975" y="288" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">Git-synced</text>
+					<text x="975" y="306" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">deploy</text>
+				</g>
+
+				{/* Arrows between boxes */}
+				<text x="255" y="252" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">MCP / CLI</text>
+				<path d="M 204 260 L 306 260" markerEnd="url(#km5-arr2)"/>
+
+				<text x="545" y="252" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">open PR</text>
+				<path d="M 494 260 L 596 260" markerEnd="url(#km5-arr2)"/>
+
+				<text x="835" y="252" textAnchor="middle" fill="currentColor" stroke="none" fontSize="13" opacity="0.7">merge</text>
+				<path d="M 784 260 L 886 260" markerEnd="url(#km5-arr2)"/>
+			</svg>
+			<figcaption className={contribDiagramExpanded ? "text-center text-sm text-gray-300 mt-3" : "text-center text-sm text-gray-500 dark:text-gray-400 mt-3"}>
+				Non-developers pair an AI agent loaded with the Windmill MCP server, OpenFlow spec and team skills, iterate on a fork, then open a GitHub pull request for engineering review before merge.
+			</figcaption>
+		</figure>
+	</div>
+</div>
+</section>
+
+<section>
+<h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The result</h2>
+<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+	Windmill is the central piece of 1KOMMA5°'s GTM infrastructure. The CRM team ships new connectors with the same engineering loop they use for the rest of the product, business logic lives in code and not in CRM scripting, and operations have full observability through Datadog.
+</p>
+<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+	On top of that, the contribution surface has widened. With forks, MCP, the CLI and AI agents wired together, non-developers can now ship workflows under code review without breaking the engineering bar.
+</p>
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
+	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
+		"Infrastructure is complex: concurrency, high volume, worker orchestration, all of that. Windmill abstracts it away so we focus on the domain problem and not on plumbing. That is a big win."
+	</p>
+	<cite className="text-sm text-gray-500 dark:text-gray-400">
+		Patrick Nüser
+	</cite>
+</blockquote>
+</section>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}

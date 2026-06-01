@@ -6,7 +6,7 @@ export const cfaInstituteCaseStudy = {
 	grayscale: false,
 	title: 'How CFA Institute migrated from n8n and scaled production-critical monitoring with Windmill',
 	description: "CFA Institute needed production-critical monitoring at scale. n8n couldn't meet their reliability and performance requirements, prompting their migration to Windmill, where they now run 25 synthetic tests every 5 minutes.",
-	category: 'Financial Services',
+	category: 'Financial services',
 	author: {
 		name: 'Cam Barts',
 		role: 'Manager, SRE',

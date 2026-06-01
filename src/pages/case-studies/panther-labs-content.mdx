@@ -17,7 +17,8 @@ export default function PantherLabsContent({ title, description }) {
 				<CaseStudyBackLink />
 
 				{/* Two-column layout */}
-				<div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+				<div className="lg:block">
+					<div className="lg:float-left lg:w-72 lg:mr-12 lg:mb-8">
 					<CaseStudySidebar
 						logo={{
 							light: "/images/brands/panther.svg",
@@ -30,7 +31,6 @@ export default function PantherLabsContent({ title, description }) {
 						description="Modern cybersecurity SIEM platform that helps security teams detect threats at scale."
 						useCases={["Customer provisioning", "AWS account management", "Infrastructure deployment", "Alerting systems"]}
 						selfHosted={pantherLabsCaseStudy.selfHosted}
-						workers={16}
 						website={{ url: "https://panther.com", label: "panther.com" }}
 						featuring={{
 							name: "BJ Maldonado",
@@ -38,9 +38,10 @@ export default function PantherLabsContent({ title, description }) {
 							linkedin: "https://www.linkedin.com/in/bjmaldonado/"
 						}}
 					/>
+					</div>
 
-					{/* Right column - Main content */}
-					<div className="lg:col-span-2">
+					{/* Main content - flows next to sidebar, full-width below */}
+					<div>
 						{/* Header section */}
 						<div className="mb-12">
 							<div className="mb-6 flex items-center justify-between">
@@ -73,7 +74,7 @@ export default function PantherLabsContent({ title, description }) {
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 	When <a href="https://blog.boldtech.dev/airplane-dev-alternatives/#:~:text=What%20next%3F-,Airplane.,your%20internal%20tools%20and%20scripts.&text=Airplane.,-dev's%20short%2Dhaul" target="_blank" rel="noopener noreferrer" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">Airplane.dev was acquired and announced it would shut down</a>, Panther Labs had just 30 days to migrate their entire internal operations platform or face operational paralysis. All their core processes would stop working: customer provisioning, AWS account management, deployment pipelines, and alerting.
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"We were fully embedded into this platform. Everything was fine. We weren't looking to migrate. They got acqui-killed... we had to migrate to a new platform in 30 days."
 	</p>
@@ -90,7 +91,7 @@ export default function PantherLabsContent({ title, description }) {
 	<li><strong>Production reliability</strong> - For mission-critical internal operations</li>
 	<li><strong>True portability</strong> - Ability to migrate without rewriting everything</li>
 </ul>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"We got bit once before... determined not to get bit again by the sun setting of a startup platform."
 	</p>
@@ -130,7 +131,7 @@ def main(customer_email: str, aws_account_id: str):
     return result`}
 </CodeBlock>
 </div>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"We put the bulk of the business logic inside of a third-party library and the platform executors pull down this library. It gives us flexibility to just move our stuff around."
 	</p>
@@ -167,7 +168,7 @@ def main(customer_email: str, aws_account_id: str):
 	<li><strong>Monitoring and alerting:</strong> Slack alerts generated through Windmill workflows</li>
 	<li><strong>Self-service operations:</strong> Graphical apps for non-technical team members to manage complex configurations</li>
 </ul>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"Windmill ranks among the most stable components of our infrastructure."
 	</p>

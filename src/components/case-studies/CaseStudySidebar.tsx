@@ -21,7 +21,6 @@ interface CaseStudySidebarProps {
 	description: string;
 	useCases: string[];
 	selfHosted: boolean;
-	workers: number;
 	website: {
 		url: string;
 		label: string;
@@ -36,7 +35,6 @@ export default function CaseStudySidebar({
 	description,
 	useCases,
 	selfHosted,
-	workers,
 	website,
 	featuring
 }: CaseStudySidebarProps) {
@@ -101,14 +99,6 @@ export default function CaseStudySidebar({
 							<span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs font-medium">
 								{selfHosted ? 'EE Self-hosted' : 'EE Cloud'}
 							</span>
-						</div>
-					</div>
-					<div>
-						<div className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
-							Workers
-						</div>
-						<div className="text-sm text-gray-900 dark:text-white">
-							{workers}
 						</div>
 					</div>
 					<div>

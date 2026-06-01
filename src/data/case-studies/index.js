@@ -5,6 +5,7 @@ import { axiansCaseStudy } from './axians';
 import { zoomCaseStudy } from './zoom';
 
 // Private case studies (uncomment when approved):
+// import { onekomma5CaseStudy } from './1komma5';
 // import { twilioCaseStudy } from './twilio';
 
 export const caseStudies = [

@@ -17,7 +17,8 @@ export default function AxiansContent({ title, description }) {
 				<CaseStudyBackLink />
 
 				{/* Two-column layout */}
-				<div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+				<div className="lg:block">
+					<div className="lg:float-left lg:w-72 lg:mr-12 lg:mb-8">
 					<CaseStudySidebar
 						logo={{
 							light: "/images/brands/axians-vinci.svg",
@@ -25,12 +26,11 @@ export default function AxiansContent({ title, description }) {
 							alt: "Axians logo",
 							className: "h-44 w-auto object-contain mb-6"
 						}}
-						industry="IT Infrastructure"
+						industry="IT infrastructure"
 						companySize="400"
 						description="Managed service provider delivering network, cloud, datacenter, and unified communications services to enterprise customers worldwide."
 						useCases={["Multi-tenant orchestration", "Network deployments", "Self-healing automations", "Compliance automation"]}
 						selfHosted={axiansCaseStudy.selfHosted}
-						workers={20}
 						website={{ url: "https://www.axians.com", label: "axians.com" }}
 						featuring={{
 							name: "Ben Willems",
@@ -38,9 +38,10 @@ export default function AxiansContent({ title, description }) {
 							linkedin: "https://www.linkedin.com/in/benwillems/"
 						}}
 					/>
+					</div>
 
-					{/* Right column - Main content */}
-					<div className="lg:col-span-2">
+					{/* Main content - flows next to sidebar, full-width below */}
+					<div>
 						{/* Header section */}
 						<div className="mb-12">
 							<div className="mb-6 flex items-center justify-between">
@@ -82,7 +83,7 @@ export default function AxiansContent({ title, description }) {
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 	Axians operates in environments where customers entrust the organization with their most critical infrastructure. This level of trust requires predictability, transparency, and strict compliance. At the same time, Axians wanted to empower its engineers—those closest to the customer—to design, develop, and operate automations themselves.
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"We manage network and datacenter environments for customers such as government agencies, schools, hospitals, and large enterprises. These customers entrust Axians with mission-critical infrastructure, which requires a high degree of control, transparency, and compliance. To meet these expectations, we want to enable our engineers—who work closest to the customer—to develop automations themselves, within a centrally governed, secure, and auditable platform."
 	</p>
@@ -114,7 +115,7 @@ export default function AxiansContent({ title, description }) {
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 	Windmill's <Link to="/docs/advanced/cli/workspace-management" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">workspace model</Link> allows Axians to create a fully isolated environment per customer, while still enabling controlled sharing of automation components where appropriate. Axians deliberately started with customers whose processes were more generalizable and expanded from there as more customer teams onboarded.
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"You have a separate environment just for one customer where you can build all your automations and applications. We use Windmill Hub Private to share scripts between customers when appropriate and customize them for customer-specific logic."
 	</p>
@@ -133,7 +134,7 @@ export default function AxiansContent({ title, description }) {
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 	A key enabler of this approach is Windmill's <Link to="/pricing" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">usage-based pricing</Link> model. Axians can start with a limited number of active customers and expand as adoption increases, without committing to fixed licensing costs upfront.
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"The fact that the pricing of Windmill is based on actual usage aligns with the business value created. If adoption is high and many users are active, the cost of these licenses is also justified because more use cases are realized."
 	</p>
@@ -152,7 +153,7 @@ export default function AxiansContent({ title, description }) {
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 	Previously, engineers often ran scripts locally without consistent registration or guardrails. By adopting Windmill as the central orchestration platform, Axians ensured that every execution is logged, every change is traceable, and audit evidence is available by default.
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"We needed to move away from engineers running scripts on their laptops without any guardrails or registration. With Windmill as our central orchestration platform, everything is audited, registered, and logged—giving us the visibility and compliance we need."
 	</p>
@@ -173,7 +174,7 @@ export default function AxiansContent({ title, description }) {
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 	The solution consisted of multiple smaller scripts written in different languages, such as Python and Ansible, orchestrated into a single <Link to="/docs/flows/flow_editor" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">flow</Link>. This provided full visibility into deployment status, improved error handling, and ensured consistent configuration across all locations.
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"Back when we did not use Windmill, we had one large script that contained all the logic to deploy a customer. This was prone to errors and had no visibility on the status of the deployment. Now we create smaller scripts and orchestrate them, which gives us much more control over the entire deployment and the codebase behind it."
 	</p>
@@ -191,7 +192,7 @@ export default function AxiansContent({ title, description }) {
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 	Axians started with early adopters and is now scaling orchestration across the organization. Many customer-facing teams actively build and operate automations on the platform, with additional teams onboarding as adoption spreads.
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"You see that adoption is increasing. Where previously only technical people were thinking in terms of scripts, you now see business stakeholders also pushing for automation."
 	</p>

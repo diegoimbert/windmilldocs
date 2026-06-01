@@ -17,7 +17,8 @@ export default function ZoomContent({ title, description }) {
 				<CaseStudyBackLink />
 
 				{/* Two-column layout */}
-				<div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+				<div className="lg:block">
+					<div className="lg:float-left lg:w-72 lg:mr-12 lg:mb-8">
 					<CaseStudySidebar
 						logo={{
 							light: "/images/brands/zoom.svg",
@@ -30,7 +31,6 @@ export default function ZoomContent({ title, description }) {
 						description="Leading enterprise video communications platform offering meetings, phone systems, chat, and contact centers to millions of users globally."
 						useCases={["Demo platform", "Account provisioning", "Account hydration"]}
 						selfHosted={zoomCaseStudy.selfHosted}
-						workers={44}
 						website={{ url: "https://www.zoom.us", label: "zoom.us" }}
 						featuring={{
 							name: "Frederick Loucks",
@@ -38,9 +38,10 @@ export default function ZoomContent({ title, description }) {
 							linkedin: "https://www.linkedin.com/in/fred-loucks/"
 						}}
 					/>
+					</div>
 
-					{/* Right column - Main content */}
-					<div className="lg:col-span-2">
+					{/* Main content - flows next to sidebar, full-width below */}
+					<div>
 						{/* Header section */}
 						<div className="mb-12">
 							<div className="mb-6 flex items-center justify-between">
@@ -73,7 +74,7 @@ export default function ZoomContent({ title, description }) {
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 	Unlike tools where you can quickly spin up a sandbox environment, demonstrating a comprehensive, real-time communications platform like Zoom presents unique challenges, as the real-time API requires displaying live messages, calls, and other dynamic elements.
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"Zoom is an extensive platform with many interconnected components. The challenge is finding the balance between providing a fully-configured and lived-in demo environment that accurately shows Zoom's capabilities to our customers, and keeping those environments isolated from one another, ensuring changes to one demo don't disrupt another…all while limiting the amount of toil that goes into crafting these environments."
 	</p>
@@ -94,7 +95,7 @@ export default function ZoomContent({ title, description }) {
 	<li><Link to="/docs/advanced/self_host" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">Self-hosted</Link> on Kubernetes, with complete control in their AWS EKS environment</li>
 	<li>Everything-as-code, with workflows backed by proper <Link to="/docs/advanced/git_sync" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">version control</Link></li>
 </ul>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"A big part of our team's strength is the broad and varied skills we possess as a whole. However, when it comes to building a platform and inviting contribution from everyone, that can be a double-edged sword. With so many different programming and scripting languages at play, we needed something that could bridge all of those skillsets without forcing everyone to learn a new language."
 	</p>
@@ -140,7 +141,7 @@ def main(account_email: str, license_type: str):
 		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 			Zoom's most innovative use case — "drip hydration" — required sophisticated <Link to="/docs/core_concepts/scheduling" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">job scheduling</Link>. Unlike databases where you can insert data instantly, Zoom's real-time APIs require sequential message sending with realistic delays to create compelling demos that feel authentic.
 		</p>
-		<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+		<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 			<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 				"We actually use Windmill's job engine to do a lot of the heavy lifting for us. We schedule future jobs into Windmill's job engine to handle some of these drip hydration tasks."
 			</p>
@@ -160,7 +161,7 @@ def main(account_email: str, license_type: str):
 		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 			Windmill sits "at the center of everything" in Zoom's demo platform architecture, <Link to="/docs/advanced/self_host" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">self-hosted</Link> in AWS EKS. The platform consists of a React front-end portal with <Link to="/docs/apps/app_configuration_settings/app_styling" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">Windmill Apps</Link> embedded via iFrame, allowing rapid feature deployment without front-end code changes.
 		</p>
-		<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+		<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 			<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 				"We can build things very quickly in Windmill, iterate very quickly, and we can ship them into a nice front end portal without needing to really modify the front-end code in any way."
 			</p>

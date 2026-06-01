@@ -16,19 +16,19 @@ export default function CFAInstituteContent({ title, description }) {
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
 				<CaseStudyBackLink />
 
-				<div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+				<div className="lg:block">
+					<div className="lg:float-left lg:w-72 lg:mr-12 lg:mb-8">
 					<CaseStudySidebar
 						logo={{
 							light: "/images/brands/cfa-institute.svg",
 							dark: "/images/brands/cfa-institute-dark.svg",
 							alt: "CFA Institute logo"
 						}}
-						industry="Financial Services"
+						industry="Financial services"
 						companySize="1000+"
 						description="Global association of investment professionals that sets standards and provides education for the financial services industry, serving hundreds of thousands of investment professionals worldwide."
 						useCases={["Synthetic monitoring", "Microsoft Teams Bot", "Grafana data layer"]}
 						selfHosted={cfaInstituteCaseStudy.selfHosted}
-						workers={21}
 						website={{ url: "https://www.cfainstitute.org", label: "cfainstitute.org" }}
 						featuring={{
 							name: "Cam Barts",
@@ -37,8 +37,10 @@ export default function CFAInstituteContent({ title, description }) {
 							github: "https://github.com/cam-barts"
 						}}
 					/>
+					</div>
 
-					<div className="lg:col-span-2">
+					{/* Main content - flows next to sidebar, full-width below */}
+					<div>
 						<div className="mb-12">
 							<div className="mb-6 flex items-center justify-between">
 								<span className="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400">
@@ -69,7 +71,7 @@ export default function CFAInstituteContent({ title, description }) {
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 	CFA Institute's SRE team faced a common enterprise dilemma: they needed to automate frequent operational tasks, but their company's maintenance requirements made rapid deployment nearly impossible.
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"Our company has strict requirements around maintenance and deployment processes. We needed a way to get scripts into production quickly while still meeting those compliance standards."
 	</p>
@@ -90,7 +92,7 @@ export default function CFAInstituteContent({ title, description }) {
 	<li>Team Collaboration - Proper version control and Git workflows</li>
 	<li>Scale - Handle hundreds of executions per hour with complex orchestration</li>
 </ul>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"We needed something that was going to be a lot more robust, something that we could actually write code inside of. Windmill was kind of a natural evolution from n8n."
 	</p>
@@ -145,7 +147,7 @@ def main(endpoint: str, expected_status: int = 200):
 		<p className="text-gray-700 dark:text-gray-300 leading-relaxed">
 			Windmill scripts integrate into CFA Institute's formal change management process through a hot path that accelerates production readiness while maintaining proper controls. With <Link to="https://www.windmill.dev/docs/advanced/git_sync" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">Git sync</Link>, proper version control, and workspace collaboration features, the entire SRE team could work together seamlessly within their governance framework.
 		</p>
-		<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+		<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 			<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 				"We were very quickly able to get our scripts out of n8n and transitioned over into Windmill pretty quickly. And then from there our use of Windmill has kind of exploded."
 			</p>

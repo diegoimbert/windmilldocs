@@ -17,19 +17,19 @@ export default function AthenaIntelligenceContent({ title, description }) {
 				<CaseStudyBackLink />
 
 				{/* Two-column layout */}
-				<div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+				<div className="lg:block">
+					<div className="lg:float-left lg:w-72 lg:mr-12 lg:mb-8">
 					<CaseStudySidebar
 						logo={{
 							light: "/images/brands/athena-light.svg",
 							dark: "/images/brands/athena-dark.svg",
 							alt: "Athena Intelligence logo"
 						}}
-						industry="Enterprise Software"
+						industry="Enterprise software"
 						companySize="10-50"
 						description="AI agent platform for enterprise automation serving the advisory and consulting industry, financial services, and healthcare."
 						useCases={["AI agent scripts", "Embedded deployment", "Self-hosted infrastructure"]}
 						selfHosted={athenaIntelligenceCaseStudy.selfHosted}
-						workers={24}
 						website={{ url: "https://www.athenaintel.com", label: "athenaintel.com" }}
 						featuring={{
 							name: "Brendon Geils",
@@ -38,9 +38,10 @@ export default function AthenaIntelligenceContent({ title, description }) {
 							github: "https://github.com/bgeils"
 						}}
 					/>
+					</div>
 
-					{/* Right column - Main content */}
-					<div className="lg:col-span-2">
+					{/* Main content - flows next to sidebar, full-width below */}
+					<div>
 						{/* Header section */}
 						<div className="mb-12">
 							<div className="mb-6 flex items-center justify-between">
@@ -73,7 +74,7 @@ export default function AthenaIntelligenceContent({ title, description }) {
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 	Brendon Geils, founder of Athena Intelligence, spent years evaluating workflow orchestration platforms. The blocker was always deployment: could it run in a customer's environment? In an on-premise data center? Embedded into another product?
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"I had tested every product on the market. There was not very many products that were willing to be deployed on private clouds, self-hosted, on-prem, embedded."
 	</p>
@@ -84,7 +85,7 @@ export default function AthenaIntelligenceContent({ title, description }) {
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 	Most workflow companies built SaaS products where multi-tenancy was baked into their business model. Self-hosting was an afterthought. But for Athena, this blocked access to their entire target market. Major consulting firms won't route sensitive client data through third-party SaaS. Healthcare companies face HIPAA requirements. Financial services have data sovereignty policies.
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"We would never go with a vendor that wouldn't make that possible in one, two, three years time because it's like putting all your eggs in a basket and then at scale you can actually never deploy that basket into the facilities that we want."
 	</p>
@@ -102,7 +103,7 @@ export default function AthenaIntelligenceContent({ title, description }) {
 	<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
 		Windmill supported cloud, <Link to="https://www.windmill.dev/docs/advanced/self_host" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">self-hosted</Link>, on-premise, and embedded deployments as core capabilities, not afterthoughts. The <a href="https://github.com/windmill-labs/windmill" target="_blank" rel="noopener noreferrer" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">open-source</a> foundation meant Athena could verify deployment feasibility before committing, which is critical for enterprise IT reviews.
 	</p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"Everything worked out of the box. It was easy for me to learn. The technical people on our team took to it really quickly."
 	</p>
@@ -113,7 +114,7 @@ export default function AthenaIntelligenceContent({ title, description }) {
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
 	For a platform company, reliability was existential. When infrastructure embedded in a customer-facing product fails, it's Athena's reputation on the line.
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"When I get woken up at night because something is on fire, it's never due to Windmill. Windmill is actually one of the most stable parts of our business, so we can quickly focus on identifying and fixing the real issue."
 	</p>
@@ -131,7 +132,7 @@ export default function AthenaIntelligenceContent({ title, description }) {
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
 	When Athena's <Link to="https://www.windmill.dev/docs/core_concepts/ai_agents" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">AI agent</Link> encounters a task it can't handle, customers write a custom script. The agent helps write the code, the script is saved in Windmill, and it becomes a new tool the agent invokes automatically.
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"Our primary use case is the script capability. Our agent has a set of built-in tools, but whenever we need something new, customers build a custom script. The agent can help them write the code, and then that script becomes a new tool in the agent's toolkit."
 	</p>
@@ -171,7 +172,7 @@ def check_compliance(company_id: str, review_year: int):
 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
 	After nearly a year in production, Windmill serves dozens of customer organizations running 24/7 automation. The infrastructure has proven rock-solid.
 </p>
-<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 overflow-hidden">
 	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
 		"Windmill ranks among the most stable components of our infrastructure for performance, cost, scaling, uptime."
 	</p>

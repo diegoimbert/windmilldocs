@@ -76,10 +76,8 @@ function Spacer() {
 
 export default function BlogPostItemHeaderInfo({ className }) {
 	const blogPostContext = useBlogPost();
-	console.log('BlogPost context:', blogPostContext);
-	
+
 	if (!blogPostContext?.metadata) {
-		console.warn('No metadata available');
 		return null;
 	}
 

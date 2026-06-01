@@ -4,7 +4,7 @@ import { ArrowRight, CircleIcon, LucideIcon } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import FlowChart from './FlowChart';
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import { light } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { githubGist as light } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 // Client-only Lottie component
 function LottiePlayer({ animationData, loop, autoplay, onPlay }: {
