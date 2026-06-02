@@ -7,7 +7,7 @@ description: How do I authenticate users with external JWT tokens instead of Win
 Instead of using the built-in authentication and authorization mechanisms, you can generate your own JWT tokens with the desired permissions for your already authenticated users and pass them to Windmill.
 This way, you control what permissions your users have without having to create them in Windmill.
 
-This feature is [Enterprise Edition](/pricing) and [Whitelabel](../../misc/8_white_labelling/index.mdx) only.
+This feature is [Enterprise Edition](/pricing) only.
 
 For [billing](/pricing), a unique external JWT user is counted per (username/email, scope, instance) tuple used in the last 30 days. The same email used with two different scopes, or on two different instances, counts as two JWT users. Each unique JWT user counts as half a [Seat](../../core_concepts/16_roles_and_permissions/index.mdx#users) - the same as an [operator](../../core_concepts/16_roles_and_permissions/index.mdx#operator). Operators and external JWT users are interchangeable in seat counting (e.g. 1 operator + 1 external JWT user = 1 Seat).
 
