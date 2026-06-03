@@ -1,0 +1,334 @@
+---
+title: How Wezoo lets non-engineers contribute to Windmill through workspace forks
+description: Wezoo's solo Head of Engineering opened up internal automation to a non-developer team by replacing Git sync with workspace forks as the contribution model, keeping AI-built apps reviewable without forcing everyone to learn Git.
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import React from 'react';
+import Link from '@docusaurus/Link';
+import CaseStudySidebar from '@site/src/components/case-studies/CaseStudySidebar';
+import CaseStudyBackLink from '@site/src/components/case-studies/CaseStudyBackLink';
+import { wezooCaseStudy } from '@site/src/data/case-studies/wezoo';
+
+export default function WezooContent({ title, description }) {
+	const [contribDiagramExpanded, setContribDiagramExpanded] = React.useState(false);
+	return (
+		<div className="pt-32 max-w-full">
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+				<CaseStudyBackLink />
+
+				<div className="lg:block">
+					<div className="lg:float-left lg:w-72 lg:mr-12 lg:mb-8">
+					<CaseStudySidebar
+						logo={{
+							light: "/images/brands/wezoo-light.svg",
+							dark: "/images/brands/wezoo-dark.svg",
+							alt: "Wezoo logo",
+							className: "h-44 w-auto object-contain mb-6"
+						}}
+						industry="Marketplace"
+						companySize="<10"
+						description="Bootstrapped marketplace for flexible office space, connecting companies with workspaces, hot desks and meeting rooms across cities."
+						useCases={["Operational dashboards", "Non-developer contribution", "Internal automation", "AI-built apps"]}
+						selfHosted={wezooCaseStudy.selfHosted}
+						workers={4}
+						website={{ url: "https://wezoo.com", label: "wezoo.com" }}
+						featuring={{
+							name: "Yuri van Geffen",
+							role: "Head of Engineering at Wezoo",
+							linkedin: "https://www.linkedin.com/in/yuri-van-geffen/"
+						}}
+					/>
+					</div>
+
+					{/* Main content - flows next to sidebar, full-width below */}
+					<div>
+						{/* Header section */}
+						<div className="mb-12">
+							<div className="mb-6 flex items-center justify-between">
+								<span className="text-xs font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400">
+									Case Study
+								</span>
+								<span className="text-sm text-gray-500 dark:text-gray-400">
+									{new Date(wezooCaseStudy.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+								</span>
+							</div>
+							<h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-white mb-4">
+								{title}
+							</h1>
+							<p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
+								{description}
+							</p>
+						</div>
+
+						{/* Content sections */}
+						<div className="space-y-12">
+<section>
+<h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">About</h2>
+	<p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+		<a href="https://wezoo.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">Wezoo</a> is an online booking platform for flexible office space: meeting rooms, day offices, hot desks and longer-term private offices. It works with many coworking and hotel brands across the EU, US and UK, with more than 2500 locations bookable through the platform. Behind the product, Wezoo runs as a lean startup: a handful of full-time team members, a rotation of interns and freelancers, and a single Head of Engineering responsible for everything tech.
+	</p>
+	<p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+		Windmill has been a cornerstone of Wezoo's backend operations from when the platform had only a couple of locations all the way to today's 2500+. Wezoo runs a self-hosted Windmill instance on Kubernetes to cover both internal tools and automations.
+	</p>
+	<figure className="mt-6 overflow-hidden">
+		<img src="/images/case-studies/wezoo-product-1.webp" alt="Wezoo flexible office space marketplace" className="w-full rounded-lg border border-gray-200 dark:border-gray-700" loading="lazy" />
+		<figcaption className="text-sm text-gray-500 dark:text-gray-400 mt-2 text-center">The Wezoo booking platform, where customers reserve meeting rooms across 2500+ locations.</figcaption>
+	</figure>
+</section>
+
+<section>
+<h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The problem</h2>
+<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+	Wezoo started with Windmill the classical way: <Link to="/docs/apps/app_editor" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">apps</Link> and dashboards for the operations team to review bookings, edit locations and run administrative tasks. That worked well when one engineer was the only builder and the rest of the team were operators.
+</p>
+<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+	As the team started experimenting with AI coding agents, the picture changed. Non-engineering colleagues, mostly in marketing, sales and business operations, began drafting their own internal apps locally with Claude Code and the <Link to="/docs/core_concepts/mcp" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">Windmill MCP server</Link>. The output was promising but the contribution surface was now larger than Yuri alone, and the existing <Link to="/platform/deployment-versioning" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">Git sync</Link> workflow that Yuri used to manage his own changes did not translate well to the rest of the team.
+</p>
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
+		"Git sync works fine for me, but it's a complicated concept for non-developer people to understand."
+	</p>
+	<cite className="text-sm text-gray-500 dark:text-gray-400">
+		Yuri van Geffen, Head of Engineering at Wezoo
+	</cite>
+</blockquote>
+<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+	The constraint was not the building, AI agents handled most of that, but the contribution loop: how does a non-developer ship a script or an app into a self-hosted Windmill instance without learning Git, without accidentally touching production, and without blocking on Yuri for every edit?
+</p>
+</section>
+
+<section>
+<h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The solution</h2>
+
+<div className="space-y-8">
+	<div>
+		<h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+			Workspace forks as the non-developer contribution model
+		</h3>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+			Instead of pushing the rest of the team toward Git, Yuri pushed the contribution model toward them. Non-developers now work inside <Link to="/platform/deployment-versioning" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">forked workspaces</Link>: full copies of the production workspace where they can iterate without touching the live setup. Yuri reviews and merges back when the change is ready.
+		</p>
+		<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+			<p className="text-gray-700 dark:text-gray-300 italic mb-2">
+				"For their workspaces, they use the forking functionality. I might imagine that we all migrate towards that at some point, and just have Git as a backup for the source code."
+			</p>
+			<cite className="text-sm text-gray-500 dark:text-gray-400">
+				Yuri van Geffen
+			</cite>
+		</blockquote>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+			The mental model is closer to what the team already knows: a personal copy you can mess with, a clear handoff back to the main instance through review. Git stays in place as the source of truth for Yuri's own work and as a backup of the production workspace, but it is no longer the only path into the platform.
+		</p>
+	</div>
+
+	<div>
+		<h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+			AI agents and MCP for local building
+		</h3>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+			On the building side, non-developers pair an AI coding agent (mostly Claude Code) with the <Link to="/docs/core_concepts/mcp" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">Windmill MCP server</Link>. They draft scripts, flows and apps locally, with the MCP server providing context about the available Windmill primitives. Once a piece is in good enough shape, Yuri helps export it into their forked workspace where it can actually run against Wezoo's infrastructure.
+		</p>
+		<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+			<p className="text-gray-700 dark:text-gray-300 italic mb-2">
+				"The visualness of Windmill makes things understandable, and the MCP integration makes it quite useful for me to explain things to them. It's the best moment in time to at least try it."
+			</p>
+			<cite className="text-sm text-gray-500 dark:text-gray-400">
+				Yuri van Geffen
+			</cite>
+		</blockquote>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+			The visual editor matters here for a second reason: even when the original author is an agent, someone else on the team still needs to read the result. A flow that renders as a graph and an app that renders as a form are reviewable by people who would not read raw code.
+		</p>
+	</div>
+
+	<div>
+		<h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+			One workspace per non-developer, sandboxed access
+		</h3>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+			Non-developers each get their own forked workspace rather than dropping straight into production. That keeps the blast radius tight: each contributor only has access to the backend endpoints and resources they actually need, and an experiment that goes wrong stays inside the fork. Yuri's role on the backend has shifted accordingly: less building dashboards himself, more exposing the right scripts and endpoints so the rest of the team can compose with them safely.
+		</p>
+		<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+			<p className="text-gray-700 dark:text-gray-300 italic mb-2">
+				"We're a small team, so we need everyone to be able to automate some parts of the operation themselves without relying on me."
+			</p>
+			<cite className="text-sm text-gray-500 dark:text-gray-400">
+				Yuri van Geffen
+			</cite>
+		</blockquote>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+			Operational dashboards remain a load-bearing part of the setup. Bookings, locations and customer admin still flow through Windmill apps the team uses every day. The forks model sits on top of that foundation, not in place of it.
+		</p>
+		<figure
+			className={contribDiagramExpanded
+				? "fixed inset-0 z-[1000] m-0 p-8 bg-black flex flex-col items-center justify-center cursor-zoom-out text-gray-100"
+				: "my-8 text-gray-900 dark:text-gray-100 max-w-5xl mx-auto cursor-zoom-in"}
+			onClick={() => setContribDiagramExpanded(!contribDiagramExpanded)}
+			role="button"
+			tabIndex={0}
+			onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') setContribDiagramExpanded(!contribDiagramExpanded); }}
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 480" fill="none" stroke="currentColor" strokeWidth="1.25" className={contribDiagramExpanded ? "max-w-[95vw] max-h-[85vh] w-auto h-auto" : "w-full h-auto"} role="img" aria-label="Wezoo contribution flow: non-developers paired with Claude Code and Windmill MCP push into sandboxed forks that get reviewed and merged into a production workspace backed up to GitHub.">
+				<title>Wezoo non-developer contribution flow</title>
+				<defs>
+					<marker id="wz-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+						<path d="M0,0 L10,5 L0,10 z" fill="currentColor" stroke="none"/>
+					</marker>
+					<path id="wz-path-1" d="M 240 85 L 300 85"/>
+					<path id="wz-path-2" d="M 240 225 L 300 225"/>
+					<path id="wz-path-3" d="M 240 365 L 300 365"/>
+					<path id="wz-path-m1" d="M 510 85 C 560 85, 560 225, 610 225"/>
+					<path id="wz-path-m2" d="M 510 225 L 610 225"/>
+					<path id="wz-path-m3" d="M 510 365 C 560 365, 560 225, 610 225"/>
+					<path id="wz-path-git" d="M 830 225 L 890 225"/>
+				</defs>
+
+				{/* Column headers */}
+				<text x="125" y="22" textAnchor="middle" fontSize="11" fontWeight="600" fill="currentColor" stroke="none" opacity="0.55" letterSpacing="1.5">NON-DEVELOPERS + AI</text>
+				<text x="400" y="22" textAnchor="middle" fontSize="11" fontWeight="600" fill="currentColor" stroke="none" opacity="0.55" letterSpacing="1.5">SANDBOXED FORKS</text>
+				<text x="720" y="22" textAnchor="middle" fontSize="11" fontWeight="600" fill="currentColor" stroke="none" opacity="0.55" letterSpacing="1.5">PRODUCTION</text>
+				<text x="950" y="22" textAnchor="middle" fontSize="11" fontWeight="600" fill="currentColor" stroke="none" opacity="0.55" letterSpacing="1.5">SOURCE OF TRUTH</text>
+
+				{/* Non-developer pods (3 rows) */}
+				{[0,1,2].map(i => (
+					<g key={`nd-${i}`} transform={`translate(0,${i*140})`}>
+						<rect x="20" y="40" width="220" height="90" rx="10" strokeOpacity="0.35"/>
+						<circle cx="50" cy="72" r="13" strokeOpacity="0.6"/>
+						<circle cx="50" cy="68" r="4.5" fill="currentColor" stroke="none" opacity="0.7"/>
+						<path d="M 38 84 Q 50 78 62 84" strokeOpacity="0.6"/>
+						<text x="72" y="68" fill="currentColor" stroke="none" fontWeight="600" fontSize="13">{`Non-dev ${i+1}`}</text>
+						<text x="72" y="84" fill="currentColor" stroke="none" fontSize="12" opacity="0.7">marketing · sales · ops</text>
+						<line x1="32" y1="98" x2="228" y2="98" strokeOpacity="0.2"/>
+						<text x="130" y="118" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12" opacity="0.75">Claude Code + Windmill MCP</text>
+					</g>
+				))}
+
+				{/* Fork workspaces (3 rows) */}
+				{[0,1,2].map(i => (
+					<g key={`fk-${i}`} transform={`translate(0,${i*140})`}>
+						<rect x="300" y="40" width="210" height="90" rx="10" strokeOpacity="0.35"/>
+						<image href="/img/windmill.svg" x="316" y="56" width="24" height="24" preserveAspectRatio="xMidYMid meet"/>
+						<text x="348" y="68" fill="currentColor" stroke="none" fontWeight="600" fontSize="13">Fork workspace</text>
+						<text x="348" y="84" fill="currentColor" stroke="none" fontSize="12" opacity="0.7">isolated copy</text>
+						<line x1="312" y1="98" x2="498" y2="98" strokeOpacity="0.2"/>
+						<text x="405" y="118" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12" opacity="0.75">scoped resources · safe to break</text>
+					</g>
+				))}
+
+				{/* Production workspace (one box, vertically centered) */}
+				<rect x="610" y="125" width="220" height="200" rx="12" strokeOpacity="0.45" strokeWidth="1.75" fill="currentColor" fillOpacity="0.04"/>
+				<image href="/img/windmill.svg" x="628" y="148" width="32" height="32" preserveAspectRatio="xMidYMid meet"/>
+				<text x="668" y="162" fill="currentColor" stroke="none" fontWeight="600" fontSize="14">Production</text>
+				<text x="668" y="180" fill="currentColor" stroke="none" fontSize="13" opacity="0.75">workspace</text>
+				<line x1="622" y1="200" x2="818" y2="200" strokeOpacity="0.2"/>
+				<text x="720" y="222" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12" opacity="0.7">apps · dashboards</text>
+				<text x="720" y="240" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12" opacity="0.7">scripts · flows</text>
+				<text x="720" y="278" textAnchor="middle" fill="currentColor" stroke="none" fontSize="11" opacity="0.55" letterSpacing="1">REVIEWED BY YURI</text>
+				<rect x="650" y="288" width="140" height="22" rx="4" strokeOpacity="0.35"/>
+				<text x="720" y="304" textAnchor="middle" fill="currentColor" stroke="none" fontSize="11" opacity="0.7">merge from fork</text>
+
+				{/* GitHub box */}
+				<rect x="890" y="160" width="170" height="130" rx="10" strokeOpacity="0.35"/>
+				<image href="/third_party_logos/github.svg" x="906" y="178" width="28" height="28" preserveAspectRatio="xMidYMid meet" className={contribDiagramExpanded ? "invert" : "dark:invert"}/>
+				<text x="942" y="190" fill="currentColor" stroke="none" fontWeight="600" fontSize="13">GitHub</text>
+				<text x="942" y="206" fill="currentColor" stroke="none" fontSize="12" opacity="0.7">repo backup</text>
+				<line x1="902" y1="220" x2="1048" y2="220" strokeOpacity="0.2"/>
+				<text x="975" y="244" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12" opacity="0.75">Git sync</text>
+				<text x="975" y="262" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12" opacity="0.7">production backup</text>
+				<text x="975" y="280" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12" opacity="0.7">Yuri's own work</text>
+
+				{/* Static arrow strokes */}
+				<use href="#wz-path-1" markerEnd="url(#wz-arr)" strokeOpacity="0.55"/>
+				<use href="#wz-path-2" markerEnd="url(#wz-arr)" strokeOpacity="0.55"/>
+				<use href="#wz-path-3" markerEnd="url(#wz-arr)" strokeOpacity="0.55"/>
+				<use href="#wz-path-m1" markerEnd="url(#wz-arr)" strokeOpacity="0.55"/>
+				<use href="#wz-path-m2" markerEnd="url(#wz-arr)" strokeOpacity="0.55"/>
+				<use href="#wz-path-m3" markerEnd="url(#wz-arr)" strokeOpacity="0.55"/>
+				<use href="#wz-path-git" markerEnd="url(#wz-arr)" strokeOpacity="0.55"/>
+
+				{/* Animated travelling dots along each path */}
+				<circle r="3.5" fill="#3b82f6" stroke="none">
+					<animateMotion dur="2.6s" repeatCount="indefinite" rotate="0">
+						<mpath href="#wz-path-1"/>
+					</animateMotion>
+				</circle>
+				<circle r="3.5" fill="#3b82f6" stroke="none">
+					<animateMotion dur="2.6s" begin="0.4s" repeatCount="indefinite" rotate="0">
+						<mpath href="#wz-path-2"/>
+					</animateMotion>
+				</circle>
+				<circle r="3.5" fill="#3b82f6" stroke="none">
+					<animateMotion dur="2.6s" begin="0.8s" repeatCount="indefinite" rotate="0">
+						<mpath href="#wz-path-3"/>
+					</animateMotion>
+				</circle>
+				<circle r="3.5" fill="#22c55e" stroke="none">
+					<animateMotion dur="3.2s" begin="1.2s" repeatCount="indefinite" rotate="0">
+						<mpath href="#wz-path-m1"/>
+					</animateMotion>
+				</circle>
+				<circle r="3.5" fill="#22c55e" stroke="none">
+					<animateMotion dur="3.2s" begin="1.6s" repeatCount="indefinite" rotate="0">
+						<mpath href="#wz-path-m2"/>
+					</animateMotion>
+				</circle>
+				<circle r="3.5" fill="#22c55e" stroke="none">
+					<animateMotion dur="3.2s" begin="2s" repeatCount="indefinite" rotate="0">
+						<mpath href="#wz-path-m3"/>
+					</animateMotion>
+				</circle>
+				<circle r="3.5" fill="#a855f7" stroke="none">
+					<animateMotion dur="2.4s" begin="0.6s" repeatCount="indefinite" rotate="0">
+						<mpath href="#wz-path-git"/>
+					</animateMotion>
+				</circle>
+
+				{/* Arrow labels */}
+				<text x="270" y="78" textAnchor="middle" fill="currentColor" stroke="none" fontSize="11" opacity="0.65">draft</text>
+				<text x="270" y="218" textAnchor="middle" fill="currentColor" stroke="none" fontSize="11" opacity="0.65">draft</text>
+				<text x="270" y="358" textAnchor="middle" fill="currentColor" stroke="none" fontSize="11" opacity="0.65">draft</text>
+				<text x="560" y="135" textAnchor="middle" fill="currentColor" stroke="none" fontSize="11" opacity="0.65">review + merge</text>
+				<text x="860" y="218" textAnchor="middle" fill="currentColor" stroke="none" fontSize="11" opacity="0.65">Git sync</text>
+			</svg>
+			<figcaption className={contribDiagramExpanded ? "text-center text-sm text-gray-300 mt-3" : "text-center text-sm text-gray-500 dark:text-gray-400 mt-3"}>
+				Each non-developer pairs an AI agent with the Windmill MCP server and drafts into their own sandboxed fork. Yuri reviews and merges into the production workspace, which Git-syncs to GitHub as backup and source of truth.
+			</figcaption>
+		</figure>
+	</div>
+
+	<div>
+		<h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+			Self-hosted on Kubernetes
+		</h3>
+		<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+			Wezoo runs Windmill <Link to="/docs/advanced/self_host" className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline cursor-pointer">self-hosted</Link> on their own Kubernetes cluster. That keeps customer data inside their infrastructure and gives Yuri the level of control he wants over how the platform is deployed and updated.
+		</p>
+	</div>
+</div>
+</section>
+
+<section>
+<h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The result</h2>
+<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+	Wezoo runs its internal tooling, integrations and growing fleet of AI-built apps off a single self-hosted Windmill instance, maintained by one engineer. Non-developers can now ship into the platform without learning Git, working inside forked workspaces that get reviewed and merged back into production.
+</p>
+<p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+	The split is clean: Yuri keeps Git sync for his own work and for production backup, the rest of the team contributes through forks, and AI agents handle the bulk of the drafting on both sides. For a four-person operation, that is the difference between one bottlenecked engineer and a team that can automate its own work.
+</p>
+<blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6">
+	<p className="text-gray-700 dark:text-gray-300 italic mb-2">
+		"We're probably going to be using Windmill more and more, also because of the rest of the team onboarding as creators and not just as operators."
+	</p>
+	<cite className="text-sm text-gray-500 dark:text-gray-400">
+		Yuri van Geffen
+	</cite>
+</blockquote>
+</section>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}

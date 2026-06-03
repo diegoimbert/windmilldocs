@@ -7,7 +7,7 @@ import LayoutProvider from '@theme/Layout/Provider';
 import { caseStudies } from '../data/case-studies';
 import CaseStudyCard from '../components/use-cases/CaseStudyCard';
 
-const INDUSTRY_FILTERS = ['All', 'Enterprise software', 'IT infrastructure', 'Cybersecurity', 'Financial services', 'Climate tech'];
+const INDUSTRY_FILTERS = ['All', 'Enterprise software', 'IT infrastructure', 'Cybersecurity', 'Financial services', 'Climate tech', 'Marketplace'];
 
 export default function CaseStudiesPage() {
 	const [activeFilter, setActiveFilter] = useState('All');
