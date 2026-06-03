@@ -65,6 +65,20 @@ sign button) and select a Variable. The name of a Variable will look like
 `$var:<NAME_OF_VAR>`. When resources are called from a Script, the Variable
 reference will be replaced by its value.
 
+Resource values support two other placeholders, resolved at the moment the resource is fetched:
+
+- `$res:<RESOURCE_PATH>` — embeds another Resource's value. Like `$var:`, it is resolved with the caller's permissions, so the fetch fails if the caller cannot read the referenced resource.
+- `$WM_*` — a [contextual variable](../47_environment_variables/index.mdx#contextual-variables) (for example `$WM_TOKEN`, `$WM_JOB_ID`, `$WM_WORKSPACE`), resolved to the running job's context when the resource is fetched as part of a job. Outside of a job context it is left unchanged.
+
+:::info Only these placeholders are interpolated
+
+Inside a Resource value, only `$var:`, `$res:` and `$WM_*` are substituted. Any other
+`$`-prefixed string — including [custom workspace environment variables](../47_environment_variables/index.mdx#custom-environment-variables) —
+is returned as-is and is **not** interpolated. (Custom environment variables are still
+injected into Scripts and workers; they are simply not resolved inside Resource values.)
+
+:::
+
 Resources can be assigned a description. It supports markdown.
 
 ![Resource description](./resource_description.png 'Resource description')
