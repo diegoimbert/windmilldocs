@@ -88,10 +88,10 @@ import { main as foo, util } from '../my_script_path';
 
 Relative imports syntax is much preferred as it will work on [local editors](../4_local_development/index.mdx) without further configuration.
 
-You may also use absolute imports. The recommended form uses the `$f/` and `$u/` aliases, which resolve the same way on the Windmill worker and locally - both for editor type hints and when running scripts, in Bun and Deno:
+You may also use absolute imports:
 
 ```typescript
-import { main as foo, util } from '$f/common/my_script_path.ts';
+import { main as foo, util } from '/f/common/my_script_path';
 
 export async function main() {
 	await foo();
@@ -99,9 +99,7 @@ export async function main() {
 }
 ```
 
-`$f/` points to folder scripts (`f/<foldername>/...`) and `$u/` to user-space scripts (`u/<username>/...`). On [local development](../4_local_development/index.mdx), `wmill init` (or `wmill refresh tsconfig`) generates the configuration that resolves these aliases: a wmill-managed `tsconfig.wmill.json` holding the recommended `compilerOptions`, and a `tsconfig.json` that extends it. Deno projects get an `import_map.wmill.json` wired through `deno.json` instead.
-
-The older `/f/` and `/u/` absolute form still works on the worker. Locally, adding this mapping to tsconfig.json lets Bun resolve it too:
+but to make it work with your local editor, you will need the following configuration in tsconfig.json
 
 ```json
 {
@@ -112,8 +110,6 @@ The older `/f/` and `/u/` absolute form still works on the worker. Locally, addi
 	}
 }
 ```
-
-Bun applies tsconfig `paths`, so this resolves at runtime, but the leading `/` makes the import non-portable: Deno resolves through import maps rather than tsconfig `paths`, and other tools treat `/f/...` as a filesystem-root path. Prefer `$f/` / `$u/`, a bare specifier that resolves consistently through the generated config.
 
 Note that [paths](../../core_concepts/16_roles_and_permissions/index.mdx#path) in Windmill can have as many depth as needed, so you can have paths like this `f/folder/subfolder/my_script_path` and relative imports will work at any level. Hence, it will work exactly the same as on local.
 
