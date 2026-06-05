@@ -13,7 +13,7 @@ In this quick start guide, we will write our first script ran from a [Docker](ht
 Windmill natively supports Python, TypeScript, Go, PHP, Bash or SQL.
 In some cases where your task requires a complex set of dependencies or is implemented in a non-supported language, Windmill allows running any Docker container through its [Bash](../4_bash_quickstart/index.mdx) support.
 
-As a pre-requisite, the host docker daemon needs to be mounted into the worker container. This is done through a simple volume mount: `/var/run/docker.sock:/var/run/docker.sock`.
+The recommended way is the sandboxed `# sandbox <image>` runtime: it is daemonless (no Docker socket or Docker-in-Docker sidecar) and runs the image inside the job's own nsjail sandbox, so it is safe to run untrusted code and is available on [Windmill Cloud](/pricing). See [Run Docker containers](../../../advanced/7_docker/index.mdx) for the full reference.
 
 ![script 1](../../../advanced/7_docker/as_script.png.webp)
 
@@ -51,28 +51,28 @@ Scripts consist of 2 parts:
 
 When stored in a code repository, those 2 parts are stored separately at `<path>.docker` and `<path>.script.yaml`.
 
-Below is a simple example of a script built using Bash to run Docker containers from Windmill:
+Below is a simple example of a script built using Bash to run a Docker container from Windmill:
 
 ```bash
 # shellcheck shell=bash
-# docker
-# The annotation "docker" above is important, it tells windmill that after 
-# the end of the bash script, it should manage the container at id $WM_JOB_ID:
-# pipe logs, monitor memory usage, kill container if job is cancelled.
+# sandbox alpine:latest
+# The "# sandbox <image>" annotation runs this script INSIDE the image above,
+# sandboxed via nsjail. The body runs with the image's /bin/sh and windmill args
+# bind positionally as $1, $2, ...
 
 msg="${1:-world}"
 
-IMAGE="alpine:latest"
-COMMAND="/bin/echo Hello $msg"
-
-# ensure that the image is up-to-date
-docker pull $IMAGE
-
-# if using the 'docker' mode, name it with $WM_JOB_ID for windmill to monitor it
-docker run --name $WM_JOB_ID -it -d $IMAGE $COMMAND
+echo "Hello $msg"
+cat /etc/os-release | head -1
 ```
 
-To see more details about to setup your kubernetes or docker-compose setup to run docker containers, see [Run docker containers](../../../advanced/7_docker/index.mdx)
+To see more details about the sandboxed runtime, see [Run docker containers](../../../advanced/7_docker/index.mdx).
+
+:::note
+
+A bare `# docker` annotation selects a separate legacy daemon-based runtime that requires a mounted Docker socket and is intended for trusted setups only. New scripts should use `# sandbox <image>`.
+
+:::
 
 <div className="grid grid-cols-2 gap-6 mb-4">
 	<DocCard
@@ -134,31 +134,20 @@ boilerplate. Let's take a look:
 
 ```bash
 # shellcheck shell=bash
-# docker
-# The annotation "docker" above is important, it tells windmill that after 
-# the end of the bash script, it should manage the container at id $WM_JOB_ID:
-# pipe logs, monitor memory usage, kill container if job is cancelled.
+# sandbox alpine:latest
+# The "# sandbox <image>" annotation runs this script INSIDE the image above,
+# sandboxed via nsjail. The body runs with the image's /bin/sh and windmill args
+# bind positionally as $1, $2, ...
 
 msg="${1:-world}"
 
-IMAGE="alpine:latest"
-COMMAND="/bin/echo Hello $msg"
-
-# ensure that the image is up-to-date
-docker pull $IMAGE
-
-# if using the 'docker' mode, name it with $WM_JOB_ID for windmill to monitor it
-docker run --name $WM_JOB_ID -it -d $IMAGE $COMMAND
+echo "Hello $msg"
+cat /etc/os-release | head -1
 ```
 
 `msg` is just a normal Bash variable. It can be used to pass arguments to the script. This syntax is the standard Bash one to assign default values to parameters.
 
-```
-docker run --name $WM_JOB_ID -it -d $IMAGE $COMMAND
-```
-
-Windmill has a native docker support if the `# docker` annotation is used. It will assume a a docker socket is mounted like in the example above and will take over management of the container as soon as the script ends, assuming that the container was ran with the `$WM_JOB_ID` as name.
-Which is why you should use docker `-d` deamon mode so that the bash script terminates early.
+With the `# sandbox <image>` annotation, the rest of the script runs **inside** that image, sandboxed by nsjail: the image rootfs is pulled and the body runs chrooted in it via the image's `/bin/sh`, inheriting the job's confinement. Windmill arguments bind positionally as `$1`, `$2`, … It is daemonless, so there is no Docker socket to mount and no `docker run` to manage.
 
 ### Instant preview & testing
 

@@ -300,16 +300,13 @@ function main(
   if ($uppercase) $greeting = strtoupper($greeting);
   return ["message" => $greeting, "count" => $count];
 }` },
-	{ id: 'docker', label: 'Docker', icon: SiDocker, lang: 'bash', runtime: 'Any language via Docker containers', deps: 'Any — defined in Dockerfile or image', lsp: 'Bash shellcheck', quickstart: '/docs/getting_started/scripts_quickstart/docker', snippet:
+	{ id: 'docker', label: 'Docker', icon: SiDocker, lang: 'bash', runtime: 'Any image, sandboxed (daemonless)', deps: 'Any — defined in Dockerfile or image', lsp: 'Bash shellcheck', quickstart: '/docs/getting_started/scripts_quickstart/docker', snippet:
 `# shellcheck shell=bash
-# docker
+# sandbox alpine:latest
 
 msg="\${1:-world}"
-IMAGE="alpine:latest"
 
-docker pull $IMAGE
-docker run --rm --name $WM_JOB_ID \\
-  $IMAGE /bin/echo "Hello $msg"` },
+echo "Hello $msg"` },
 	{ id: 'rest', label: 'REST', icon: Globe, lang: 'typescript', runtime: 'Bun TypeScript (native fetch)', deps: 'None — stdlib JavaScript only', lsp: 'TypeScript LSP', quickstart: '/docs/getting_started/scripts_quickstart/rest_grapqhql', snippet:
 `//native
 

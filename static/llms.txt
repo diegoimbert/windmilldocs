@@ -75,7 +75,7 @@ OpenAPI: https://app.windmill.dev/openapi.html
 - [Dependencies in python](https://www.windmill.dev/docs/advanced/dependencies_in_python.md): How do I manage Python dependencies in Windmill scripts?
 - [Dependencies in typescript](https://www.windmill.dev/docs/advanced/dependencies_in_typescript.md): How do I manage TypeScript dependencies in Windmill using Bun and Deno?
 - [Deploy gh gl](https://www.windmill.dev/docs/advanced/deploy_gh_gl.md): How do I set up a Git Promotion workflow to deploy across Windmill instances?
-- [Docker](https://www.windmill.dev/docs/advanced/docker.md): How do I run Docker containers from Windmill scripts?
+- [Docker](https://www.windmill.dev/docs/advanced/docker.md): How do I run Docker containers from Windmill scripts? Run any container image sandboxed with the `# sandbox <image>` annotation, daemonless.
 - [Draft and deploy](https://www.windmill.dev/docs/core_concepts/draft_and_deploy.md): How do I use draft and deploy to iterate on scripts, flows, and apps safely in Windmill?
 - [Ducklake](https://www.windmill.dev/docs/core_concepts/persistent_storage/ducklake.md): How do I use Ducklake to store large datasets in S3 and query them with SQL in Windmill?
 - [Enterprise onboarding](https://www.windmill.dev/docs/misc/enterprise_onboarding.md): How do I get started with Windmill Enterprise Edition setup and best practices?

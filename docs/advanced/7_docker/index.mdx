@@ -1,211 +1,84 @@
 ---
-description: How do I run Docker containers from Windmill scripts?
+description: How do I run Docker containers from Windmill scripts? Run any container image sandboxed with the `# sandbox <image>` annotation, daemonless.
 ---
 
 import DocCard from '@site/src/components/DocCard';
 
 # Run Docker containers
 
-:::info Worker security
+Windmill can run any container image directly from a [Bash](../../getting_started/0_scripts_quickstart/4_bash_quickstart/index.mdx) script with the `# sandbox <image>` annotation. It is daemonless (no Docker socket, no Docker-in-Docker sidecar) and runs the image inside the job's own [nsjail](../security_isolation/index.mdx) sandbox, so it is safe to run untrusted multi-tenant code and is available on [Windmill Cloud](/pricing).
 
-Windmill workers in the official docker-compose have `ENABLE_UNSHARE_PID=true` enabled by default for process isolation. This protects worker credentials from being accessed by jobs. See [Security and Process Isolation](/docs/advanced/security_isolation) for details.
+## Using it
 
-:::
-
-## Using Windmill native docker support (recommended)
-
-Windmill has a native docker support if the `# docker` annotation is used in a bash script. It will assume a a docker socket is mounted like in the example above and will take over management of the container as soon as the script ends, assuming that the container was ran with the `$WM_JOB_ID` as name.
-Which is why you should use docker `-d` deamon mode so that the bash script terminates early.
-
-It will handle memory tracking, logs streaming and the different exit code of the container properly.
-
-The default code is as follows:
-
-```
-# docker
-# The annotation "docker" above is important, it tells windmill that after 
-# the end of the bash script, it should manage the container at id $WM_JOB_ID:
-# pipe logs, monitor memory usage, kill container if job is cancelled.
-
-msg="${1:-world}"
-
-IMAGE="alpine:latest"
-COMMAND="/bin/echo Hello $msg"
-
-# ensure that the image is up-to-date
-docker pull $IMAGE
-
-# if using the 'docker' mode, name it with $WM_JOB_ID for windmill to monitor it
-docker run --name $WM_JOB_ID -it -d $IMAGE $COMMAND
-```
-
-### Setup
-
-#### Docker compose
-
-On the docker-compose, it is enough to uncomment the volume mount of the Windmill worker
-
-```dockerfile
-      # mount the docker socket to allow to run docker containers from within the workers
-      # - /var/run/docker.sock:/var/run/docker.sock
-```
-
-#### Helm charts
-
-In the charts values of our [helm charts](https://github.com/windmill-labs/windmill-helm-charts), set `windmill.exposeHostDocker` to `true`.
-
-## Docker-in-Docker sidecar container (recommended)
-
-One possibility to use the docker daemon with k8s with containerd is to run a docker daemon in the same pod using "Docker-in-Docker" ( dind) Using the official image `docker:stable-dind`:
-
-Here an example of a a worker group setup with a dind side-container to be adapted with your needs.
-
-```
-  workerGroups:
-    ...
-    - name: "docker"
-      replicas: 2
-      securityContext:
-        privileged: true
-      resources:
-        limits:
-          memory: "256M"
-          ephemeral-storage: "8Gi"
-      volumes:
-        - emptyDir: {}
-          name: sock-dir
-        - emptyDir: {}
-          name: windmill-workspace
-      volumeMounts:
-        - mountPath: /var/run
-          name: sock-dir
-        - mountPath: /opt/windmill
-          name: windmill-workspace
-      extraContainers:
-        - args:
-            - --mtu=1450
-          image: docker:27.2.1-dind
-          imagePullPolicy: IfNotPresent
-          name: dind
-          resources:
-            limits:
-              memory: "2Gi"
-              ephemeral-storage: "8Gi"
-          securityContext:
-            privileged: true
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-            - mountPath: /opt/windmill
-              name: windmill-workspace
-            - mountPath: /var/run
-              name: sock-dir
-```
-
-
-
-
-### Using remote container runtimes (not recommended)
-
-This method is not recommended because it skips Windmill's native docker runtime and simpl execute as a normal bash script.
-
-### Remote docker daemon (not recommended)
+Put the image reference on a `# sandbox` annotation line and the rest of the script runs **inside** that image:
 
 ```bash
-#!/bin/bash
-
-set -ex
-
-# The Remote Docker daemon Address -> 100.64.2.97:8000
-# In the example, 100.64.2.97 is my pod address.
-
-DOCKER="docker -H 100.64.2.97:8000"
-$DOCKER run --rm alpine /bin/echo "Hello $msg"
-```
-
-output
-
-```log
-+ DOCKER='docker -H 100.64.2.97:8000'
-+ docker -H 100.64.2.97:8000 run --rm alpine /bin/echo 'Hello '
-Unable to find image 'alpine:latest' locally
-latest: Pulling from library/alpine
-7264a8db6415: Pulling fs layer
-7264a8db6415: Verifying Checksum
-7264a8db6415: Download complete
-7264a8db6415: Pull complete
-Digest: sha256:7144f7bab3d4c2648d7e59409f15ec52a18006a128c733fcff20d3a4a54ba44a
-Status: Downloaded newer image for alpine:latest
-Hello
-+ exit 0
-```
-
-### As a kubernetes task (not recommended)
-
-If you use kubernetes and would like to run your docker file directly on the kubernetes host, use the following script:
-
-```
 # shellcheck shell=bash
-# Bash script that calls docker as a client to the host daemon
-# See documentation: https://www.windmill.dev/docs/advanced/docker
-msg="${1:-world}"
+# sandbox python:3.12-slim
+# The "# sandbox <image>" annotation runs this script INSIDE the image above,
+# sandboxed via nsjail. The body runs with the image's /bin/sh and windmill args
+# bind positionally as $1, $2, ...
 
-IMAGE="docker/whalesay:latest"
-COMMAND=(sh -c "cowsay $msg")
-
-APISERVER=https://kubernetes.default.svc
-SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
-NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace)
-TOKEN=$(cat ${SERVICEACCOUNT}/token)
-CACERT=${SERVICEACCOUNT}/ca.crt
-
-KUBECONFIG_TMP_DIR="$(mktemp -d)"
-export KUBECONFIG="${KUBECONFIG_TMP_DIR}/kubeconfig"
-
-trap "rm -rfv ${KUBECONFIG_TMP_DIR}" EXIT
-
-kubectl config set-cluster local --server="${APISERVER}" --certificate-authority="${CACERT}"
-kubectl config set-credentials local --token="${TOKEN}"
-kubectl config set-context local --cluster=local --user=local --namespace="${NAMESPACE}"
-kubectl config use-context local
-
-kubectl run task -it --rm --restart=Never --image="$IMAGE" -- "${COMMAND[@]}"
+name="$1"
+python3 -c "import sys; print('hello', sys.argv[1])" "$name"
 ```
 
-and use the following additional privileges
+- The body runs via the image's `/bin/sh -c`, so the image needs a shell.
+- An **empty** body runs the image's `ENTRYPOINT` + `CMD`.
+- Windmill arguments (declared `x="$1"`, …) bind positionally.
+- The image's `Env` and `WorkingDir` are applied, and the windmill reserved variables (`WM_TOKEN`, `BASE_INTERNAL_URL`, …) are injected so [`wmill`](../3_cli/index.mdx) and API calls work from inside the container.
+- [`# volume`](../../core_concepts/56_volumes/index.mdx) mounts and the same-worker `/tmp/shared` folder apply inside the container.
 
-```yaml
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  namespace: windmill
-  name: pod-management
-rules:
-  - apiGroups: ['']
-    resources: ['pods']
-    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
-  - apiGroups: ['']
-    resources: ['pods/log']
-    verbs: ['get', 'list', 'watch']
-  - apiGroups: ['']
-    resources: ['pods/attach']
-    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
-  - apiGroups: ['']
-    resources: ['events']
-    verbs: ['get', 'list', 'watch']
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: pod-management
-  namespace: windmill
-subjects:
-  - kind: ServiceAccount
-    name: windmill-chart
-    namespace: windmill
-roleRef:
-  kind: Role
-  name: pod-management
-  apiGroup: rbac.authorization.k8s.io
-```
+`# sandbox <image>` and a bare `# sandbox` are distinct: a bare `# sandbox` runs the bash script itself under nsjail, while `# sandbox <image>` runs that image's command under nsjail.
+
+## How it works
+
+1. **Pull/extract**: [`crane`](https://github.com/google/go-containerregistry) exports the image's flattened root filesystem to a tar (layers and whiteouts applied, like `docker export`) and reads its OCI config. The tar and config are cached content-addressed by image digest, so unchanged digests reuse the cache across jobs. `crane` is a single static binary; the image is never *run* by it (nsjail does), so no container engine, daemon, or root is needed.
+2. **Run**: nsjail binds the rootfs as the container's `/`, mounts the standard pseudo-filesystems (`/proc` from the jail's pid namespace, a tmpfs `/tmp`, `/dev` nodes), maps uid/gid 0 inside to the unprivileged worker user outside, and runs the command. The container *is* the jail.
+
+Because the run is just the job's own nsjail with the image's filesystem as root, the container inherits exactly the job's confinement:
+
+- **Filesystem**: only the rootfs and the job's mounts are visible. No host `/`, no other job directories, no dependency cache, nothing to bind-mount escape to.
+- **/proc**: the jail's own pid namespace, so the worker and other jobs aren't visible.
+- **uid**: a single-uid jail. An escape lands as the unprivileged worker user.
+- **Network**: the job's network, same as any bash job.
+
+## Requirements
+
+- [`crane`](https://github.com/google/go-containerregistry) and `tar` on the worker for image pull/extract (a single static binary, no daemon, root, or privileged container).
+- `nsjail` on the worker, which **is** the sandbox. If nsjail is absent, a `# sandbox <image>` job errors clearly. Set `DISABLE_NSJAIL=false` to enable nsjail (see [Self-host](../1_self_host/index.mdx)).
+
+The default Windmill worker image ships `crane`, and no Docker socket or Docker-in-Docker sidecar is needed.
+
+## Image storage, freshness and limits
+
+These are configured as [instance settings](../18_instance_settings/index.mdx) in the superadmin settings and are hot-reloaded without a worker restart.
+
+- **Where pulls live**: a content-addressed cache of flattened rootfs tars keyed by image digest, persistent and deduped across jobs. The per-job extracted rootfs is removed with the job.
+- **Pull policy** (`sandbox_image_pull_policy`, default `newer`): the cache is keyed by digest, so a moving tag like `:latest` whose digest changed re-pulls automatically. `newer`/`always` re-resolve the digest each job (one cheap manifest fetch); `missing` reuses a cached digest without hitting the registry; `never` only uses the cache. Pinning a digest (`img@sha256:…`) is immutable and never stale.
+- **Per-image size cap** (`sandbox_image_max_size_mb`, default off): images whose compressed download size exceeds the cap are rejected before any layer is downloaded.
+- **Cache size cap** (`sandbox_image_cache_max_mb`, default off): best-effort eviction of the oldest cached rootfs tars after a run, until the cache is back under the cap.
+- **Default registry** (`sandbox_image_default_registry`): prepended to unqualified image references (`alpine` → `<registry>/alpine`); fully-qualified references are untouched.
+- **Private registry auth** (`sandbox_registry_auth`): a docker/podman `auth.json` blob, written to a per-job credentials file (mode `0600`, removed with the job) and passed to the puller for private registries.
+
+## Limitations
+
+The runtime is daemonless and run-to-completion by design:
+
+- No `docker run -d` with later `exec`/`attach`/`logs -f`, no `docker build`, `compose`, swarm, or healthchecks.
+- No arbitrary `-v` host bind mounts, `--privileged`, `--cap-add`, `--device`, or host namespace sharing.
+- Images that drop to a non-root uid or chown to arbitrary uids inside need a subuid range in the jail (single-uid only today).
+- The script result is a completion message; capture output via stdout/logs or `./result.json`.
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	<DocCard
+		title="Docker quickstart"
+		description="Run any Docker image as a Windmill script via Bash support."
+		href="/docs/getting_started/scripts_quickstart/docker"
+	/>
+	<DocCard
+		title="Security and process isolation"
+		description="How Windmill isolates jobs with nsjail and PID namespaces."
+		href="/docs/advanced/security_isolation"
+	/>
+</div>

@@ -370,7 +370,7 @@ For Nu first returned data from main function will be used as a result.
 
 In some cases where your task requires a complex set of dependencies or is implemented in a non-supported language, you can still include it as a flow step or individual script.
 
-Windmill supports running any docker container through its Bash support. As a pre-requisite, the host docker daemon needs to be mounted into the worker container. This is done through a simple volume mount: `/var/run/docker.sock:/var/run/docker.sock`.
+Windmill supports running any docker container through its Bash support with the `# sandbox <image>` annotation. The image runs inside the job's own nsjail sandbox, daemonless: no Docker socket or Docker-in-Docker sidecar required.
 
 <div className="grid grid-cols-2 gap-6 mb-4">
 	<DocCard
