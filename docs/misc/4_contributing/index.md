@@ -15,6 +15,10 @@ Here are some ways you can contribute to our platform:
 
 ## Security bounty program
 
+:::caution Temporarily on hold
+Our security bounty program is paused while we revamp our static analysis methodology around LLMs. We still welcome vulnerability reports at security@windmill.dev, but monetary rewards are suspended in the meantime.
+:::
+
 We are committed to rewarding white hat hackers who help us by identifying and reporting significant security vulnerabilities.
 
 **Eligibility and Rewards**:
