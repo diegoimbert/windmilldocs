@@ -173,7 +173,7 @@ Compute Units are calculated as follows:
 - A worker with 4GB memory limit = 2 CUs
 - On self-hosted plans, any worker with more than 2GB of memory counts as 2 Compute Units (e.g., a worker with 16GB counts as 2 Compute Units)
 - On cloud plans, the number of Compute Units scales linearly with memory (e.g., a 4GB worker = 2 Compute Units, 8GB worker = 4 Compute Units)
-- 8 native workers count as 1 compute unit. They go 8 by 8. Native workers are workers within the native worker group. This group is pre-configured to listen to native jobs tags (query languages). Those jobs are executed under a special mode with subworkers for increased throughput. You can set the number of native workers to 0.
+- A native worker counts as 1 compute unit. It runs 8 native subworkers, which go 8 by 8. Native workers are workers within the native worker group. This group is pre-configured to listen to native jobs tags (query languages). Those jobs are executed under a special mode with native subworkers for increased throughput. You can set the number of native workers to 0.
 
 On [AWS ECS](../../advanced/1_self_host/index.mdx#aws-gcp-azure-neon), if the reported Compute Units is not what you expect, you can apply memory limit [at the container level](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#standard_container_definition_params).
 
@@ -193,7 +193,7 @@ Below are examples from your setup [docker-compose.yml](https://github.com/windm
 
 #### Basic setup (3 CUs)
 
-Calculation: 2 workers × 1 CU each + 1 native worker with 8 subworkers = 3 CUs
+Calculation: 2 workers × 1 CU each + 1 native worker with 8 native subworkers = 3 CUs
 
 ```yaml
 services:
@@ -208,7 +208,7 @@ services:
   
   windmill_worker_native:
     deploy:
-      replicas: 1  # 1 native worker with 8 subworkers = 1 CU
+      replicas: 1  # 1 native worker with 8 native subworkers = 1 CU
       resources:
         limits:
           memory: 2048M
@@ -219,7 +219,7 @@ services:
 
 #### Medium setup (8 CUs)
 
-Calculation: 3 workers × 1 CU each + 1 native worker with 8 subworkers = 8 CUs
+Calculation: 3 workers × 1 CU each + 1 native worker with 8 native subworkers = 8 CUs
 
 ```yaml
 services:
@@ -248,7 +248,7 @@ services:
 
   windmill_worker_native:
     deploy:
-      replicas: 1  # 1 native worker with 8 subworkers = 1 CU
+      replicas: 1  # 1 native worker with 8 native subworkers = 1 CU
       resources:
         limits:
           memory: 2048M
@@ -261,7 +261,7 @@ services:
 
 Note: for now, setups of cloud EE instances are handled directly by the Windmill team. Please reach out to us if you need to configure your setup.
 
-Calculation: 2 workers × 1 CU each + 4 workers × 3 CUs each + 1 native worker with 8 subworkers = 16 CUs
+Calculation: 2 workers × 1 CU each + 4 workers × 3 CUs each + 1 native worker with 8 native subworkers = 16 CUs
 
 ```yaml
 services:
@@ -288,7 +288,7 @@ services:
 
   windmill_worker_native:
     deploy:
-      replicas: 1  # 1 worker with 8 subworkers (can't be changed) = 1 CU
+      replicas: 1  # 1 native worker with 8 native subworkers (can't be changed) = 1 CU
       resources:
         limits:
           memory: 2048M
@@ -299,7 +299,7 @@ services:
 
 #### Large setup (Self-hosted - 12 CUs)
 
-Calculation: 2 workers × 1 CU each + 4 workers × 2 CUs each + 1 native worker with 8 subworkers = 12 CUs
+Calculation: 2 workers × 1 CU each + 4 workers × 2 CUs each + 1 native worker with 8 native subworkers = 12 CUs
 
 ```yaml
 services:
@@ -326,7 +326,7 @@ services:
 
   windmill_worker_native:
     deploy:
-      replicas: 1  # 1 native worker with 8 subworkers = 1 CU
+      replicas: 1  # 1 native worker with 8 native subworkers = 1 CU
       resources:
         limits:
           memory: 2048M
@@ -358,7 +358,7 @@ In this configuration:
 - `name: "native"`: Specifies the native worker group that handles query language jobs
 - `replicas: 1`: Sets the number of native worker replicas (typically 1)
 - `extraEnv`: Environment variables for the native workers:
-  - `NATIVE_MODE`: Automatically spawns 8 subworkers and restricts the worker to native jobs + flow handling
+  - `NATIVE_MODE`: Automatically spawns 8 native subworkers and restricts the worker to native jobs + flow handling
   - `SLEEP_QUEUE`: Sleep duration between queue polling in milliseconds (default: 200)
 
 For the complete default configuration, refer to the [Windmill Helm chart values.yaml](https://github.com/windmill-labs/windmill-helm-charts/blob/main/charts/windmill/values.yaml#L172).

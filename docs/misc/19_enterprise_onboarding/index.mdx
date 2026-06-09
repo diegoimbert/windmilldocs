@@ -342,9 +342,9 @@ A [Compute Unit](../7_plans_details/index.mdx#setup-and-compute-units) (CU) = 2 
 
 - Standard worker (2GB memory) = 1 CU
 - Large workers (>2GB memory) = 2 CU (capped on self-hosted)
-- 8 native workers = 1 CU
+- 1 native worker (8 native subworkers) = 1 CU
 
-**Minimum recommended setup:** 3 CUs (2 standard workers at 2GB each + 8 native workers)
+**Minimum recommended setup:** 3 CUs (2 standard workers at 2GB each + 1 native worker)
 
 **Note:** Windmill Pro is limited to a maximum of 10 Compute Units.
 

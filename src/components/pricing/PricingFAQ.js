@@ -118,18 +118,18 @@ const faqs = [
 	},
 	{
 		id: 'native-workers',
-		question: 'What are native workers?',
-		textAnswer: 'Native workers are workers in the native worker group, pre-configured to listen to native job tags (query languages). They execute under a special mode with subworkers for increased throughput. You can set the number of native workers to 0.',
+		question: 'What are native subworkers?',
+		textAnswer: 'Native subworkers run within a native worker, in the native worker group, pre-configured to listen to native job tags (query languages). They execute under a special mode for increased throughput and go 8 by 8. You can set the number of native subworkers to 0.',
 		answer: (
 			<span>
-				Native workers are workers within the{' '}
+				Native subworkers run within a native worker, in the{' '}
 				<Link
 					to="/docs/core_concepts/worker_groups#native-workers"
 					className="text-blue-600 hover:text-blue-800 dark:text-blue-500 dark:hover:text-blue-600"
 				>
 					native worker group
 				</Link>
-				. This group is pre-configured to listen to native jobs tags (query languages). Those jobs are executed under a special mode with subworkers for increased throughput. You can set the number of native workers to 0.
+				. This group is pre-configured to listen to native jobs tags (query languages). Those jobs are executed under a special mode with native subworkers, which go 8 by 8, for increased throughput. You can set the number of native subworkers to 0.
 			</span>
 		)
 	},

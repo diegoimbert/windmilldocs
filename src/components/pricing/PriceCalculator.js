@@ -154,7 +154,7 @@ const ComputeUnitsSummary = ({ workerGroups, nativeWorkers, agentWorkers, select
 					);
 				})}
 			{nativeWorkers > 0 && (
-				<span className="ml-4">{nativeWorkers} native {nativeWorkers === 1 ? 'worker' : 'workers'} = {nativeWorkers/8} CU</span>
+				<span className="ml-4">{nativeWorkers} native {nativeWorkers === 1 ? 'subworker' : 'subworkers'} = {nativeWorkers/8} CU</span>
 			)}
 			{agentWorkers > 0 && (
 				<span className="ml-4">{agentWorkers} agent {agentWorkers === 1 ? 'worker' : 'workers'} = {tierId === 'tier-enterprise-cloud' ? agentWorkers/2 : agentWorkers/1} CU</span>
@@ -706,13 +706,13 @@ export default function PriceCalculator({ period, tier, selectedOption }) {
 						{(tier.id === 'tier-enterprise-selfhost' || tier.id === 'tier-enterprise-cloud') && (
 							<li className="flex flex-col gap-2 p-4 border rounded-lg mt-8">
 								<h6 className="font-semibold">
-									Native workers{' '}
+									Native subworkers{' '}
 									<span className="relative group">
 										<svg className="inline-block w-3 h-3 text-blue-800 hover:text-blue-400 dark:text-blue-300 dark:hover:text-blue-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 										</svg>
 										<span className="invisible group-hover:visible absolute z-10 w-96 p-2 mt-2 text-sm font-normal text-white bg-slate-800 rounded-lg shadow-lg">
-											<a href="#native-workers" className="text-blue-400 hover:text-blue-500">Native</a> workers are workers within the native <a href="/docs/core_concepts/worker_groups#native-workers" className="text-blue-400 hover:text-blue-500">worker group</a>. This group is pre-configured to listen to native jobs tags (query languages). Those jobs are executed under a special mode with subworkers for increased throughput. You can set the number of native workers to 0.
+											<a href="#native-workers" className="text-blue-400 hover:text-blue-500">Native subworkers</a> run within a native worker, in the native <a href="/docs/core_concepts/worker_groups#native-workers" className="text-blue-400 hover:text-blue-500">worker group</a>. This group is pre-configured to listen to native jobs tags (query languages). Those jobs are executed under a special mode with native subworkers, which go 8 by 8, for increased throughput. You can set the number of native subworkers to 0.
 										</span>
 									</span>
 								</h6>
@@ -725,7 +725,7 @@ export default function PriceCalculator({ period, tier, selectedOption }) {
 											min={0}
 											max={selectedOption === 'Pro' && tier.id === 'tier-enterprise-selfhost' ? 32 : 200}
 											step={8}
-										/> native {nativeWorkers === 0 ? 'worker' : 'workers'}
+										/> native {nativeWorkers === 0 ? 'subworker' : 'subworkers'}
 									</span>
 									<span className="text-sm text-gray-900 font-semibold dark:text-white">
 										${(Math.round((pricing.worker.native * nativeWorkers / 8) * (period.value === 'annually' ? 10 : 1) * 10) / 10).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 1})} /{period.value === 'annually' ? 'yr' : 'mo'}
