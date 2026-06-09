@@ -114,6 +114,19 @@ These variables are set for Python, Bash, Bun, Deno, Go, TypeScript, Rust, C#, R
 
 When OTEL tracing is disabled (or on Community Edition), these env vars are not set.
 
+## Connecting jobs to an inbound distributed trace
+
+When a caller that is already part of a distributed trace runs a job through a [webhook](../../../core_concepts/4_webhooks/index.mdx) or REST run endpoint with a [W3C `traceparent`](https://www.w3.org/TR/trace-context/) header, Windmill connects the resulting job to that trace. The job span, along with the spans of its flow steps and script subprocess, is relocated under the caller's span, so the whole execution shows up as part of the same end-to-end trace in your tracing backend instead of as a disconnected one.
+
+This requires OTEL tracing to be enabled and is an [Enterprise Edition](/pricing) feature.
+
+The inbound `traceparent` is also exposed to the job as its [`TRACEPARENT` environment variable](#otel-trace-context-in-jobs) and propagated to every flow step, so scripts that forward `TRACEPARENT` on their own outbound calls keep the trace unbroken across the whole chain.
+
+A few details:
+
+- It applies to the run endpoints that accept a request body: running a script or flow by path, hash or version, including the synchronous `run_wait_result` variants. [HTTP routes](../../../core_concepts/39_http_routing/index.mdx) and other native triggers are not picked up as inbound trace sources.
+- An invalid or malformed `traceparent` header is ignored: the job keeps its own trace derived from the job UUID, so the `job_id` / `root_job` lookup and dashboards built on it keep working.
+
 ## Monitoring metrics with Jaeger
 
 Jaeger can be used to generate time series for metrics of the collected traces. These time series can be used to compare the performance of individual steps within a workflow and their overall
