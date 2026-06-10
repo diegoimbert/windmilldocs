@@ -20,6 +20,8 @@ They should be used:
 
 Note that agent workers can even be running without docker on Linux, Windows and Apple targets using the cross-compiled binaries of Windmill attached to each release.
 
+For the narrow case where you cannot run any process in the target environment and can only reach a jump node over SSH, bash scripts can be rerouted to a remote host with the [`#ssh` directive](../../advanced/25_ssh_execution/index.mdx). Agent workers remain the recommended option whenever they are possible.
+
 ## Quickstart
 
 Go to the Workers page (/workers) as a superadmin and click "+ New agent worker"

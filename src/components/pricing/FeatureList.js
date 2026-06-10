@@ -567,6 +567,17 @@ export const sections = [
 				link: '/docs/core_concepts/agent_workers'
 			},
 			{
+				name: 'SSH execution (#ssh directive)',
+				tiers: {
+					'tier-free-selfhost': false,
+					'tier-enterprise-selfhost': true,
+					'tier-enterprise-cloud': true,
+					'tier-free': false,
+					'tier-team': false
+				},
+				link: '/docs/advanced/ssh_execution'
+			},
+			{
 				name: 'GitHub App',
 				tiers: {
 					'tier-free-selfhost': false,

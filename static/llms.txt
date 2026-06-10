@@ -115,6 +115,7 @@ Every docs page below is available as raw markdown by appending `.md` to its URL
 - [Sharing common logic](https://www.windmill.dev/docs/advanced/sharing_common_logic.md): How do I share common logic between scripts using relative imports in Windmill?
 - [Snowflake app with user roles](https://www.windmill.dev/docs/misc/guides/snowflake_app_with_user_roles.md): How do I build a Windmill app that accesses Snowflake data with end-user OAuth roles?
 - [Sql to s3 streaming](https://www.windmill.dev/docs/core_concepts/sql_to_s3_streaming.md): How do I stream SQL query results to S3 and read S3 files as parameters from native SQL scripts in Windmill?
+- [Ssh execution](https://www.windmill.dev/docs/advanced/ssh_execution.md): How do I run a bash script on a remote SSH host from Windmill? Add a `#ssh <resource_path>` directive to reroute execution to a jump node.
 - [Staging prod](https://www.windmill.dev/docs/core_concepts/staging_prod.md): How do I deploy items from a staging workspace to production using the Windmill UI?
 - [Streaming](https://www.windmill.dev/docs/core_concepts/streaming.md): How does streaming work in Windmill? Stream job results via SSE, webhooks, HTTP routes and AI agents.
 - [Structured databases](https://www.windmill.dev/docs/core_concepts/persistent_storage/structured_databases.md): How do I use Postgres databases like Supabase or Neon.tech for structured SQL data in Windmill?

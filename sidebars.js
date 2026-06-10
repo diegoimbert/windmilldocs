@@ -1082,6 +1082,7 @@ const sidebars = {
 				'advanced/preinstall_binaries/index',
 				'advanced/browser_automation/index',
 				'advanced/docker/index',
+				'advanced/ssh_execution/index',
 				'advanced/security_isolation/index',
 				'misc/setup_oauth/index',
 				'advanced/sharing_common_logic/index',

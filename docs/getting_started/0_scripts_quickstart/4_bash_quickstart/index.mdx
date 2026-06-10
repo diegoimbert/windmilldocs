@@ -380,6 +380,18 @@ Windmill supports running any docker container through its Bash support with the
 	/>
 </div>
 
+## Run on a remote SSH host
+
+A bash script starting with a `#ssh <resource_path>` directive runs on the remote host described by the referenced `ssh_target` resource instead of the worker, with the same typed arguments, result collection and live logs ([Enterprise Edition](/pricing), off by default).
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	<DocCard
+		title="Run scripts over SSH"
+		description="Run a bash script on a remote SSH host with the #ssh directive."
+		href="/docs/advanced/ssh_execution"
+	/>
+</div>
+
 ## What's next?
 
 This script is a minimal working example, but there's a few more steps that can be useful in a real-world use case:

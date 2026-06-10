@@ -1,0 +1,131 @@
+---
+description: How do I run a bash script on a remote SSH host from Windmill? Add a `#ssh <resource_path>` directive to reroute execution to a jump node.
+---
+
+import DocCard from '@site/src/components/DocCard';
+
+# Run scripts over SSH
+
+Windmill can run a [Bash](../../getting_started/0_scripts_quickstart/4_bash_quickstart/index.mdx) script on a remote host that the worker can only reach over SSH, such as a jump or utility node in an isolated network segment. Write a normal bash script, add a `#ssh <resource_path>` directive on a leading comment line, and the worker reroutes execution to the remote host with full parity: typed positional args in, structured result out, live streamed logs, cancellation, and the remote exit code fails the job.
+
+This is a Cloud & Self-hosted [Enterprise Edition](/pricing) feature, off by default.
+
+:::info Default to agent workers
+SSH execution is for the narrow case where you can only reach a jump node over SSH and the scripts are self-contained. If you can run any process in the target environment, use an [agent worker](../../core_concepts/28_agent_workers/index.mdx) instead: it is a lightweight worker connecting back over outbound HTTP only, and it keeps dependency management, [sandboxing](../security_isolation/index.mdx), the S3 cache and native secrets. See [when to use what](#when-to-use-what).
+:::
+
+## Enabling the feature
+
+As a superadmin, turn on the `ssh_execution_enabled` [instance setting](../18_instance_settings/index.mdx) (Instance settings -> Core). It requires a valid enterprise license and is off by default.
+
+## The ssh_target resource
+
+Both the directive and the userland wrapper use the same `ssh_target` [resource type](../../core_concepts/3_resources_and_types/index.mdx). It ships in the windmill repository under [`examples/usecase/ssh-execution-wrapper/`](https://github.com/windmill-labs/windmill/tree/main/examples/usecase/ssh-execution-wrapper); push it with the [CLI](../3_cli/index.mdx):
+
+```bash
+wmill resource-type push examples/usecase/ssh-execution-wrapper/ssh_target.resource-type.json
+```
+
+Then create an `ssh_target` resource for your jump node, e.g. `f/infra/jump_node`:
+
+| Field | Description |
+| --- | --- |
+| `host` | Hostname or IP of the SSH jump/utility node. |
+| `port` | SSH port (default `22`). |
+| `user` | SSH login user. |
+| `private_key` | PEM-encoded private key, stored as a secret. |
+| `host_pubkey` | Server host public key line for `known_hosts` pinning, e.g. `ssh-ed25519 AAAAC3Nz...`. Get it with `ssh-keyscan -t ed25519 <host>`. |
+| `accept_unknown_host` | Allow connecting without a pinned `host_pubkey` by trusting the key on first use. Insecure against MITM, development only (default `false`). |
+
+## Using the directive
+
+Write a normal bash script with the directive on a leading comment line:
+
+```bash
+#ssh f/infra/jump_node
+# ^ reroutes this script to run on the host described by the
+#   ssh_target resource at f/infra/jump_node
+
+Service="$1"          # typed positional args, populated from the run form
+
+set -euo pipefail
+echo "checking $Service on $(hostname)..."   # streams live to the job log
+systemctl is-active "$Service"
+
+# last stdout line becomes the job result (result.json / result.out also honored)
+echo "{\"service\": \"$Service\", \"active\": $(systemctl is-active --quiet "$Service" && echo true || echo false)}"
+```
+
+Run it from the UI, a [flow](../../flows/1_flow_editor.mdx) or the CLI like any other script:
+
+```bash
+wmill script run f/infra/check_service --data '{"Service": "nginx"}'
+```
+
+The worker opens one multiplexed SSH connection to the target (host key pinned via `host_pubkey`), ships the script and args, runs it remotely, streams stdout/stderr into the job log live, collects the result, and removes the remote temp dir. If the remote script exits non-zero, the job fails with that exit code. From the caller's perspective it is an ordinary bash job; only the execution location changes.
+
+Only an exact leading `#ssh <u/...|f/...|$identifier>` comment line triggers the reroute; prose mentions or extra tokens are rejected.
+
+### Dynamic target
+
+Instead of hardcoding a path, the directive can name a job argument that supplies the target at call time, for picking the host from the run form or fanning out over hosts in a flow [for loop](../../flows/12_flow_loops.md):
+
+```bash
+#ssh $jump_host
+
+target="$1"           # jump_host's position: always received as an empty string
+df -h
+```
+
+The argument must be an `ssh_target` resource path string (with or without the `$res:` prefix); inline `ssh_target` objects are rejected, so the target is always resolved through the runner's resource permissions and a caller can only route execution to hosts whose resource they can read. The target argument itself is forwarded to the remote script as an empty string (its resolved value embeds the private key, which must never reach the remote command line; its position is kept so the other `$1..$n` stay aligned). With a dynamic target the runner chooses where the code executes, whereas a hardcoded path lets the script author pin it.
+
+### Result collection
+
+Same as a local bash script: `result.json` (if the script writes it), then `result.out`, then the last line of stdout.
+
+### Host-key handling
+
+Host-key pinning is enforced (`StrictHostKeyChecking=yes`) whenever the resource's `host_pubkey` is set. An empty `host_pubkey` refuses to run unless the resource explicitly sets `accept_unknown_host: true`, which falls back to weaker trust-on-first-use (`accept-new`) and logs a warning. Pin the key in production.
+
+## Parity boundary
+
+The remote host receives the script body and its positional args only. The Windmill runtime is not forwarded: `BASE_INTERNAL_URL`, the `wmill` client and reserved `WM_*` variables are unavailable remotely, so in-script Windmill API callbacks won't work. In addition:
+
+- No remote dependency management: the remote host must already have every tool the script uses.
+- No [nsjail sandbox](../security_isolation/index.mdx): the script runs as the SSH user with that user's full privileges. Scope the key and user tightly.
+- No S3/binary cache.
+- Per-job SSH connection overhead.
+- v1 is bash-only.
+
+## When to use what
+
+- Agent workers (default): if you can run any process in the target environment, use an [agent worker](../../core_concepts/28_agent_workers/index.mdx). It connects back over outbound HTTP only and keeps everything Windmill workers normally give you.
+- [Worker group tags](../../core_concepts/9_worker_groups/index.mdx): when you can place a full worker in the environment and want to route specific scripts to it.
+- SSH execution: only when you can solely reach a jump/utility node over SSH and the scripts are simple and self-contained.
+
+## Userland wrapper (no license required)
+
+Without an enterprise license, [`examples/usecase/ssh-execution-wrapper/`](https://github.com/windmill-labs/windmill/tree/main/examples/usecase/ssh-execution-wrapper) also ships `ssh_exec.sh` and `ssh_exec.py`: reusable Windmill scripts you call with your remote code as a string argument and a `language` (bash, python, node, ruby, php, perl, or a raw interpreter command). Same SSH mechanics (host-key pinning, live logs, exit-code propagation, remote temp-file cleanup), no backend changes, but you lose the editor experience, typed arguments and structured results. The repository README documents the wrapper and its design notes in detail.
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	<DocCard
+		title="Agent workers"
+		description="Lightweight workers using HTTP to communicate with the Windmill server, recommended for isolated environments."
+		href="/docs/core_concepts/agent_workers"
+	/>
+	<DocCard
+		title="Bash quickstart"
+		description="Write your first Windmill script in Bash."
+		href="/docs/getting_started/scripts_quickstart/bash"
+	/>
+	<DocCard
+		title="Instance settings"
+		description="Settings only configurable by instance superadmins."
+		href="/docs/advanced/instance_settings"
+	/>
+	<DocCard
+		title="Security and process isolation"
+		description="How Windmill isolates jobs with nsjail and PID namespaces."
+		href="/docs/advanced/security_isolation"
+	/>
+</div>
