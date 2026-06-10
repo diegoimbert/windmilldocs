@@ -59,6 +59,15 @@ Kubernetes native autoscaling integration can automatically infer the worker-gro
 
 For proper functionality, you need to configure RBAC roles and rolebindings to allow autoscaling from within the pod:
 
+#### Scale-in prefers idle workers
+
+When scaling in, the integration annotates the worker pods with [`controller.kubernetes.io/pod-deletion-cost`](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/#pod-deletion-cost) just before lowering the replica count, so the ReplicaSet controller deletes idle pods first instead of picking victims blindly (which could leave a worker mid-job terminating while idle pods stay alive):
+
+- Idle pods get a cost of 0.
+- Pods currently running a job get a cost of `10 + age of their oldest running job in seconds` (capped at 1 day), so workers on long-running jobs are protected hardest.
+
+This requires the optional `list` and `patch` permissions on pods (see the RBAC manifests below). The annotation pass is best-effort and can never fail a scaling operation: if the permissions are missing or anything else goes wrong, a warning is logged and the replica change proceeds as before, without the idle-pods-first preference. The annotation is honored by Kubernetes 1.22+ where the `PodDeletionCost` feature gate is enabled by default.
+
 #### Using Helm
 
 In your values.yaml set:
@@ -81,6 +90,11 @@ rules:
 - apiGroups: ["apps"]
   resources: ["deployments"]
   verbs: ["patch", "get"]  # Crucial to include both verbs
+# Optional: lets the autoscaler annotate pods with pod-deletion-cost
+# so idle workers are deleted first on scale-in
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "patch"]
 
 ---
 
@@ -113,6 +127,8 @@ Look for the non-default ServiceAccount name.
 After configuring RBAC using either method above, you can hit "Check Health" to verify everything is configured properly:
 
 ![Healthy autoscaling configuration](./healthy_k8s_config.png)
+
+The health check also probes the optional pods permissions used for [pod-deletion-cost annotations](#scale-in-prefers-idle-workers) and logs a non-fatal warning if they are missing: autoscaling stays fully functional, it just loses the idle-pods-first preference on scale-in.
 
 You are ready to go!
 
