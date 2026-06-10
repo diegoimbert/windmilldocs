@@ -2,26 +2,12 @@ import React, { useEffect, useState } from 'react';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import useInkeepSettings from '../../utils/useInkeepSettings';
 
-const cssOverrides = `
-  [data-theme='dark'] .ikp-floating-button {
-    background: #353e52;
-    color: white;
-  }
-
-  .ikp-floating-button {
-    background: #ebedf0;
-    color: var(--inkeep-colors-inkeep-primary-text-subtle);
-  }
-`;
-
-const stylesheets = [<style key="inkeep-overrides">{cssOverrides}</style>];
-
 function Footer() {
 	const [ChatButton, setChatButton] = useState(null);
 
 	useEffect(() => {
 		(async () => {
-			const { InkeepChatButton } = await import('@inkeep/widgets');
+			const { InkeepChatButton } = await import('@inkeep/cxkit-react');
 			setChatButton(() => InkeepChatButton);
 		})();
 	}, []);
@@ -29,13 +15,13 @@ function Footer() {
 	const { baseSettings, aiChatSettings, searchSettings } = useInkeepSettings();
 
 	const chatButtonProps = {
-		stylesheets,
 		baseSettings,
 		aiChatSettings,
 		searchSettings,
-		chatButtonType: 'ICON_TEXT',
+		label: 'Ask AI',
 		modalSettings: {
-			areOpenHotKeysDisabled: true
+			// The search bar already owns the Cmd/Ctrl+K shortcut
+			shortcutKey: null
 		}
 	};
 
