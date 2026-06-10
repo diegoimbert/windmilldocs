@@ -114,6 +114,16 @@ The extension also allows you to run your scripts and flows locally from the edi
 	/>
 </div>
 
+## LLM-friendly documentation
+
+The Windmill documentation is published in formats designed for AI agents:
+
+- [`https://www.windmill.dev/llms.txt`](https://www.windmill.dev/llms.txt): a curated [llms.txt](https://llmstxt.org/) index of the documentation, with a one-line description per page. Point your agent at it to find the right page for any Windmill concept.
+- Every docs page is available as raw markdown by appending `.md` to its URL, e.g. [`https://www.windmill.dev/docs/core_concepts/scheduling.md`](https://www.windmill.dev/docs/core_concepts/scheduling.md). Agents should prefer these over the HTML pages.
+- [`https://www.windmill.dev/llms-full.txt`](https://www.windmill.dev/llms-full.txt): the entire documentation as a single file (~2.3 MB). Intended for bulk indexing or RAG pipelines, not for loading directly into an agent's context.
+
+To make your agent aware of these, add a line to your project's `AGENTS.md`, for example: "For Windmill concepts, fetch https://www.windmill.dev/llms.txt and follow the relevant `.md` links."
+
 ## Context7 plugin
 
 If you use the [Context7](https://context7.com) plugin in Claude Code, Codex, Cursor, or any other Context7-aware client, you can point it at the dedicated Windmill CLI docs index so the agent has up-to-date `wmill` command reference available inline:

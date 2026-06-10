@@ -311,7 +311,17 @@ function writeMarkdownVariants(urlToFile) {
 
 function writeLLMsFullTxt(llms, urlToFile) {
 	const headerEnd = llms.indexOf('## Documentation structure');
-	const header = headerEnd === -1 ? llms : llms.slice(0, headerEnd).trim();
+	// The llms.txt header advertises llms-full.txt; inside llms-full.txt itself,
+	// replace that line with a back-pointer to the curated index.
+	const header = (headerEnd === -1 ? llms : llms.slice(0, headerEnd))
+		.split('\n')
+		.map((line) =>
+			line.includes('llms-full.txt')
+				? 'This file contains the entire Windmill documentation as a single document. A curated per-page index with one-line descriptions is available at https://www.windmill.dev/llms.txt.'
+				: line
+		)
+		.join('\n')
+		.trim();
 
 	const sections = [];
 	const sortedEntries = [...urlToFile.entries()].sort((a, b) => a[0].localeCompare(b[0]));

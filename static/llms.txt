@@ -9,6 +9,8 @@ Cloud: https://app.windmill.dev
 Hub: https://hub.windmill.dev
 OpenAPI: https://app.windmill.dev/openapi.html
 
+Every docs page below is available as raw markdown by appending `.md` to its URL. The entire documentation is also available as a single file (over 2 MB, for bulk indexing rather than direct reading) at https://www.windmill.dev/llms-full.txt.
+
 ## Documentation structure
 
 ### Getting started

@@ -26,6 +26,18 @@ const config = {
 		}
 	],
 
+	headTags: [
+		{
+			tagName: 'link',
+			attributes: {
+				rel: 'alternate',
+				type: 'text/plain',
+				href: 'https://www.windmill.dev/llms.txt',
+				title: 'LLM-friendly documentation index'
+			}
+		}
+	],
+
 	customFields: {
 		inkeepCredentials: {
 			apiKey: '8ce4bf9ddc2ef8bc9ec53f133fd864292678e2d2e41872a0',

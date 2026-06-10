@@ -37,4 +37,7 @@ Allow: /
 User-agent: Bytespider
 Allow: /
 
+# LLM-friendly documentation index: https://www.windmill.dev/llms.txt
+# Full documentation as a single file: https://www.windmill.dev/llms-full.txt
+
 Sitemap: https://www.windmill.dev/sitemap.xml
