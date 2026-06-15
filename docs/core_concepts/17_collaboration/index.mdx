@@ -18,15 +18,12 @@ Collaboration in Windmill is simplified through various features and workflows. 
 
 ## Draft system
 
-Windmill offers a draft system for scripts, flows, and apps (both [low-code](../../apps/0_app_editor/index.mdx) and [full-code](../../full_code_apps/index.mdx)), allowing multiple iterations and collaboration before deploying. Drafts are available to anyone with write access to the underlying item. It provides a simple way to iterate on items with multiple collaborators.
+Windmill offers a draft system for scripts, flows, and apps (both [low-code](../../apps/0_app_editor/index.mdx) and [full-code](../../full_code_apps/index.mdx)), allowing multiple iterations before deploying. Drafts are **user-scoped** and **automatically saved** to the database as you edit - no manual save action is required.
 
-<video
-	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
-	controls
-	src="/videos/draft_and_deploy.mp4"
-/>
+When multiple users work on the same item, each user has their own draft. You can see who else is editing the same item and view their version (as JSON) or fork their draft to continue from their changes. This provides a basic mechanism to handle concurrent editing without conflicts.
 
-<br />
+For conflicts, Windmill alerts you if another session saved changes since your last save, or if someone deployed a new version while you were editing. You can choose to keep your draft or load the latest deployed version.
+
 
 <div className="grid grid-cols-2 gap-6 mb-4">
 	<DocCard

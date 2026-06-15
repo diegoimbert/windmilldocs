@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 280" width="700" height="280">
+  <defs>
+    <style>
+      .title { font: bold 16px sans-serif; fill: #1f2937; }
+      .label { font: bold 13px sans-serif; fill: #1f2937; }
+      .sublabel { font: 11px sans-serif; fill: #6b7280; }
+      .draft-box { fill: #dbeafe; stroke: #3b82f6; stroke-width: 2; rx: 6; }
+      .deployed-box { fill: #d1fae5; stroke: #10b981; stroke-width: 2; rx: 6; }
+      .section { fill: #f9fafb; stroke: #e5e7eb; stroke-width: 1; rx: 8; }
+      .arrow { stroke: #9ca3af; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#9ca3af" />
+    </marker>
+  </defs>
+  
+  <!-- White background -->
+  <rect width="700" height="280" fill="#ffffff"/>
+  
+  <!-- Drafts section -->
+  <rect x="20" y="50" width="400" height="200" class="section"/>
+  <text x="220" y="30" text-anchor="middle" class="title">Drafts (user-scoped)</text>
+  <text x="220" y="235" text-anchor="middle" class="sublabel">Each user has their own draft · Autosaved to database</text>
+  
+  <!-- User drafts -->
+  <rect x="40" y="80" width="110" height="55" class="draft-box"/>
+  <text x="95" y="105" text-anchor="middle" class="label">Alice's draft</text>
+  <text x="95" y="122" text-anchor="middle" class="sublabel">v2 changes</text>
+  
+  <rect x="165" y="80" width="110" height="55" class="draft-box"/>
+  <text x="220" y="105" text-anchor="middle" class="label">Bob's draft</text>
+  <text x="220" y="122" text-anchor="middle" class="sublabel">v3 experiment</text>
+  
+  <rect x="290" y="80" width="110" height="55" class="draft-box"/>
+  <text x="345" y="105" text-anchor="middle" class="label">Carol's draft</text>
+  <text x="345" y="122" text-anchor="middle" class="sublabel">bug fix</text>
+  
+  <!-- No conflict note -->
+  <text x="220" y="165" text-anchor="middle" class="sublabel" style="fill: #3b82f6;">No conflicts — drafts are isolated</text>
+  <text x="220" y="182" text-anchor="middle" class="sublabel" style="fill: #3b82f6;">Users can see each other's versions</text>
+  
+  <!-- Deployed section -->
+  <rect x="480" y="70" width="200" height="140" class="section"/>
+  <text x="580" y="30" text-anchor="middle" class="title">Deployed</text>
+  
+  <rect x="500" y="100" width="160" height="70" class="deployed-box"/>
+  <text x="580" y="130" text-anchor="middle" class="label">Production version</text>
+  <text x="580" y="150" text-anchor="middle" class="sublabel">Shared by all users</text>
+  
+  <!-- Arrow -->
+  <path d="M420,140 L478,140" class="arrow"/>
+  <text x="449" y="130" text-anchor="middle" class="sublabel">Deploy</text>
+</svg>

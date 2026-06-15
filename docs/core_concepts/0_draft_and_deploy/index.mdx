@@ -6,47 +6,79 @@ import DocCard from '@site/src/components/DocCard';
 
 # Draft and deploy
 
-Draft, test, and deploy scripts, flows, and apps Windmill to iterate and save safely.
+Draft, test, and deploy scripts, flows, and apps in Windmill to iterate and save safely.
 
 :::info Deploy to prod in Windmill
 
-For all details on Deployments to prod in Windmill, see [Deploy to prod](../../advanced/12_deploy_to_prod/index.mdx).
+For all details on deployments to prod in Windmill, see [Deploy to prod](../../advanced/12_deploy_to_prod/index.mdx).
 
 :::
 
-Each script, flow or app can be saved (sometimes concurrently) in 3 fashions, by your browser in `local storage`, by the backend as a `draft`, and `deployed`.
+Each script, flow, or app exists in two states: as a `draft` (work in progress) and as a `deployed` version (the authoritative, production-ready version). Drafts are user-scoped and automatically saved to the database as you edit.
 
 Once deployed, scripts, flows and apps will be visible, editable and/or runnable by users [with the right permissions](../16_roles_and_permissions/index.mdx).
 
-![Recap Draft and deploy](./recap_draft_and_deploy.png "Recap Draft and deploy")
+![Draft and deploy overview](./draft_diagram.svg "Draft and deploy overview")
 
 :::tip Deploy to prod
 
-For all details on Deployments to prod in Windmill, see [Deploy to prod](../../advanced/12_deploy_to_prod/index.mdx).
+For all details on deployments to prod in Windmill, see [Deploy to prod](../../advanced/12_deploy_to_prod/index.mdx).
 
 :::
 
-<video
-	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
-	autoPlay
-	controls
-	id="main-video"
-	src="/videos/draft_and_deploy.mp4"
-/>
-
-<br />
-
-## Local edits
-
-Changes made to a script, flow, or app are saved locally in your browser until they are validated as either a 'Draft' or 'Deployed' version.
-
-Local edits can be run and tested only from the editor (script, flow or app) with the `Test` button.
-
 ## Draft
 
-Local edits can be saved as a draft for staging purposes. A draft is visible from members of the workspace and can be edited. There is only one draft per runnable. The draft inherits the permission of the item it is attached to or at the path they are in for drafts non deployed items.
+Drafts are user-scoped and automatically saved to the database whenever you make changes in the editor. The script, flow, app, and raw app editors all display an **Autosave indicator** that shows when your changes are being saved.
 
-Drafts can be run and tested only from the editor (script, flow or app) with the `Test` button.
+<!-- PLACEHOLDER: Replace with screenshot of the autosave indicator in the editor toolbar, showing the "Saving..." and "Saved" states -->
+![Autosave indicator](./autosave_indicator.png "Autosave indicator")
+
+The autosave is intelligently debounced to avoid data loss while preventing excessive requests. Your work is continuously preserved without needing to manually click a save button.
+
+Drafts can be run and tested only from the editor (script, flow, or app) with the `Test` button. The draft inherits the permissions of the item it is attached to, or the path permissions for drafts of items that have not yet been deployed.
+
+### Legacy drafts
+
+Previously, drafts were workspace-scoped (shared among all users in the workspace) and also had a local storage auto-save layer in the browser. Existing workspace-scoped drafts will appear as **"Legacy draft"** in the editor. You can continue working from a legacy draft or discard it in favor of the deployed version.
+
+### Concurrent editing and user versions
+
+When multiple users are working on the same item, you can see who else is currently editing it. Each user's draft is saved separately, allowing parallel work without overwriting each other's changes.
+
+<!-- PLACEHOLDER: Replace with screenshot of the editor showing other users working on the same item, with a UI element indicating their presence -->
+![Concurrent editing](./concurrent_editing.png "Concurrent editing")
+
+You can view another user's version as JSON or fork their version to start working from their changes. This basic synchronization mechanism helps resolve race conditions when multiple people work on the same item.
+
+:::tip For true collaborative workflows
+
+For teams that need real-time collaborative editing and structured workflows, we recommend using [Workspace Forks](/docs/advanced/workspace_forks), available in the [Enterprise Edition](/pricing).
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	<DocCard
+		title="Workspace forks"
+		description="Create independent copies of workspaces for parallel development workflows."
+		href="/docs/advanced/workspace_forks"
+	/>
+</div>
+
+:::
+
+### Conflict detection
+
+Windmill includes basic conflict detection to prevent accidental overwrites:
+
+- **Concurrent save detection**: If your autosave writes to the database but another browser tab or session has saved since your last save, you will be alerted.
+- **Deployed version conflicts**: If you are editing an item from a draft and someone else deploys a new version of that item since you last saved, you will be prompted to choose whether to keep working on your draft or load the latest deployed version.
+
+<!-- PLACEHOLDER: Replace with screenshot of the conflict detection dialog showing options to keep draft or load deployed version -->
+![Conflict detection](./conflict_detection.png "Conflict detection")
+
+### AI session drafts
+
+[AI sessions](/docs/core_concepts/ai_generation) can create and edit drafts for workspace items including scripts, flows, apps, raw apps, resources, variables, and triggers. When an AI session modifies an item's draft, you will see the changes appear live in your editor.
+
+This enables AI-assisted development workflows where you can guide the AI to make changes while watching the results in real-time.
 
 ## Deployed version
 
@@ -64,7 +96,7 @@ If you want to have several versions of the same runnable, just fork it with the
 
 ## Diff viewer
 
-Visualize changes between [current](#local-edits) and [latest deployed version](#deployed-version) or [latest draft](#draft) for any script, flow or app.
+Visualize changes between your [current draft](#draft) and the [latest deployed version](#deployed-version) for any script, flow, or app.
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -74,11 +106,11 @@ Visualize changes between [current](#local-edits) and [latest deployed version](
 
 <br />
 
-> Changes can then be reversed to previous version.
+> Changes can then be reversed to the previous version.
 
 <br />
 
-You can also use the diff toggle to quickly check the code changes of an inline script, between you current and deployed version code.
+You can also use the diff toggle to quickly check the code changes of an inline script between your current draft and the deployed version code.
 
 ![Diff toggle](./quick_diff.png 'Diff toggle')
 
