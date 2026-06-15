@@ -165,13 +165,19 @@ For more production use-cases, we recommend using the [Helm-chart](#helm-chart).
 
 To setup an external database, you need to set DATABASE_URL in the .env file to point your external database. You should also set the number of db replicas to 0.
 
-:::tip
+:::tip Managed PostgreSQL / no superuser access
 
-In setups where you do not have access to the PG superuser (Azure PostgreSQL, GCP Postgresql, etc), you will need to set the initial role manually. You can do so by running the following command:
+In setups where the Windmill database user is not a PostgreSQL superuser (Scaleway, Azure Database for PostgreSQL, GCP Cloud SQL, AWS RDS/Aurora, etc.), you must create the Windmill roles manually before the first start. Windmill cannot create them itself in this case: the `windmill_admin` role is created `WITH BYPASSRLS`, and only a superuser can create a `BYPASSRLS` role. If you skip this step, the initial migration fails with:
+
+```
+role "windmill_admin" does not exist
+```
+
+Run the init script with a **privileged role** that is allowed to create roles (your provider's admin role — e.g. `_rdb_superadmin` on Scaleway, the master/`postgres` user on RDS, GCP and Azure):
 
 ```bash
 curl https://raw.githubusercontent.com/windmill-labs/windmill/main/init-db-as-superuser.sql -o init-db-as-superuser.sql
-psql <DATABASE_URL> -f init-db-as-superuser.sql
+psql <PRIVILEGED_DATABASE_URL> -f init-db-as-superuser.sql
 ```
 
 Make sure that the user used in the DATABASE_URL passed to Windmill has the role `windmill_admin` and `windmill_user`:
@@ -179,6 +185,18 @@ Make sure that the user used in the DATABASE_URL passed to Windmill has the role
 ```sql
 GRANT windmill_admin TO <user used in database_url>;
 GRANT windmill_user TO <user used in database_url>;
+```
+
+Finally, the Windmill roles need `USAGE` on the `public` schema. The simplest way to guarantee this is to let the Windmill database user **own its database** — create the database while connected as that user (`CREATE DATABASE windmill;`) rather than pointing Windmill at a pre-provisioned database owned by another role. If you do use a database owned by another role and the provider has stripped the default `USAGE` grant on `public` (some managed setups, e.g. certain Scaleway databases, do this), the `windmill_admin`/`windmill_user` roles cannot read any table and every query fails with:
+
+```
+permission denied for schema public
+```
+
+In that case, grant schema usage with the same privileged role:
+
+```sql
+GRANT USAGE ON SCHEMA public TO windmill_user, windmill_admin;
 ```
 
 :::
