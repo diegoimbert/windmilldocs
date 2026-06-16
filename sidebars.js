@@ -377,8 +377,8 @@ const sidebars = {
 						},
 						{
 							type: 'doc',
-							id: 'core_concepts/persistent_storage/within_windmill',
-							label: 'Within Windmill (not recommended)'
+							id: 'core_concepts/persistent_storage/states_resources_shared_directory',
+							label: 'States, resources & shared directory'
 						},
 						{
 							type: 'doc',

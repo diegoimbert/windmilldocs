@@ -6,9 +6,11 @@ import DocCard from '@site/src/components/DocCard';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Within Windmill: Not recommended
+# States, resources & shared directory
 
 This page is part of our section on [Persistent storage & databases](./index.mdx) which covers where to effectively store and manage the data manipulated by Windmill. Check that page for more options on data storage.
+
+States, resources and the shared directory are convenient for persisting small, transient JSON between job executions or for passing data between steps of a flow. They are not recommended as a general-purpose persistence layer: they are meant for small payloads, and the shared directory is ephemeral to a single flow execution. For larger or long-lived data, prefer an external database or [object storage (S3, R2, MinIO, Azure Blob, GCS)](./large_data_files.mdx).
 
 ## States and resources
 

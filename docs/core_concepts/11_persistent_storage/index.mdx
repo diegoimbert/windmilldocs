@@ -31,7 +31,7 @@ There are several kinds of persistent storage in Windmill:
 
 2. [Ducklakes](#ducklake) for data lakehouse storage.
 
-3. [Small data](#within-windmill-not-recommended) that is relevant in between script/flow execution and can be persisted on Windmill itself.
+3. [Small data](#states-resources--shared-directory) that is relevant in between script/flow execution and can be persisted on Windmill itself.
 
 4. [Object storage for large data](#large-data-s3-r2-minio-azure-blob-google-cloud-storage) such as S3.
 
@@ -75,17 +75,17 @@ If your service provider is already part of [our list of integrations](../../int
 
 If your service provider is not already integrated with Windmill, you can create a [new resource type](../../core_concepts/3_resources_and_types/index.mdx#create-a-resource-type) to establish the connection (and if you want, [share the schema on our Hub](../../misc/1_share_on_hub/index.md)).
 
-## Within Windmill: not recommended
+## States, resources & shared directory
 
-There are however internal methods to persist data between executions of jobs.
+Windmill has internal methods to persist data between executions of jobs: [states](../3_resources_and_types/index.mdx#states) and [resources](../3_resources_and_types/index.mdx) to store small transient JSON, [custom flow states](../3_resources_and_types/index.mdx#custom-flow-states) to share data across the steps of a flow, and the shared directory to pass files between steps running on the same worker.
 
-All details at:
+These are convenient for small or transient payloads but are not recommended as a general-purpose persistence layer: states and resources are meant for small JSON, and the shared directory is ephemeral to a single flow execution. For larger or long-lived data, prefer an external database or object storage.
 
 <div className="grid grid-cols-2 gap-6 mb-4">
 	<DocCard
-		title="Within Windmill: not recommended"
-		description="Internal methods to persist data between executions of jobs."
-		href="/docs/core_concepts/persistent_storage/within_windmill"
+		title="States, resources & shared directory"
+		description="Use states, resources, custom flow states, and the shared directory to persist small or transient data between jobs and across flow steps."
+		href="/docs/core_concepts/persistent_storage/states_resources_shared_directory"
 	/>
 </div>
 

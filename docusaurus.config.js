@@ -64,6 +64,10 @@ const config = {
 						from: '/docs/'
 					},
 					{
+						to: '/docs/core_concepts/persistent_storage/states_resources_shared_directory',
+						from: '/docs/core_concepts/persistent_storage/within_windmill'
+					},
+					{
 						to: '/docs/core_concepts/webhooks#custom-response-code',
 						from: '/docs/script_editor/custom_response_code'
 					},
