@@ -26,13 +26,18 @@ wmill init
 ```
 
 This creates:
-- An `AGENTS.md` file — a standard context file for AI coding agents
-- Skill files — Skill files for AI coding agents
+- `AGENTS.cli.md` - a wmill-managed context file describing the Windmill file structure and conventions
+- `AGENTS.md` and `CLAUDE.md` - user-owned files that include the managed `AGENTS.cli.md` and hold your own project-specific instructions
+- Skill files under `.claude/skills/` and `.agents/skills/` - per-task guidance for AI coding agents
+
+`AGENTS.cli.md` and the skill files are refreshed on every run (and via `wmill refresh prompts`); `AGENTS.md` and `CLAUDE.md` are created once and never overwritten. `wmill init` also generates [TypeScript editor config and resource-type definitions](../../../advanced/4_local_development/index.mdx#project-files-generated-by-wmill-init).
 
 These files describe the Windmill file structure, how [scripts](../../../script_editor/index.mdx) and [flows](../../../flows/1_flow_editor.mdx) are organized, how to create and edit them, and how to manage resources like [triggers](../../../getting_started/8_triggers/index.mdx) and [schedules](../../../core_concepts/1_scheduling/index.mdx). AI tools that read these files automatically get this context when working in the workspace.
 
 This is the expected file tree:
 ```
+├── .agents
+│   └── skills              # mirrors .claude/skills
 ├── .claude
 │   └── skills
 │       ├── cli-commands
@@ -60,9 +65,12 @@ This is the expected file tree:
 │       ├── write-script-python3
 │       ├── write-script-rust
 │       └── write-script-snowflake
-├── AGENTS.md
-├── CLAUDE.md
-├── rt.d.ts
+├── AGENTS.cli.md          # managed
+├── AGENTS.md              # user-owned
+├── CLAUDE.md              # user-owned
+├── rt.d.ts                # resource type RT namespace
+├── tsconfig.wmill.json    # managed
+├── tsconfig.json          # user-owned, extends tsconfig.wmill.json
 ├── wmill-lock.yaml
 └── wmill.yaml
 ```
