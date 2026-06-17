@@ -88,7 +88,7 @@ The messages are sent in the order they are specified.
 
 Instead of having all messages trigger the runnable, you can specify filters to restrict which messages trigger the runnable.
 Windmill supports the following filter:
-- **JSON**: The message is parsed as a JSON object and the filter checks that the filter `key` exists and the value at the key is equal or is a subset of the filter `value`.
+- **JSON**: The message is parsed as a JSON object and the filter checks that the filter `key` exists and the value at the key is equal to or is a superset of the filter `value`. Keys are matched literally against the message's top-level fields (e.g. `type`); to match a nested field, use the parent key with an object value (e.g. key `data`, value `{"status": "active"}`). The runnable receives the message as the raw string argument `msg`.
 
 When multiple filters are configured, a filter logic selector lets you choose how they are combined:
 - **AND** (default): the message must match all filters to trigger the runnable.

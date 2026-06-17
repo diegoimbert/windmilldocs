@@ -340,17 +340,17 @@ export async function main(message_content: string, topic: string, partition: nu
 
 ## Filters
 
-Kafka triggers support message filtering so that only messages matching specified criteria trigger the runnable. Filters are evaluated on the raw message payload before it is passed to the script.
+Kafka triggers support message filtering so that only messages matching specified criteria trigger the runnable. Filters match against the message parsed as JSON, referencing its top-level keys (e.g. `type`). The base64 encoding only applies to the payload the script/flow receives — filters run on the message before it is encoded.
 
 Each filter is a key/value pair where:
-- **Key**: A path into the JSON-decoded message (e.g. `type`, `data.status`)
-- **Value**: The expected value at that path (can be a string, number, object, or array)
+- **Key**: A top-level key of the message (e.g. `type`). Keys are matched literally — to match a nested field, use the parent key with an object value (see the superset note below).
+- **Value**: The expected value at that key (can be a string, number, object, or array)
 
 When multiple filters are configured, a filter logic selector lets you choose how they are combined:
 - **AND** (default): the message must match all filters to trigger the runnable.
 - **OR**: the message triggers the runnable as soon as it matches any one of the filters.
 
-The matching uses a superset check — the message value at the given key must contain all fields from the filter value (additional fields in the message are allowed). Existing triggers without an explicit filter logic default to **AND**.
+The matching uses a superset check — the message value at the given key must contain all fields from the filter value (additional fields in the message are allowed). For example, to match a nested field, use key `data` with value `{"status": "active"}` to match `{"data": {"status": "active", ...}}`. Existing triggers without an explicit filter logic default to **AND**.
 
 Filters can be configured in the Kafka trigger editor UI using the filter section. You can add multiple key/value pairs, and a human-readable preview is shown for each filter (e.g. `payload.type == "order_created"`).
 
