@@ -39,6 +39,21 @@ export async function main() {
 
 ![Try Catch](./try_catch.png.webp)
 
+## Tag a successful run as a failure
+
+A script or flow can return a top-level `wm_failure` field (string) to retag the run as a failure even though the runtime did not raise an error. The string becomes the error message, and the run takes the standard failure path: the run is marked as failed on the [Runs page](../5_monitor_past_and_future_runs/index.mdx), configured error handlers fire, and the stored result is wrapped as `{ "error": { "name": "ManualFailure", "message": <wm_failure> }, ... }`.
+
+```ts
+export async function main() {
+  return {
+    wm_failure: "Upstream API returned 500",
+    foo: "bar"
+  }
+}
+```
+
+This applies to any job, regardless of how it was triggered (manual run, schedule, flow step, webhook). On [synchronous webhook endpoints](../4_webhooks/index.mdx#synchronous), sibling fields such as `wm_status_code`, `wm_content_type`, and `wm_headers` are still honored, so a manually-tagged failure can also set a custom HTTP status code or response headers.
+
 ## Flows' error handlers
 
 The Error handler is a special [flow](../../flows/1_flow_editor.mdx) step that is executed when an error occurs within a flow.

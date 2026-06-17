@@ -352,6 +352,22 @@ the synchronous endpoint with return the result with the header `X-Custom-Header
 
 It's better to use `wm_content_type` to override the content type, as the output will be correctly formatted.
 
+### Tag a successful run as a failure
+
+A script or flow can return a top-level `wm_failure` string to mark the run as a failure (see [Tag a successful run as a failure](../10_error_handling/index.mdx#tag-a-successful-run-as-a-failure) under error handling). On sync endpoints, `wm_status_code`, `wm_content_type`, and `wm_headers` are still honored alongside `wm_failure`, so a manually-tagged failure can return a custom HTTP status code or content type. For example, returning:
+
+```json
+{
+	"wm_failure": "Upstream API returned 500",
+	"wm_status_code": 502,
+	"result": {
+		"Hello": "World"
+	}
+}
+```
+
+stores the run as a failure (triggering any configured error handlers) and the sync endpoint responds with status code `502`.
+
 ### Return early for flows
 
 It is possible to define a node at which the flow will return at for sync endpoints. The rest of the flow will continue asynchronously.
