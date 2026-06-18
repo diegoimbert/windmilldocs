@@ -1,0 +1,79 @@
+<svg viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Deep navy gradient, top-left to bottom-right -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1220" />
+      <stop offset="35%" stop-color="#0f1c33" />
+      <stop offset="100%" stop-color="#1E3A8A" stop-opacity="0.55" />
+    </linearGradient>
+    <!-- Soft radial glow anchored bottom-left, large spread -->
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1E3A8A" stop-opacity="0.55" />
+      <stop offset="60%" stop-color="#1E3A8A" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#1E3A8A" stop-opacity="0" />
+    </radialGradient>
+    <!-- Ring stroke gradient for depth -->
+    <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa" />
+      <stop offset="100%" stop-color="#1E3A8A" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)" />
+
+  <!-- Faint grid for texture (very subtle, keep elegant) -->
+  <g stroke="#1E3A8A" stroke-width="0.5" opacity="0.10">
+    <line x1="0" y1="157" x2="1200" y2="157" />
+    <line x1="0" y1="315" x2="1200" y2="315" />
+    <line x1="0" y1="472" x2="1200" y2="472" />
+    <line x1="400" y1="0" x2="400" y2="630" />
+    <line x1="800" y1="0" x2="800" y2="630" />
+  </g>
+
+  <!-- Large light-blue glow sweeping from the bottom-left -->
+  <ellipse cx="220" cy="640" rx="720" ry="560" fill="url(#glow)" />
+  <!-- Glow behind illustration -->
+  <ellipse cx="905" cy="315" rx="320" ry="320" fill="url(#glow)" />
+
+  <!-- =========================================================== -->
+  <!-- ILLUSTRATION SLOT  -  REPLACE THIS BLOCK PER TOPIC          -->
+  <!-- Region: right half, centered ~cx=905 cy=315. Keep x>=580 so -->
+  <!-- it never overlaps the title/subtitle. Use only brand colors -->
+  <!-- and low opacities. See SKILL.md "Illustration" for recipes. -->
+  <!-- Default below = concentric rings (generic). Swap it out.    -->
+  <!-- =========================================================== -->
+  <circle cx="905" cy="315" r="210" fill="none" stroke="url(#ring)" stroke-opacity="0.20" stroke-width="1.5" />
+  <circle cx="905" cy="315" r="160" fill="none" stroke="url(#ring)" stroke-opacity="0.30" stroke-width="1.5" />
+  <circle cx="905" cy="315" r="110" fill="none" stroke="url(#ring)" stroke-opacity="0.45" stroke-width="1.5" />
+  <circle cx="905" cy="315" r="62"  fill="none" stroke="url(#ring)" stroke-opacity="0.60" stroke-width="1.5" />
+  <circle cx="905" cy="315" r="16" fill="#1E3A8A" opacity="0.55" />
+  <circle cx="905" cy="315" r="6"  fill="#60a5fa" />
+  <circle cx="1115" cy="315" r="5" fill="#60a5fa" opacity="0.7" />
+  <circle cx="905"  cy="105" r="4" fill="#60a5fa" opacity="0.5" />
+  <circle cx="795"  cy="315" r="4" fill="#93c5fd" opacity="0.6" />
+  <circle cx="1018" cy="203" r="3.5" fill="#60a5fa" opacity="0.45" />
+  <circle cx="827"  cy="425" r="3.5" fill="#93c5fd" opacity="0.4" />
+  <circle cx="1005" cy="430" r="3" fill="#60a5fa" opacity="0.3" />
+  <!-- ===================== END ILLUSTRATION SLOT ================ -->
+
+  <!-- Windmill logo -->
+  <g transform="translate(80, 120) scale(0.16)">
+    <polygon fill="#BCD4FC" points="134.78,14.22 114.31,48.21 101.33,69.75 158.22,69.75 177.97,36.95 191.67,14.22"/>
+    <polygon fill="#3B82F6" points="227.55,69.75 186.61,69.75 101.33,69.75 129.78,119.02 158.16,119.02 228.61,119.02 256,119.02"/>
+    <polygon fill="#3B82F6" points="136.93,132.47 116.46,167.93 73.82,241.78 130.71,241.78 144.9,217.2 180.13,156.18 193.82,132.46"/>
+    <polygon fill="#3B82F6" points="121.7,131.95 101.23,96.49 58.59,22.63 30.15,71.91 44.34,96.49 79.57,157.5 93.26,181.22"/>
+    <polygon fill="#BCD4FC" points="64.81,131.95 25.15,131.21 0,130.74 28.44,180.01 66.73,180.72 93.26,181.21"/>
+    <polygon fill="#BCD4FC" points="165.38,181.74 184.58,216.46 196.75,238.47 225.19,189.2 206.66,155.69 193.83,132.46"/>
+  </g>
+  <text x="130" y="151" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="30" font-weight="700" fill="#ffffff" letter-spacing="-0.01em">Windmill</text>
+
+  <!-- Thin accent rule above title -->
+  <rect x="82" y="278" width="56" height="3" rx="1.5" fill="#60a5fa" />
+
+  <!-- Title -->
+  <text x="80" y="345" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="62" font-weight="700" fill="#ffffff" letter-spacing="-0.03em">{{TITLE}}</text>
+
+  <!-- Subtitle -->
+  <text x="80" y="400" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="400" fill="#94a3b8">{{SUBTITLE}}</text>
+</svg>
