@@ -1,0 +1,65 @@
+name: Sync public docs mirror
+
+# Regenerates the public, contribution-only mirror whenever docs content lands
+# on main. See scripts/public-mirror/README.md for the full design.
+#
+# Required configuration (Settings -> Secrets and variables -> Actions):
+#   secret  MIRROR_DEPLOY_KEY  SSH private key of a deploy key with WRITE access
+#                              to the mirror repo (add the public half there).
+#   var     MIRROR_REMOTE      SSH URL of the mirror,
+#                              e.g. git@github.com:windmill-labs/windmilldocs-public.git
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'blog/**'
+      - 'changelog/**'
+      - 'writing_style_guide.md'
+      - 'LICENSE.txt'
+      - 'scripts/public-mirror/**'
+      - '.github/workflows/sync-public-mirror.yml'
+  workflow_dispatch:
+
+# Never run two syncs at once; let an in-flight sync finish (don't cancel, so we
+# never push a half-written mirror).
+concurrency:
+  group: sync-public-mirror
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout private repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync to public mirror
+        env:
+          MIRROR_REMOTE: ${{ vars.MIRROR_REMOTE }}
+          MIRROR_DEPLOY_KEY: ${{ secrets.MIRROR_DEPLOY_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${MIRROR_REMOTE:-}" ] || [ -z "${MIRROR_DEPLOY_KEY:-}" ]; then
+            echo "::error::MIRROR_REMOTE (var) and MIRROR_DEPLOY_KEY (secret) must be set." >&2
+            exit 1
+          fi
+
+          # Identity for the mirror sync commit.
+          git config --global user.name  "windmill-docs-bot"
+          git config --global user.email "docs-bot@windmill.dev"
+
+          # Deploy key used for cloning and pushing the mirror.
+          mkdir -p ~/.ssh
+          printf '%s\n' "$MIRROR_DEPLOY_KEY" > ~/.ssh/mirror_key
+          chmod 600 ~/.ssh/mirror_key
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/mirror_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+
+          scripts/public-mirror/sync.sh \
+            --mirror-dir "$RUNNER_TEMP/mirror" \
+            --remote "$MIRROR_REMOTE" \
+            --push
