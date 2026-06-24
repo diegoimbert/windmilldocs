@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RadioGroup, Dialog } from '@headlessui/react';
+import { RadioGroup } from '@headlessui/react';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/20/solid';
 
 import PricingFAQ from './pricing/PricingFAQ';
@@ -366,76 +366,6 @@ const pricing = {
 	]
 };
 
-function QualificationModal({
-	isOpen,
-	closeModal,
-	planType,
-	qualificationText,
-	setQualificationText,
-	onConfirm
-}) {
-	const [organizationName, setOrganizationName] = useState('');
-
-	return (
-		<Dialog open={isOpen} onClose={closeModal} className="relative z-50">
-			<div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-
-			<div className="fixed inset-0 flex items-center justify-center p-4">
-				<Dialog.Panel className="mx-auto w-full max-w-2xl rounded-xl bg-white dark:bg-gray-800 p-8">
-					<Dialog.Title className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
-						Qualify for {planType} Plan
-					</Dialog.Title>
-
-					<div className="mb-6">
-						<label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
-							Organization name
-						</label>
-						<input
-							type="text"
-							value={organizationName}
-							onChange={(e) => setOrganizationName(e.target.value)}
-							className="w-full p-3 text-base border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-							placeholder="Enter your organization name"
-						/>
-					</div>
-					<div className="mb-6">
-						<label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
-							Reason for qualification
-						</label>
-						<textarea
-							value={qualificationText}
-							onChange={(e) => setQualificationText(e.target.value)}
-							className="w-full p-3 text-base border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-							rows={6}
-							placeholder={
-								planType === 'Pro'
-									? 'Please explain how you qualify for the Pro plan (e.g., small business size, revenue, etc.).'
-									: 'Please explain how you qualify for the Nonprofit plan (e.g., organization status, registration number, etc.).'
-							}
-						/>
-					</div>
-
-					<div className="flex justify-end gap-4">
-						<button
-							onClick={closeModal}
-							className="px-6 py-3 text-base font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-						>
-							Cancel
-						</button>
-						<button
-							onClick={() => onConfirm(organizationName)}
-							disabled={!qualificationText.trim() || !organizationName.trim()}
-							className="px-6 py-3 text-base font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-						>
-							Confirm
-						</button>
-					</div>
-				</Dialog.Panel>
-			</div>
-		</Dialog>
-	);
-}
-
 export default function Pricing() {
 	const [frequency, setFrequency] = useState(types[1]);
 	const [period, setPeriod] = useState(periods[0]);
@@ -443,9 +373,17 @@ export default function Pricing() {
 	const buttonOptions = ['Pro', 'Nonprofit', 'Enterprise'];
 
 	const [selectedOption, setSelectedOption] = useState('Enterprise');
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [qualificationText, setQualificationText] = useState('');
-	const [pendingUrl, setPendingUrl] = useState('');
+
+	// The single "Try it for a month" CTA points at the self-service portal trial
+	// funnel (portal.windmill.dev/trial). The plan/nonprofit variant rides in the
+	// query string so the funnel pre-selects it and captures eligibility there
+	// (replacing the old dual CC/no-cc buttons + qualification modal).
+	const trialSignupUrl =
+		selectedOption === 'Pro'
+			? 'https://portal.windmill.dev/trial?plan=selfhosted_pro'
+			: selectedOption === 'Nonprofit'
+				? 'https://portal.windmill.dev/trial?nonprofit=true'
+				: 'https://portal.windmill.dev/trial';
 
 	const handleOptionChange = (option) => {
 		setSelectedOption(option);
@@ -464,48 +402,6 @@ export default function Pricing() {
 				} else {
 					return pricing.selfhost;
 				}
-		}
-	};
-
-	const handlePlanClick = (url, planType) => {
-		if (planType === 'Pro' || planType === 'Nonprofit') {
-			setIsModalOpen(true);
-			setPendingUrl(url);
-		} else {
-			window.open(url, '_blank');
-		}
-	};
-
-	const handleModalConfirm = async (organizationName) => {
-		if (pendingUrl && qualificationText.trim()) {
-			// Call webhook
-			try {
-				await fetch(
-					'https://app.windmill.dev/api/w/windmill-labs/jobs/run_wait_result/f/f/bd/qualification_trial',
-					{
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							Authorization: 'Bearer Mk9WB1kn5ZkVNRW1nbD0sxdnl71KpPPV'
-						},
-						body: JSON.stringify({
-							qualificationText,
-							organizationName,
-							plan: selectedOption
-						})
-					}
-				);
-			} catch (error) {
-				console.error('Error sending qualification data:', error);
-			}
-
-			// Open the pending URL in a new tab
-			window.open(pendingUrl, '_blank');
-
-			// Reset modal state
-			setIsModalOpen(false);
-			setQualificationText('');
-			setPendingUrl('');
 		}
 	};
 
@@ -716,79 +612,25 @@ export default function Pricing() {
 								/>
 							</div>
 
-							{tier.id === 'tier-enterprise-selfhost' && selectedOption !== 'Pro' && frequency.value === 'selfhost' ? (
-								selectedOption === 'Enterprise' ? (
-									<div className="try-it-button">
-										<a
-											href="https://billing.windmill.dev/b/4gw4hu51YbfZ0N200j"
-											onClick={(e) => {
-												e.preventDefault();
-												e.stopPropagation();
-												handlePlanClick(
-													'https://billing.windmill.dev/b/4gw4hu51YbfZ0N200j',
-													'Enterprise'
-												);
-											}}
-											className="main-section"
-										>
-											Try it for a month
-										</a>
-										<a
-											href="https://app.windmill.dev/a/windmill-prod/ee_trial_form"
-											className="hover-section"
-											target="_blank"
-											onClick={(e) => {
-												e.stopPropagation();
-											}}
-										>
-											No credit card?
-										</a>
-									</div>
-								) : (
-									<div className="try-it-button">
-										<a
-											onClick={(e) => {
-												e.preventDefault();
-												e.stopPropagation();
-												handlePlanClick(
-													'https://billing.windmill.dev/b/4gw4hu51YbfZ0N200j' +
-														(selectedOption === 'Nonprofit' ? '?prefilled_promo_code=nonprofit' : ''),
-													selectedOption
-												);
-											}}
-											className={classNames(
-												'text-sm bg-teal-600 !text-white shadow-sm hover:bg-teal-700 focus-visible:outline-teal-600',
-												'main-section !no-underline text-center font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'
-											)}
-											style={{ cursor: 'pointer' }}
-										>
-											Try it for a month
-										</a>
-										<a
-											href="https://app.windmill.dev/a/windmill-prod/ee_trial_form"
-											className="hover-section"
-											target="_blank"
-											onClick={(e) => {
-												e.stopPropagation();
-											}}
-										>
-											No credit card?
-										</a>
-									</div>
-								)
+							{tier.id === 'tier-enterprise-selfhost' && frequency.value === 'selfhost' ? (
+								<a
+									href={trialSignupUrl}
+									target="_blank"
+									aria-describedby={tier.id}
+									className={classNames(
+										'bg-teal-600 !text-white shadow-sm hover:bg-teal-700 focus-visible:outline-teal-600',
+										'!no-underline mt-6 block rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'
+									)}
+								>
+									Try it for a month
+								</a>
 							) : (
 								<a
-									href={
-										tier.id === 'tier-enterprise-selfhost' && selectedOption === 'Pro'
-											? '#pro-plan'
-											: tier.href
-									}
+									href={tier.href}
 									target="_blank"
 									aria-describedby={tier.id}
 									className={classNames(
 										tier.id === 'tier-team'
-											? 'bg-blue-600 !text-white shadow-sm hover:bg-blue-700'
-											: tier.id === 'tier-enterprise-selfhost' && selectedOption === 'Pro'
 											? 'bg-blue-600 !text-white shadow-sm hover:bg-blue-700'
 											: tier.enterprise_edition
 											? 'bg-teal-600 !text-white shadow-sm hover:bg-teal-700'
@@ -796,11 +638,7 @@ export default function Pricing() {
 										'!no-underline mt-6 block rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600'
 									)}
 								>
-									{tier.id === 'tier-enterprise-selfhost' && selectedOption === 'Pro'
-										? 'Check if you qualify'
-										: tier.customMessage
-										? tier.customMessage
-										: 'Get in touch'}
+									{tier.customMessage ? tier.customMessage : 'Get in touch'}
 								</a>
 							)}
 
@@ -823,8 +661,7 @@ export default function Pricing() {
 								) : null}
 
 								{tier.id === 'tier-enterprise-selfhost' &&
-									frequency.value === 'selfhost' &&
-									selectedOption !== 'Pro' ? (
+									frequency.value === 'selfhost' ? (
 									<a
 										href={tier.href}
 										target="_blank"
@@ -838,75 +675,7 @@ export default function Pricing() {
 									>
 										Get in touch
 									</a>
-								) : (
-									(tier.id === 'tier-enterprise-selfhost' &&
-										frequency.value === 'selfhost' &&
-										(selectedOption === 'Enterprise' ? (
-											<div className="try-it-button">
-												<a
-													href="https://billing.windmill.dev/b/4gw4hu51YbfZ0N200j"
-													onClick={(e) => {
-														e.preventDefault();
-														e.stopPropagation();
-														handlePlanClick(
-															'https://billing.windmill.dev/b/4gw4hu51YbfZ0N200j',
-															'Enterprise'
-														);
-													}}
-													className="main-section"
-												>
-													Try it for a month
-												</a>
-												<a
-													href="https://app.windmill.dev/a/windmill-prod/ee_trial_form"
-													className="hover-section"
-													target="_blank"
-													onClick={(e) => {
-														e.stopPropagation();
-													}}
-												>
-													No credit card?
-												</a>
-											</div>
-										) : (
-											<div className="try-it-button">
-												<a
-													onClick={(e) => {
-														e.preventDefault();
-														e.stopPropagation();
-														handlePlanClick(
-															selectedOption === 'Pro'
-																? 'https://billing.windmill.dev/b/28o3dq51Y6ZJ9jy7sM'
-																: 'https://billing.windmill.dev/b/4gw4hu51YbfZ0N200j' +
-																		(selectedOption === 'Nonprofit'
-																			? '?prefilled_promo_code=nonprofit'
-																			: ''),
-															selectedOption
-														);
-													}}
-													className={classNames(
-														selectedOption === 'Pro'
-															? 'text-sm bg-blue-600 !text-white shadow-sm hover:bg-blue-700 focus-visible:outline-blue-600'
-															: 'text-sm bg-teal-600 !text-white shadow-sm hover:bg-teal-700 focus-visible:outline-teal-600',
-														'main-section !no-underline text-center font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'
-													)}
-													style={{ cursor: 'pointer' }}
-												>
-													Try it for a month
-												</a>
-												<a
-													href="https://app.windmill.dev/a/windmill-prod/ee_trial_form"
-													className="hover-section"
-													target="_blank"
-													onClick={(e) => {
-														e.stopPropagation();
-													}}
-												>
-													No credit card?
-												</a>
-											</div>
-										)))
-								)}
+								) : null}
 							</div>
 						</div>
 					))}
@@ -1238,18 +1007,6 @@ export default function Pricing() {
 			)}
 			<div className="relative dark:bg-gray-950 lg:pt-14"></div>
 			<PricingFAQ />
-			<QualificationModal
-				isOpen={isModalOpen}
-				closeModal={() => {
-					setIsModalOpen(false);
-					setQualificationText('');
-					setPendingUrl('');
-				}}
-				planType={selectedOption}
-				qualificationText={qualificationText}
-				setQualificationText={setQualificationText}
-				onConfirm={handleModalConfirm}
-			/>
 		</div>
 	);
 }
