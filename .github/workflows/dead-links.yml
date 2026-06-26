@@ -1,0 +1,57 @@
+name: check dead links
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'docs/**'
+      - 'blog/**'
+      - 'changelog/**'
+      - 'brand_guidelines/**'
+      - 'scripts/check-dead-links.mjs'
+      - 'scripts/dead-links-skip.json'
+      - '.github/workflows/dead-links.yml'
+  schedule:
+    # Weekly full-site sweep (Mondays 06:00 UTC) to catch external links that
+    # rot independently of any PR.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      check_all:
+        description: 'Check every page in the sitemap, not just the diff'
+        type: boolean
+        default: false
+
+jobs:
+  dead_links:
+    runs-on: ubicloud-standard-4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          # linkinator 7.x depends on undici, which needs the Node 20+ File global
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build docs
+        timeout-minutes: 10
+        run: npm run build
+
+      - name: Start local preview
+        run: |
+          npm run serve -- --no-open &
+          npx --yes wait-on http://localhost:3000 --timeout 60000
+
+      - name: Check dead links
+        env:
+          PREVIEW_URL: http://localhost:3000
+          DIFF_BASE: origin/${{ github.base_ref }}
+          # Sweep the whole sitemap on the weekly schedule or when manually requested;
+          # otherwise check only the pages changed in the PR.
+          CHECK_ALL: ${{ (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.check_all)) && '1' || '' }}
+        run: node scripts/check-dead-links.mjs

@@ -1,0 +1,20 @@
+{
+	"_comment": "Regex patterns for links the dead-link checker should ignore. Tuned from a full-site sweep. Only false positives belong here: documentation placeholder/example URLs, and hosts that block crawlers (return 403/408/429 to bots but resolve fine in a browser). Do NOT add hosts that genuinely 404 - those are real dead links worth fixing. Merged with the built-in defaults in scripts/check-dead-links.mjs.",
+	"skip": [
+		"\\.example\\.com",
+		"^https?://localhost(:8000)?/?$",
+		"^https?://your-windmill-instance\\.com",
+		"^https?://hooks\\.slack\\.com",
+		"^https?://(www\\.)?marketplace\\.microsoft\\.com",
+		"^https?://questions\\.windmill\\.dev",
+		"^https?://(www\\.)?(charts\\.)?ag-grid\\.com",
+		"^https?://crates\\.io",
+		"^https?://img\\.shields\\.io",
+		"^https?://(www\\.)?mysql\\.com",
+		"^https?://news\\.ycombinator\\.com",
+		"^https?://media\\.licdn\\.com",
+		"^https?://(www\\.)?fema\\.gov",
+		"^https?://(www\\.)?kobotoolbox\\.org",
+		"^https?://(www\\.)?consumercal\\.org"
+	]
+}

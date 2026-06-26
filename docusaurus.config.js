@@ -19,13 +19,6 @@ const config = {
 	organizationName: 'windmill', // Usually your GitHub org/user name.
 	projectName: 'windmill',
 
-	stylesheets: [
-		{
-			href: './src/css/custom.css',
-			type: 'text/css'
-		}
-	],
-
 	headTags: [
 		{
 			tagName: 'link',
