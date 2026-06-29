@@ -36,3 +36,5 @@ profiles:
 integrations:
   linear:
     enabled: true
+    autoCreateWorktrees: true
+    watchTeams: [DOCS]
