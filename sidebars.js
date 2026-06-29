@@ -104,6 +104,11 @@ const sidebars = {
 						},
 						{
 							type: 'doc',
+							id: 'getting_started/pipeline_quickstart/index',
+							label: 'Pipelines (alpha)'
+						},
+						{
+							type: 'doc',
 							id: 'getting_started/full_code_apps_quickstart/index',
 							label: 'Apps (full-code)'
 						},
@@ -405,6 +410,11 @@ const sidebars = {
 				'core_concepts/object_storage_in_windmill/index',
 				'core_concepts/custom_instance_database/index',
 				'core_concepts/data_pipelines/index',
+				{
+					type: 'doc',
+					id: 'core_concepts/pipelines/index',
+					label: 'Pipelines (alpha)'
+				},
 				'core_concepts/roles_and_permissions/index',
 				'core_concepts/authentification/index',
 				'core_concepts/user_tokens/index',

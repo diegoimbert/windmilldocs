@@ -89,15 +89,17 @@ function frontmatterSlug(file) {
 	return slug ? slug[1].trim() : null;
 }
 
-function readSitemapPaths() {
+function readSitemap() {
 	if (!existsSync(SITEMAP)) {
 		console.error(`Missing ${SITEMAP} - run "npm run build" before this check.`);
 		process.exit(1);
 	}
 	const xml = readFileSync(SITEMAP, 'utf8');
-	return new Set(
-		[...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname.replace(/\/$/, ''))
-	);
+	const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]));
+	const paths = new Set(locs.map((u) => u.pathname.replace(/\/$/, '')));
+	// All locs share the production siteUrl origin (https://www.windmill.dev).
+	const origin = locs.length ? locs[0].origin : null;
+	return { paths, origin };
 }
 
 function changedFiles() {
@@ -152,7 +154,7 @@ function resolveRoutes(files, sitemap) {
 }
 
 async function main() {
-	const sitemap = readSitemapPaths();
+	const { paths: sitemap, origin: siteOrigin } = readSitemap();
 
 	let routes;
 	if (process.env.CHECK_ALL === '1') {
@@ -179,7 +181,26 @@ async function main() {
 	}
 
 	const urls = routes.map((r) => `${PREVIEW_URL}${r}/`);
-	const skip = [...DEFAULT_SKIP, ...loadExtraSkips()];
+	const skipRegexes = [...DEFAULT_SKIP, ...loadExtraSkips()].map((s) => new RegExp(s));
+
+	// Docusaurus emits canonical / alternate <link> tags using the absolute
+	// production siteUrl. For a page built in THIS repo those resolve to the
+	// live site, where a not-yet-deployed new page 404s - a false positive. An
+	// absolute self-link whose path is in the local sitemap is a real page (the
+	// build already failed on broken internal links via onBrokenLinks: 'throw'),
+	// so skip it. Self-links to paths absent from the sitemap still get checked.
+	const linksToSkip = async (url) => {
+		if (skipRegexes.some((re) => re.test(url))) return true;
+		if (siteOrigin) {
+			try {
+				const u = new URL(url);
+				if (u.origin === siteOrigin && sitemap.has(u.pathname.replace(/\/$/, ''))) return true;
+			} catch {
+				// not a parseable absolute URL; fall through
+			}
+		}
+		return false;
+	};
 
 	const checker = new LinkChecker();
 	const result = await checker.check({
@@ -190,7 +211,7 @@ async function main() {
 		retry: true,
 		retryErrors: true,
 		retryErrorsCount: 3,
-		linksToSkip: skip
+		linksToSkip
 	});
 
 	const broken = result.links.filter((l) => l.state === 'BROKEN');

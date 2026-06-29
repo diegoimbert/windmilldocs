@@ -20,6 +20,7 @@ Every docs page below is available as raw markdown by appending `.md` to its URL
 - [Apps quickstart](https://www.windmill.dev/docs/getting_started/apps_quickstart.md): How do I build an internal tool with Windmill? Create data-driven apps and dashboards with drag-and-drop components and code.
 - [Full code apps quickstart](https://www.windmill.dev/docs/getting_started/full_code_apps_quickstart.md): How do I build a full-code app with Windmill? Step-by-step guide to create a React or Svelte app with backend runnables.
 - [Triggers](https://www.windmill.dev/docs/getting_started/triggers.md): How do I trigger scripts and flows in Windmill? Use schedules, webhooks, emails, HTTP routes, websockets, Kafka, Postgres, NATS, SQS, MQTT, GCP, Azure Event Grid and more.
+- [Pipeline quickstart](https://www.windmill.dev/docs/getting_started/pipeline_quickstart.md): How do I build my first pipeline in Windmill? Step-by-step guide to connect scripts with asset lineage and run them as a pipeline.
 
 ### Script languages
 - [SQL](https://www.windmill.dev/docs/getting_started/scripts_quickstart/sql.md): How do I run SQL queries in Windmill? Connect to PostgreSQL, MySQL, BigQuery, Snowflake and other databases.
@@ -44,7 +45,7 @@ Every docs page below is available as raw markdown by appending `.md` to its URL
 - [Dependency management](https://www.windmill.dev/docs/advanced/imports.md): How do I manage dependencies and imports across languages in Windmill?
 - [Persistent storage and databases](https://www.windmill.dev/docs/core_concepts/persistent_storage.md): What are the storage options in Windmill? S3/R2/MinIO object storage, Postgres, DuckDB, data tables and key-value stores.
 - [Object storage (S3)](https://www.windmill.dev/docs/core_concepts/object_storage_in_windmill.md): How do I connect Windmill to S3, Azure Blob, or Google Cloud Storage for workspace and instance object storage?
-- [Data pipelines](https://www.windmill.dev/docs/core_concepts/data_pipelines.md): How do I build data pipelines in Windmill? DAG-based ETL processing with S3 integration and SQL-to-S3 streaming.
+- [Data pipelines](https://www.windmill.dev/docs/core_concepts/data_pipelines.md): How do I run efficient ETL and data processing in Windmill? DAG-based processing with S3 streaming, Polars and DuckDB, and SQL-to-S3.
 - [Roles and permissions](https://www.windmill.dev/docs/core_concepts/roles_and_permissions.md): How do I manage permissions in Windmill? Control access to scripts, flows, apps and resources at instance and workspace level.
 - [Authentication](https://www.windmill.dev/docs/core_concepts/authentification.md): How do I configure authentication in Windmill using SSO, restricted domains, or manual user management?
 - [Error handling](https://www.windmill.dev/docs/core_concepts/error_handling.md): How do I handle errors in Windmill? Use error handlers, retries, custom error messages and recovery strategies.
@@ -133,6 +134,7 @@ Every docs page below is available as raw markdown by appending `.md` to its URL
 - [Workspace forks](https://www.windmill.dev/docs/advanced/workspace_forks.md): How do I create workspace forks for parallel development workflows in Windmill?
 - [Workspace secret encryption](https://www.windmill.dev/docs/core_concepts/workspace_secret_encryption.md): How does Windmill encrypt workspace secrets, and how do I update the encryption key?
 - [Workspace settings](https://www.windmill.dev/docs/core_concepts/workspace_settings.md): What are workspace settings and how do I configure users, Git sync, storage, and other workspace options?
+- [Pipelines](https://www.windmill.dev/docs/core_concepts/pipelines.md): How do I build pipelines in Windmill? Connect scripts with asset lineage, schedules, partitions, joins, debounce, managed DuckLake materialization, column-level lineage and data tests using comment annotations.
 - [States resources shared directory](https://www.windmill.dev/docs/core_concepts/persistent_storage/states_resources_shared_directory.md): What are states and resources for transient data storage within Windmill, and why are external databases preferred?
 
 ### Triggers

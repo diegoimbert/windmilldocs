@@ -1,0 +1,78 @@
+---
+description: How do I build my first pipeline in Windmill? Step-by-step guide to connect scripts with asset lineage and run them as a pipeline.
+---
+
+import DocCard from '@site/src/components/DocCard';
+
+# Pipelines quickstart
+
+:::caution Alpha
+Pipelines are in alpha. The entry point is deliberately tucked away while we develop the feature, and the annotation syntax and behavior described in this guide are still evolving and may change in future releases. We would love your feedback - share it on [Discord](https://discord.com/invite/V7PM2YHsPB) or [GitHub](https://github.com/windmill-labs/windmill).
+:::
+
+This guide builds your first [pipeline](../../core_concepts/63_pipelines/index.mdx): a set of scripts in a folder wired together automatically by the data they read and write, no manual orchestration. It takes about five minutes.
+
+## 1. Create a pipeline
+
+On the home page, open the dropdown next to the **+ Flow** button and select **Pipeline (alpha)**.
+
+![Create a pipeline from the + Flow dropdown](./create_pipeline_menu.png 'Create a pipeline from the + Flow dropdown')
+
+Pipelines live in a [folder](../../core_concepts/8_groups_and_folders/index.mdx) (for example `f/demo`); every script you add to it and mark with `// pipeline` becomes part of the same pipeline graph.
+
+## 2. Add a producer script
+
+Create a script `f/demo/ingest`. The `// pipeline` line places it in the folder's pipeline; the S3 write is detected automatically as the script's output.
+
+```ts
+// pipeline
+import * as wmill from 'windmill-client';
+
+export async function main() {
+	await wmill.writeS3File({ s3: 'demo/raw.json' }, JSON.stringify([{ n: 1 }, { n: 2 }]));
+}
+```
+
+## 3. Add a consumer script
+
+Create `f/demo/transform`. The `// on` annotation declares the asset it reads, which becomes an incoming edge: this script runs automatically whenever `demo/raw.json` is written.
+
+```ts
+// pipeline
+// on s3://demo/raw.json
+import * as wmill from 'windmill-client';
+
+export async function main() {
+	const rows = JSON.parse(await wmill.loadS3File({ s3: 'demo/raw.json' }));
+	await wmill.writeS3File({ s3: 'demo/sum.json' }, JSON.stringify({ count: rows.length }));
+}
+```
+
+## 4. Open the pipeline graph
+
+Open the folder and select the pipeline view. You will see the lineage:
+
+`ingest` → `s3://demo/raw.json` → `transform` → `s3://demo/sum.json`
+
+## 5. Run it
+
+On the `ingest` node, choose "Run + downstream". `ingest` runs, writes `raw.json`, and the asset cascade automatically fires `transform`, which writes `sum.json`. Each node shows live status as the run progresses.
+
+That is the whole model: mark scripts with `// pipeline`, declare inputs with `// on`, and Windmill infers and runs the graph from asset lineage.
+
+## Next steps
+
+Add schedules, partitions, AND/OR joins and debounce. Every annotation and option is documented, with examples, on the concept page.
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	<DocCard
+		title="Pipelines"
+		description="Full reference: every annotation and option with examples (schedules, partitions, joins, debounce)."
+		href="/docs/core_concepts/pipelines"
+	/>
+	<DocCard
+		title="Assets"
+		description="How Windmill detects and tracks the S3 objects, resources and tables your scripts read and write."
+		href="/docs/core_concepts/assets"
+	/>
+</div>

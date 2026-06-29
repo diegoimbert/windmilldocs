@@ -1,5 +1,6 @@
 ---
-description: How do I build data pipelines in Windmill? DAG-based ETL processing with S3 integration and SQL-to-S3 streaming.
+description: How do I run efficient ETL and data processing in Windmill? DAG-based processing with S3 streaming, Polars and DuckDB, and SQL-to-S3.
+sidebar_label: 'ETL & data processing'
 ---
 
 import DocCard from '@site/src/components/DocCard';
@@ -7,16 +8,26 @@ import BarChart from '@site/src/components/BarChart';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Data pipelines
+# ETL and data processing
 
-In essence, an ETL (Extract, Transform, Load) process is a [Directed Acyclic Graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG) of jobs where each job reads data, performs computations, and outputs new or updated datasets.
+In essence, an ETL (Extract, Transform, Load) process is a [Directed Acyclic Graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG) of jobs where each job reads data, performs computations, and outputs new or updated datasets. This page covers the data-processing side: efficient S3 streaming, Polars and DuckDB patterns, and SQL-to-S3, assembled in the flow editor.
 
-Windmill streamlines the creation of data pipelines that are not only fast and reliable but also straightforward to construct:
+This page focuses on the data-processing side: reading, transforming and writing datasets efficiently, independent of how the steps are orchestrated.
 
-- **Developer Experience**: Windmill's design facilitates the swift assembly of data [flows](../../flows/1_flow_editor.mdx), allowing for step-by-step data processing in a visually intuitive and manageable manner.
-- **Control and Efficiency**: It offers the ability to manage [parallelism](../../flows/13_flow_branches.md#branch-all) across steps and set [concurrency limits](../../flows/6_concurrency_limit.mdx) to accommodate external resources that may be sensitive to overload or have rate limits.
-- **Flexibility in Execution**: Flows in Windmill can be [restarted](../../flows/18_test_flows.mdx#restart-from-step-iteration-or-branch) from any point, enhancing the process of pipeline development and debugging by making it more flexible and efficient.
-- **Simplified Monitoring**: Built-in [error and recovery handling](../10_error_handling/index.mdx) mechanisms simplify monitoring, ensuring that managing your data pipelines is both effective and straightforward.
+Windmill makes data processing fast, reliable and straightforward to build:
+
+- **Efficient processing**: stream large datasets to and from [object storage](../38_object_storage_in_windmill/index.mdx) and process them with Polars or DuckDB without loading everything into memory (see the recipes and benchmarks below).
+- **Developer experience**: each step is an ordinary script you can write, test and run in isolation, in the language best suited to the transformation.
+- **Built-in monitoring**: [error and recovery handling](../10_error_handling/index.mdx) and run history apply to every step regardless of how it is orchestrated.
+
+### Orchestrating the steps
+
+The processing recipes here are orchestration-agnostic. Windmill offers two ways to connect the steps, and you can pick per use case:
+
+- [Flows](../../flows/1_flow_editor.mdx): a general-purpose visual DAG editor. Best when you want explicit control over [parallelism](../../flows/13_flow_branches.md#branch-all), [concurrency limits](../../flows/6_concurrency_limit.mdx), branching, suspend/approval, and [restarting](../../flows/18_test_flows.mdx#restart-from-step-iteration-or-branch) from any step.
+- [Pipelines](../63_pipelines/index.mdx) (alpha): a lighter, declarative model where independent scripts in a folder are wired automatically by asset lineage, with comment annotations for schedules, partitions, joins and debounce. Best when steps are owned independently and connected only by the datasets they exchange.
+
+Neither replaces the other; the processing code below is identical regardless of which you choose.
 
 <iframe
 	style={{ aspectRatio: '16/9' }}

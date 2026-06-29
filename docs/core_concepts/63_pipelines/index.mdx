@@ -1,0 +1,664 @@
+---
+description: How do I build pipelines in Windmill? Connect scripts with asset lineage, schedules, partitions, joins, debounce, managed DuckLake materialization, column-level lineage and data tests using comment annotations.
+---
+
+import DocCard from '@site/src/components/DocCard';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Pipelines
+
+:::caution Alpha
+Pipelines are in alpha. The entry point is deliberately kept out of the way while we develop the feature - create one from the home page by opening the dropdown next to **+ Flow** and selecting **Pipeline (alpha)**. The annotation syntax and behavior described on this page are still evolving and may change in future releases. We would love your feedback - share it on [Discord](https://discord.com/invite/V7PM2YHsPB) or [GitHub](https://github.com/windmill-labs/windmill).
+:::
+
+A pipeline is a set of scripts in the same [folder](../8_groups_and_folders/index.mdx) that are wired together by the data they read and write. Instead of assembling steps by hand in a [flow](../../flows/1_flow_editor.mdx), you declare a few comment annotations at the top of each script and Windmill infers the execution graph from [asset](../52_assets/index.mdx) lineage: when a script writes an asset, every script that reads that asset is triggered automatically.
+
+Pipelines are a modern take on asset-based data orchestration, in the spirit of [dbt](https://www.getdbt.com/) and [Dagster](https://dagster.io/): you describe assets and their lineage rather than wiring tasks by hand. The difference is what powers them - [DuckDB](https://duckdb.org/) (and managed [DuckLake](#materialization) tables) as the analytics engine for transformations and materializations, and Windmill itself for orchestration, scheduling and compute, so every step is an ordinary Windmill script in the language of your choice and runs on your own workers.
+
+Pipelines are well suited to event-driven and data-engineering workloads where steps are owned independently, run on their own cadence, and are connected only by the datasets they exchange (S3 objects, resources, data tables, volumes). For data-processing recipes (S3 streaming, Polars and DuckDB) assembled step by step in a single editor, see [ETL and data processing](../27_data_pipelines/index.mdx) instead.
+
+This page is the full reference for every pipeline annotation and option, with an example for each case. Annotations are plain comment lines, so they use the comment prefix of the script language. Any of the three prefixes below is accepted by the parser; use the one that is a comment in your language.
+
+| Prefix | Languages |
+| --- | --- |
+| `//` | TypeScript / JavaScript (Bun, Deno) |
+| `#` | Python, Bash, PowerShell, and other `#`-comment languages |
+| `--` | SQL (DuckDB, PostgreSQL, MySQL, BigQuery, Snowflake, MS SQL) |
+
+All examples below use TypeScript (`//`); substitute `#` or `--` for other languages. Annotations may appear anywhere in the file, one per line.
+
+## Quickstart
+
+Build a two-step pipeline in a folder. The first script writes an S3 dataset; the second declares it as an input and runs automatically when it is written.
+
+1. Create a folder (for example `f/demo`) and add a script `f/demo/ingest`:
+
+```ts
+// pipeline
+import * as wmill from 'windmill-client';
+
+export async function main() {
+	await wmill.writeS3File({ s3: 'demo/raw.json' }, JSON.stringify([{ n: 1 }, { n: 2 }]));
+}
+```
+
+2. Add a second script `f/demo/transform` that reads it:
+
+```ts
+// pipeline
+// on s3://demo/raw.json
+import * as wmill from 'windmill-client';
+
+export async function main() {
+	const rows = JSON.parse(await wmill.loadS3File({ s3: 'demo/raw.json' }));
+	await wmill.writeS3File({ s3: 'demo/sum.json' }, JSON.stringify({ sum: rows.length }));
+}
+```
+
+3. Open the folder and select the pipeline view. You will see `ingest → s3://demo/raw.json → transform → s3://demo/sum.json`. Run `ingest` with "Run + downstream": `transform` fires automatically once `raw.json` is written.
+
+That is the whole model: mark scripts with `// pipeline`, declare inputs with `// on`, and Windmill wires the rest from asset lineage. The sections below cover every option. For a guided walkthrough see the [pipeline quickstart](../../getting_started/10_pipeline_quickstart/index.mdx).
+
+## Marking a script as part of a pipeline
+
+Add a bare `// pipeline` line anywhere in the script. It opts the script into its folder's pipeline and makes it appear in the pipeline graph.
+
+```ts
+// pipeline
+import * as wmill from 'windmill-client';
+
+export async function main() {
+	await wmill.writeS3File({ s3: 'datasets/raw/events.parquet' }, await fetchEvents());
+}
+```
+
+Pipeline membership is broader than materialization: a script that only validates, notifies or cleans up is still a member if it is marked and lives in the folder. A script does not need `// pipeline` to be detected as an asset producer or consumer, but the marker is what places it in the folder's pipeline view and enables the asset-driven triggers below.
+
+## Inputs and outputs (assets)
+
+A pipeline's edges come from assets, not from manual wiring:
+
+- Outputs are detected automatically from your code. Writing an S3 file, a `COPY (...) TO file` in DuckDB, or a resource write is recognized as a produced asset. See [assets](../52_assets/index.mdx) for how detection works and how to override an ambiguous read/write.
+- Inputs are declared with `// on <asset>`. Each declared asset the script reads becomes an incoming edge.
+
+Assets are referenced by URI. Every asset kind Windmill tracks can be used in a `// on` input and is detected as an output from code:
+
+| Asset kind | URI prefix | Example | Typical producer |
+| --- | --- | --- | --- |
+| S3 object | `s3://` | `s3://bucket/path/to/file.parquet` | `wmill.writeS3File`, DuckDB `COPY (...) TO 's3://...'` |
+| Resource | `$res:` | `$res:f/team/postgres` | writing/updating a resource |
+| Data table | `datatable://` | `datatable://main` | `wmill.datatable(...)` write |
+| Ducklake | `ducklake://` | `ducklake://lake` | Ducklake table write |
+| Volume | `volume://` | `volume://name` | volume write |
+
+Read/write is inferred from code context (a `COPY (...) TO` is a write, a `read_parquet` is a read). When it cannot be inferred you can set it manually; see [assets](../52_assets/index.mdx). Only asset URIs are valid here; a `// on` with an unrecognized URI is ignored. Duplicate identical `// on` lines are de-duplicated.
+
+```ts
+// pipeline
+// on s3://datasets/raw/events.parquet
+import * as wmill from 'windmill-client';
+
+export async function main() {
+	const events = await wmill.loadS3File({ s3: 'datasets/raw/events.parquet' });
+	await wmill.writeS3File({ s3: 'datasets/clean/events.parquet' }, transform(events));
+}
+```
+
+When the producer above writes `s3://datasets/raw/events.parquet`, this consumer runs automatically. If it in turn writes `s3://datasets/clean/events.parquet`, any script that declares `// on s3://datasets/clean/events.parquet` runs next, and so on down the chain.
+
+:::info Cascade safety
+
+The asset cascade is depth-capped so a cycle or a runaway fan-out cannot loop forever. To run a producer without triggering its downstream (for example while iterating on it), pass `_wmill_skip_asset_dispatch: true` in the run arguments.
+
+:::
+
+## The pipeline graph
+
+Open the folder and select the pipeline view to see the graph. Script nodes are connected to the assets they read and write, so you can see the full lineage at a glance, run a single step or a step and everything downstream of it, and watch live run activity and status on each node as the cascade progresses.
+
+![Pipeline asset graph](./pipeline_graph.png 'Pipeline asset graph')
+
+{/* PLACEHOLDER video: /static/videos/pipeline_cascade.mp4 — a ~15s screencast
+    of the pipeline graph during a run: the user clicks "Run + downstream" on
+    the top script node, then nodes light up in topological order with the
+    live "running" spinner badge turning into a green "success" badge as the
+    asset cascade propagates down the chain, edges animating active. Use a
+    <video className="border-2 rounded-lg object-cover w-full dark:border-gray-800"
+    controls src="/videos/pipeline_cascade.mp4" /> element here once captured. */}
+
+When a selected script declares inputs (for example a `partition` argument, see below), a compact arguments form appears under the Test button so the run can be parameterized before launching it from the graph.
+
+### Selective execution (run up to here)
+
+Beyond running a single step or a step and everything downstream of it, you can run a **bounded slice** of the cascade: start at an entry point and stop at one or more chosen end nodes. On a valid start node — a schedule-rooted or manual entry point — open **Run downstream up to…** to enter pick mode, click the node(s) where the run should stop (eligible nodes highlight, out-of-reach ones dim), and launch. Windmill runs exactly the path between the start and the ends — every step needed to produce the chosen ends and nothing past them — in topological order, stopping on the first failure. It maps to the natural "run up to here" gesture without dbt's compile-time `--select` grammar.
+
+![Selective execution: bounding a cascade to a chosen end node](./selective_execution.png 'Bounding a cascade to an end node')
+
+The same bounded run is available from the CLI:
+
+```bash
+wmill pipeline run <folder> --to <node>[,<node>…] [--from <start>] [--dry-run] [--json]
+```
+
+`--to` accepts script names, paths, or asset URIs (e.g. `datatable://main/staged`); `--from` defaults to the folder's sole valid start; `--dry-run` prints the planned set without running it.
+
+## Triggering a pipeline
+
+A step runs when any of its triggers fire. There are two trigger forms: asset writes (the cascade) and markers for native triggers that target the script.
+
+### Asset triggers (the cascade)
+
+```
+// on <asset-uri> [debounce=<duration>]
+```
+
+`// on <asset-uri>` runs the script whenever an upstream script writes that asset. `<asset-uri>` is any of the asset kinds in the table above. The optional trailing `debounce=` is the only inline option (see [debounce](#debounce)); it is meaningful for asset inputs only. This is the default way data flows through a pipeline.
+
+```ts
+// pipeline
+// on s3://datasets/raw/events.parquet
+// on $res:f/team/config
+```
+
+### Native-trigger markers (schedule, webhook, kafka, …)
+
+```
+// on <kind>
+```
+
+Besides asset writes, a step can be triggered by a native [trigger](../../getting_started/8_triggers/index.mdx) (including a [schedule](../1_scheduling/index.mdx)) that targets the script. This marker is **keyword-only — there is no path or cron in the annotation**. The binding lives on the trigger row itself (its `script_path` points at this script), and all of the trigger's options — cron and timezone for a schedule, connection / broker / topic / queue / filters / authentication / mapping for the others — live in that trigger's own configuration page. The `// on <kind>` line just surfaces the trigger on the pipeline graph and opts the step into firing from it. Anything after the keyword makes the line malformed (so `// schedule "<cron>"` and `// on kafka f/foo` are not valid forms).
+
+| Kind keyword | Trigger | Where the cron / options live |
+| --- | --- | --- |
+| `schedule` | a [schedule](../1_scheduling/index.mdx) | the schedule's cron + timezone |
+| `webhook` | a route / webhook | [Webhooks](../4_webhooks/index.mdx) |
+| `email` | an email trigger | [Triggers](../../getting_started/8_triggers/index.mdx) |
+| `kafka` | a Kafka trigger | [Kafka triggers](../41_kafka_triggers/index.mdx) |
+| `nats` | a NATS trigger | [NATS triggers](../45_nats_triggers/index.mdx) |
+| `mqtt` | an MQTT trigger | [MQTT triggers](../49_mqtt_triggers/index.mdx) |
+| `postgres` | a Postgres trigger | [Postgres triggers](../46_postgres_triggers/index.mdx) |
+| `sqs` | an AWS SQS trigger | [SQS triggers](../48_sqs_triggers/index.mdx) |
+| `gcp` | a GCP Pub/Sub trigger | [GCP triggers](../50_gcp_triggers/index.mdx) |
+| `data_upload` | a UI file-upload entry point | the run form's S3 file picker |
+
+If a `// on <kind>` marker has no matching trigger yet, the pipeline graph shows a placeholder node you can click to create one (for a schedule, that is where you set the cron).
+
+```ts
+// pipeline
+// on schedule
+// on kafka
+// on webhook
+import * as wmill from 'windmill-client';
+
+export async function main() {
+	await wmill.writeS3File({ s3: 'datasets/raw/orders.parquet' }, await pull());
+}
+```
+
+By default all of a script's triggers are combined with OR: any one firing runs the script once. See [joining inputs](#joining-inputs-any-vs-all) to require all inputs instead.
+
+:::info Cascade limits
+
+The asset cascade only dispatches script subscribers (flow subscribers are not wired in this version). It is depth-capped: a chain stops after a fixed number of hops so a cycle or runaway fan-out cannot loop forever. Pass `_wmill_skip_asset_dispatch: true` in a run's arguments to run a producer without firing its downstream (useful while iterating).
+
+:::
+
+## Freshness
+
+:::info Planned - parsed and shown on the graph, but no watchdog runs yet
+
+```
+// freshness <duration>
+```
+
+Declares a service-level objective: the script's outputs should be at most `<duration>` old. Windmill parses this annotation and shows it on the pipeline graph, but it does not run a freshness watchdog yet. Until watchdog runs are implemented, freshness is recognized metadata only.
+
+Planned behavior: freshness will be a backstop, not a schedule. If no other trigger has run the script within the window, a watchdog will re-run it; whenever any trigger does run it, the window will reset. Freshness is a consumer guarantee that applies regardless of which trigger last fired (a schedule is a producer cadence; the two are independent and can coexist).
+
+- The duration is a plain string such as `30m`, `2h`, `1d`. Whitespace after the keyword is required; an empty value is ignored.
+- If several `// freshness` lines are present, the first one wins.
+
+```ts
+// pipeline
+// on s3://datasets/clean/events.parquet
+// freshness 2h
+import * as wmill from 'windmill-client';
+
+export async function main() {
+	await wmill.writeS3File({ s3: 'datasets/marts/daily.parquet' }, await rollup());
+}
+```
+
+:::
+
+## Partitioned pipelines
+
+Many pipelines materialize one dataset per time bucket (a day, an hour) or per key (a tenant, a shard). Declare this with `// partitioned <kind> [options]` and use the literal `{partition}` token in asset paths.
+
+```ts
+// pipeline
+// partitioned daily
+import * as wmill from 'windmill-client';
+
+export async function main(partition: string) {
+	// `partition` is injected by Windmill, e.g. "2026-05-16"
+	await wmill.writeS3File(
+		{ s3: `datasets/raw/${partition}/events.parquet` },
+		await fetchEventsFor(partition)
+	);
+}
+```
+
+The `{partition}` token stays literal in the lineage graph, so the graph is partition-agnostic. At run time Windmill resolves the concrete partition value once and injects it into the script as a `partition` argument. The same value is then carried down the whole chain, so every step of one pipeline run materializes the same partition.
+
+Grammar: `// partitioned <kind> [option="value" ...]`. At most one `// partitioned` per script; if several are present the first wins.
+
+### Partition kinds
+
+| Kind | Default format | Example value |
+| --- | --- | --- |
+| `daily` | `%Y-%m-%d` | `2026-05-16` |
+| `hourly` | `%Y-%m-%dT%H` | `2026-05-16T09` |
+| `weekly` | `%G-W%V` (ISO week-year/week) | `2026-W20` |
+| `monthly` | `%Y-%m` | `2026-05` |
+| `dynamic key="<path>"` | n/a (value comes from the payload) | `acme` |
+
+`daily`, `hourly`, `weekly`, `monthly` are time kinds. `dynamic` requires a `key` and reads the value from the triggering payload.
+
+### Options by kind
+
+| Option | Applies to | Default | Meaning |
+| --- | --- | --- | --- |
+| `tz="<IANA tz>"` | time kinds | `UTC` | Resolve the bucket in this timezone. Matters at boundaries: 00:30 UTC can still be the previous local day. An invalid timezone fails the run with a clear error. |
+| `format="<strftime>"` | time kinds | per-kind (table above) | Override the rendered string with a standard strftime pattern, e.g. `%Y/%m/%d`. |
+| `start="YYYY-MM-DD"` | time kinds | none | Backfill anchor. A run whose computed partition is strictly before this date resolves to no partition: the run is not failed, but it is also not auto-skipped — it proceeds without a `partition` argument (a warning is logged), so guard on the argument in your code if you rely on the anchor. An invalid `start` fails the run with a clear error. |
+| `key="<json path>"` | `dynamic` (required) | none | Where in the triggering payload the value is. Minimal `$.a.b.c` dotted path only: no array indexing, wildcards or filters. The leaf must be a scalar (string, number or bool). A missing key, a non-scalar leaf, or no payload fails the run with a clear error. |
+
+### How the value is resolved
+
+The concrete partition is resolved exactly once, at the top of a chain, by this precedence:
+
+1. An explicit `partition` argument on the run (a manual run, a backfill, or a value already propagated from upstream). It is used as-is and never re-resolved. This is what makes the whole chain consistent.
+2. Otherwise, for time kinds: the run's fire time, localized to `tz` and rendered with `format`. The anchor is the schedule fire time for a scheduled run and the upstream trigger time for a cascaded run (so a chain that crosses midnight stays on one partition).
+3. Otherwise, for `dynamic`: the value extracted from the triggering payload (`trigger` object if present, otherwise the run arguments) at `key`.
+
+The resolved value is injected into the script as a `partition` argument and persisted, so every downstream step of the same run receives the identical value.
+
+### The `{partition}` token
+
+Use the literal token `{partition}` inside asset paths, both in `// on` declarations and in the paths your code writes. It stays literal in the lineage graph (the graph is partition-agnostic) and is substituted with the resolved value at run time. An `// on` whose path contains `{partition}` is a partition-bearing input (relevant to [joins](#joining-inputs-any-vs-all)).
+
+<Tabs className="unique-tabs">
+<TabItem value="daily" label="Daily (defaults)" attributes={{className: "text-xs p-4 !mt-0 !ml-0"}}>
+
+```ts
+// pipeline
+// partitioned daily
+import * as wmill from 'windmill-client';
+
+export async function main(partition: string) {
+	// partition e.g. "2026-05-16"
+	await wmill.writeS3File(
+		{ s3: `datasets/raw/${partition}/events.parquet` },
+		await fetchEventsFor(partition)
+	);
+}
+```
+
+</TabItem>
+<TabItem value="hourly" label="Hourly + start anchor" attributes={{className: "text-xs p-4 !mt-0 !ml-0"}}>
+
+```ts
+// pipeline
+// partitioned hourly start="2026-01-01"
+import * as wmill from 'windmill-client';
+
+export async function main(partition: string) {
+	// partition e.g. "2026-05-16T09"; nothing materialized before 2026-01-01
+	await wmill.writeS3File({ s3: `lake/${partition}/data.parquet` }, await build(partition));
+}
+```
+
+</TabItem>
+<TabItem value="daily-tz" label="Daily, timezone + format" attributes={{className: "text-xs p-4 !mt-0 !ml-0"}}>
+
+```ts
+// pipeline
+// partitioned daily tz="America/New_York" format="%Y/%m/%d"
+import * as wmill from 'windmill-client';
+
+export async function main(partition: string) {
+	// partition rendered as e.g. "2026/05/16" in America/New_York
+	await wmill.writeS3File({ s3: `lake/${partition}/data.parquet` }, await build(partition));
+}
+```
+
+</TabItem>
+<TabItem value="dynamic" label="Dynamic (per tenant)" attributes={{className: "text-xs p-4 !mt-0 !ml-0"}}>
+
+```ts
+// pipeline
+// partitioned dynamic key="$.tenant_id"
+import * as wmill from 'windmill-client';
+
+// Triggered with a payload like { "tenant_id": "acme", ... }
+// `partition` resolves to "acme"
+export async function main(partition: string, tenant_id: string) {
+	await wmill.writeS3File({ s3: `lake/${partition}/summary.parquet` }, await summarize(tenant_id));
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Backfill and re-runs
+
+Because the partition is resolved once and travels with the run, you can backfill a historical partition by running the top of the pipeline manually with an explicit `partition` argument (for example `partition = "2026-01-10"`). That value is never re-resolved or overridden downstream, so the entire chain reprocesses exactly that partition. A retry of a failed step likewise reprocesses the run's partition rather than drifting to "now".
+
+For materialized assets, this is surfaced as a one-click [backfill](#materialization) over a range of partitions (enterprise).
+
+## Materialization
+
+A DuckDB script can declare that it **produces** a managed [DuckLake](/docs/core_concepts/data_pipelines) table with `// materialize`. Instead of writing the table yourself, you write the query for one *slice* and Windmill owns the write: it is idempotent, captured as a DuckLake snapshot, and tracked. A **slice** is one [partition](#partitioned-pipelines) when the script is also `// partitioned`, or the **whole table** when it isn't — `materialize` works either way (`// partitioned` is optional and independent; see [Strategy and unit](#strategy-and-unit) below).
+
+```sql
+// pipeline
+// materialize ducklake://main/orders_daily key=order_id
+// partitioned daily
+
+ATTACH 'ducklake://main' AS dl;
+
+SELECT order_id, amount, created_at
+FROM dl.orders
+WHERE created_at::date = '{partition}'
+```
+
+The script is *setup statements (ATTACH, SET, CREATE TEMP …) followed by one trailing `SELECT`*. Windmill wraps that SELECT in the write — creating the table on first run, partitioning it (when `// partitioned`), and reconciling the slice — then records the produced snapshot id and row count. Re-running the same slice is safe by construction (that is also how a backfill or a failed-run retry works).
+
+The trailing `SELECT` may reference SQL arguments declared with `-- $name (type)` (for example `-- $cutoff (date)` then `WHERE created_at < $cutoff`); they bind at run time like any other DuckDB script argument, including `s3object` arguments translated to `s3://` URIs.
+
+### Grammar
+
+```
+// materialize ducklake://<name>/<table> [append] [key=<col>]   # managed (default)
+// materialize manual ducklake://<name>/<table>                 # track-only escape hatch
+```
+
+- **Managed (default)** — Windmill generates the write. DuckDB-only; validated at deploy (a script that is not a single trailing SELECT is rejected with a clear error). The **strategy** decides how each slice is reconciled:
+  - *neither option* → **replace**: the slice becomes exactly what the SELECT returned. The whole table is rebuilt with `CREATE OR REPLACE` (so changing the `SELECT`'s columns between runs just works); a partition is reconciled with `DELETE` + `INSERT`.
+  - `key=<col>` → **merge**: upsert the slice on `<col>` (rows absent from the SELECT are left in place).
+  - `append` → **insert-only**: for immutable event logs. Re-running duplicates rows, so use only for append-only sources. (`append` wins over `key=` if both are given.)
+- **`manual`** — the escape hatch: your script writes its own DDL and Windmill only records that the slice was materialized (no snapshot capture, no idempotency guarantee). Rare; explicit.
+
+`// materialize` is for DuckDB SQL. From **Python or TypeScript**, use the `wmll.ducklake` helpers (`upsert_partition`, `append_partition`, `read`) which give the same managed, idempotent write from arbitrary code.
+
+### Strategy and unit
+
+`materialize`, `partitioned`, `append` and `key` sit on **two independent axes**, and `materialize` runs the chosen strategy over the chosen unit:
+
+- **Strategy — *how* a slice is reconciled.** `append` / `key=` are options on the `// materialize` line (mutually exclusive); they have no meaning without `// materialize`.
+- **Unit — *what* a slice is.** `// partitioned` is a separate, optional annotation (it also drives the [cascade](#triggering-a-pipeline) and scheduling). With it, a slice is one partition; without it, a slice is the whole table.
+
+The two combine:
+
+| | replace (default) | `key=<col>` (merge) | `append` |
+| --- | --- | --- | --- |
+| **`// partitioned`** | replace the partition | upsert within the partition | append to the partition |
+| **whole table** (no `// partitioned`) | replace the whole table | upsert the whole table | append to the whole table |
+
+A whole-table materialization is just `// materialize` with no `// partitioned` — e.g. a dimension table rebuilt each run:
+
+```sql
+// pipeline
+// materialize ducklake://main/customer_dim key=customer_id
+
+ATTACH 'ducklake://main' AS dl;
+SELECT customer_id, name, tier FROM dl.customers
+```
+
+### What a run returns
+
+A managed run returns a small summary — the asset it produced, the row count of the slice, and the DuckLake `snapshot_id` — and the run's **Result** panel renders a live, read-only preview of the materialized table beneath it. For a `// partitioned` target the preview adds a **This partition / Whole table** toggle, and the summary's row count is the slice (partition) the run wrote. The same values are recorded as the asset's [materialization state](#partition-status-and-backfill).
+
+To run a partitioned script manually (e.g. from the editor's **Test** panel), fill the **partition** field — Windmill surfaces it automatically for `// partitioned` DuckDB scripts, as a date picker for date kinds. In a pipeline the [cascade](#triggering-a-pipeline) injects it for you.
+
+### Versioning and time-travel
+
+Every managed write is a DuckLake commit, so versioning is free — you never annotate for it. Each run records the snapshot it produced, which means you can read a table as of a past snapshot (`FROM dl.orders_daily AT (VERSION => 42)`), roll back, and reproduce a past run. This is what `// materialize` gives you over hand-writing the same SQL.
+
+### Partition status and backfill
+
+Selecting a materialized `ducklake://` asset in the pipeline graph shows its **partition-status grid** — which partitions are materialized, their snapshot id, row count, and time. From there, **Backfill** re-runs the materialization for a range of partitions (one idempotent run per partition); backfill is an enterprise feature.
+
+### Schema capture
+
+After a managed materialize run, Windmill captures the table's output schema (column names and types) and stores it as **versioned asset metadata**. Selecting a materialized `ducklake://` asset shows a **Schema** tab listing each captured version. A new version is recorded only when the column set actually changes (a column added, dropped, retyped, or reordered), so the tab is a compact schema-evolution history rather than one row per run.
+
+## Column-level lineage
+
+On top of asset-to-asset lineage, Windmill tracks **column-to-column** lineage for DuckLake pipelines: which source columns each output column is derived from. For DuckDB scripts this is **inferred automatically from the SQL** — Windmill walks the query's projection and maps every output column to the source columns its expression reads, both passthroughs and computed columns (`amount + tax AS order_total` records both `amount` and `tax` as sources). No annotation is needed in the common case.
+
+The deployed pipeline graph shows a **columns ×N** badge on the write edge into a materialized asset; hovering it lists every mapping, and selecting the asset opens a column-to-column diagram in the details pane.
+
+![Column-lineage badge on a pipeline write edge](./pipeline_graph_columns.png 'A columns badge on a write edge')
+
+![Column-to-column lineage diagram in the asset details pane](./column_lineage_view.png 'Column-to-column lineage diagram')
+
+When inference cannot reach a mapping — a polyglot transform (Python/TS/Bash has no SQL AST), dynamic SQL (`${sql.raw(...)}`), or a mis-inferred edge — declare it explicitly with `// column`:
+
+```
+// column <out_col> <- <asset-uri>.<col>[, <asset-uri>.<col> …]
+```
+
+Each line maps one output column to the source columns it derives from. Annotated and inferred lineage merge per output column, with the annotation winning. Column lineage is pure metadata — it drives the graph view and never runs a probe. The example below shows the annotation form on a plain SELECT for clarity; in practice you only annotate what inference can't derive (this particular mapping would be inferred automatically).
+
+```sql
+// pipeline
+// materialize ducklake://warehouse/orders_enriched
+// column order_total <- ducklake://warehouse/orders.amount, ducklake://warehouse/orders.tax
+
+ATTACH 'ducklake://warehouse' AS dl;
+SELECT order_id, amount + tax AS order_total FROM dl.orders
+```
+
+:::info Inference is server-side
+
+SQL-AST inference runs when a pipeline is deployed, so column lineage shows on **deployed** members. An unsaved draft shows `// column` annotations only.
+
+:::
+
+## Data tests
+
+A materialized asset can declare **data tests** that run against the freshly-materialized slice and **fail the pipeline run** on violation — propagating through the cascade like any other step failure. They are the pipeline equivalent of dbt/Dagster data tests.
+
+```
+// data_test unique <col>
+// data_test not_null <col>
+// data_test accepted_values <col> = a,b,c
+// data_test relationships <col> -> <asset-uri>.<col>
+// data_test <script_path>
+```
+
+- **`unique`** / **`not_null`** — column constraints.
+- **`accepted_values <col> = a,b,c`** — the column may only contain the listed values.
+- **`relationships <col> -> <asset-uri>.<col>`** — referential integrity: every value must exist in the referenced asset's column.
+- **`<script_path>`** — a custom DuckDB test script (the escape hatch), e.g. `// data_test f/tests/orders_amount_sane`.
+
+`// data_test` lines accumulate (a script can declare several) and malformed lines drop fail-safe. For a `// partitioned` target the built-in checks are scoped to the slice just written. Data tests require managed `// materialize` (they are rejected on `// materialize manual` or a non-DuckLake target). The producer→asset edge shows a test-count badge, and the run result lists each test with a pass/fail outcome.
+
+```sql
+// pipeline
+// materialize ducklake://main/orders_daily key=order_id
+// partitioned daily
+// data_test not_null order_id
+// data_test unique order_id
+// data_test accepted_values status = paid,pending,refunded
+
+ATTACH 'ducklake://main' AS dl;
+SELECT order_id, status, amount FROM dl.orders WHERE created_at::date = '{partition}'
+```
+
+## Joining inputs: any vs all
+
+When a script declares several `// on` inputs, `// trigger` controls how they combine:
+
+- `// trigger any` (default): the script runs whenever any input is written. Good for streaming and single-input steps.
+- `// trigger all`: an AND join barrier. The script runs once for a given partition only when every partition-bearing input has been materialized for that partition.
+
+An input is partition-bearing when its declared path contains the `{partition}` token. Only partition-bearing inputs are tracked by the AND barrier. Inputs without the token (a reference or dimension dataset refreshed on its own cadence) are not part of the barrier at all: they do not define the partition and, on their own, do not fire the join — a write to one of them while `// trigger all` is set is simply skipped. Read such reference data at run time when a partition-bearing input completes the join.
+
+```ts
+// Daily enriched table: join the day's events with the day's sessions
+// (both partitioned, must agree on the day) plus the current customers
+// dimension (unpartitioned reference).
+//
+// pipeline
+// on s3://lake/raw/events/{partition}/events.parquet
+// on s3://lake/raw/sessions/{partition}/sessions.parquet
+// on s3://lake/dim/customers/current.parquet
+// trigger all
+// partitioned daily
+import * as wmill from 'windmill-client';
+
+export async function main(partition: string) {
+	// guaranteed: both partition-bearing inputs exist for `partition`
+	const events = await wmill.loadS3File({ s3: `lake/raw/events/${partition}/events.parquet` });
+	const sessions = await wmill.loadS3File({ s3: `lake/raw/sessions/${partition}/sessions.parquet` });
+	const customers = await wmill.loadS3File({ s3: 'lake/dim/customers/current.parquet' });
+	await wmill.writeS3File(
+		{ s3: `lake/marts/enriched/${partition}/data.parquet` },
+		join(events, sessions, customers)
+	);
+}
+```
+
+With this declaration, writing `events` for `2026-05-15` does not run the script yet (one of two partition-bearing inputs present). When `sessions` for `2026-05-15` is also written, the script runs exactly once for `2026-05-15`. Writing `events` for `2026-05-16` opens a separate, independent slot. Refreshing the unpartitioned `customers` reference does not fire past partitions.
+
+:::warning Join scope
+
+The AND barrier is correct only when every partition-bearing input of a step shares the same partitioning. There is no automatic cross-granularity check: partition values are opaque strings, so mixing (say) a `daily` and an `hourly` input under one `// trigger all` step just produces values that never coincide, and the join silently never completes. A write from an unpartitioned producer to such a step is skipped rather than firing the join with a wrong or empty partition. Keep the partition-bearing inputs of an `// trigger all` step on the same partition scheme.
+
+:::
+
+## Debounce
+
+By default each upstream write fires the subscriber, which is usually the intended behavior. When an upstream is noisy (it rewrites the same asset many times in a short window) you can opt into debouncing so the downstream runs once instead of many times.
+
+- `// debounce <duration>` sets a default window for all of the script's asset inputs.
+- `// on <asset> debounce=<duration>` overrides the default for that one input.
+
+Effective window per edge, in precedence order: the per-`// on` `debounce=` value, else the script-level `// debounce`, else none (no debounce: every write fans out, the default and prior behavior).
+
+Duration grammar:
+
+| Form | Meaning | Example |
+| --- | --- | --- |
+| `<n>` | bare integer = seconds | `90` = 90s |
+| `<n>s` | seconds | `30s` |
+| `<n>m` | minutes | `5m` |
+| `<n>h` | hours | `2h` |
+| `<n>d` | days | `1d` |
+
+Parsing is fail-safe: a malformed, non-positive or unrecognized duration resolves to no debounce (a typo fans out rather than silently swallowing runs). Debounce applies to asset-cascade edges only; native-trigger `// on <kind>` markers ignore it.
+
+```ts
+// pipeline
+// debounce 1m
+// on s3://datasets/raw/events.parquet
+// on s3://datasets/dim/reference.parquet debounce=30s
+import * as wmill from 'windmill-client';
+
+export async function main() {
+	await wmill.writeS3File({ s3: 'datasets/clean/events.parquet' }, await clean());
+}
+```
+
+Debounce is keyed per subscriber and per partition, so two different partitions in flight at the same time never collapse into one, and within a window the most recent write wins. A manual run with an explicit `partition` argument (a backfill) is unaffected.
+
+## Per-step execution options
+
+Two more annotations tune how a step runs, independently of how it is triggered.
+
+### Worker tag
+
+```
+// tag <name>
+```
+
+Overrides the [worker tag](../9_worker_groups/index.mdx) the script runs on, so a pipeline step can be pinned to a dedicated worker group (a GPU pool, a high-memory queue, a network-restricted set). The value is taken verbatim; whitespace after the keyword is required and the first `// tag` wins.
+
+```ts
+// pipeline
+// tag gpu
+import * as wmill from 'windmill-client';
+
+export async function main() {
+	await wmill.writeS3File({ s3: 'datasets/marts/embeddings.parquet' }, await embed());
+}
+```
+
+### Retry
+
+```
+// retry <count> [<delay>]
+```
+
+Retries the step when it is run **by the cascade** (an upstream asset write fired it). `<count>` is a positive integer; the optional `<delay>` is a duration (same grammar as [debounce](#debounce)). A non-numeric or zero count is ignored. The first `// retry` wins. This applies to cascade-dispatched runs only — a manual run or a run launched from the graph uses the editor's own test/run behavior.
+
+```ts
+// pipeline
+// on s3://datasets/raw/events.parquet
+// retry 3 10s
+import * as wmill from 'windmill-client';
+
+export async function main() {
+	await wmill.writeS3File({ s3: 'datasets/clean/events.parquet' }, await flakyTransform());
+}
+```
+
+## Annotation reference
+
+| Annotation | Scope | Options / values | Default | Purpose |
+| --- | --- | --- | --- | --- |
+| `// pipeline` | script | none (bare marker) | - | Include the script in its folder's pipeline graph |
+| `// on <asset-uri>` | input | `debounce=<duration>` | - | Run when the asset is written (cascade); `<asset-uri>`: `s3://`, `$res:`, `datatable://`, `ducklake://`, `volume://` |
+| `// on <kind>` | trigger | none (marker-only) | - | Fire from a native trigger that targets the script; `<kind>`: `schedule`, `webhook`, `email`, `kafka`, `mqtt`, `nats`, `postgres`, `sqs`, `gcp`, `data_upload`. The cron and all other options live on the trigger row |
+| `// freshness <duration>` | SLA | `<n>[s\|m\|h\|d]` | - | Planned: parsed and shown on the graph, but no watchdog runs yet (first wins) |
+| `// partitioned <kind> [opts]` | output | kinds `daily\|hourly\|weekly\|monthly\|dynamic`; opts `tz=`, `format=`, `start=`, `key=` (dynamic) | `tz=UTC`, per-kind `format`, no `start` | Materialize one dataset per partition (first wins) |
+| `// materialize [manual] <ducklake-uri> [opts]` | output | `manual` (track-only); opts `append`, `key=<col>` | managed, replace | Managed write into a DuckLake table — idempotent, snapshotted, tracked (first wins). DuckDB-only |
+| `// column <out> <- <asset-uri>.<col>[, …]` | lineage | comma-separated source columns | inferred from SQL | Column-to-column lineage; inferred from SQL for DuckDB, override/declare for other languages. Metadata only (accumulate) |
+| `// data_test <kind> …` | test | `unique`, `not_null`, `accepted_values`, `relationships`, `<script_path>` | - | Test the materialized slice; fail the run on violation. Managed `// materialize` only (accumulate) |
+| `// trigger any` | join | `any` \| `all` | `any` | OR: any input fires the script |
+| `// trigger all` | join | `any` \| `all` | `any` | AND barrier: fire once per partition when all partition-bearing inputs present |
+| `// debounce <duration>` | script | `<n>[s\|m\|h\|d]` | none (fan-out) | Default debounce window for the script's asset inputs |
+| `// on <asset> debounce=<duration>` | input | `<n>[s\|m\|h\|d]` | script `// debounce` | Per-input debounce override |
+| `// tag <name>` | script | worker tag name | - | Pin the step to a worker tag / group (first wins) |
+| `// retry <count> [<delay>]` | script | positive int + optional duration | - | Retry the step on cascade-dispatched runs (first wins) |
+
+The `{partition}` token is used inside asset paths (in `// on` and in the paths your code writes) and is resolved at run time. Unknown annotations and unknown option values are ignored (the default is kept) rather than failing the deploy.
+
+## Related
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	<DocCard
+		title="Assets"
+		description="How Windmill detects and tracks the S3 objects, resources and tables your scripts read and write."
+		href="/docs/core_concepts/assets"
+	/>
+	<DocCard
+		title="ETL & data processing"
+		description="Efficient data-processing recipes: S3 streaming, Polars and DuckDB, SQL-to-S3."
+		href="/docs/core_concepts/data_pipelines"
+	/>
+	<DocCard
+		title="Object storage in Windmill"
+		description="Connect your workspace to S3, Azure Blob, AWS OIDC or Google Cloud Storage for large objects."
+		href="/docs/core_concepts/object_storage_in_windmill"
+	/>
+	<DocCard
+		title="Schedules"
+		description="Schedule scripts and flows with a CRON-like interface, history and error handling."
+		href="/docs/core_concepts/scheduling"
+	/>
+</div>
