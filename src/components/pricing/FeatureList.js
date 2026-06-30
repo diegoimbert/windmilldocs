@@ -623,6 +623,18 @@ export const sections = [
 				tooltip: 'Self-hosted only — global 3-workspace limit applies on Community Edition'
 			},
 			{
+				name: 'Dev workspaces (persistent fork paired with a lockable prod workspace)',
+				tiers: {
+					'tier-free-selfhost': 'Counts toward 3-workspace limit',
+					'tier-enterprise-selfhost': true,
+					'tier-enterprise-cloud': false,
+					'tier-free': 'Counts toward 3-workspace limit',
+					'tier-team': false
+				},
+				link: '/docs/advanced/dev_workspaces',
+				tooltip: 'Self-hosted only — locking the prod workspace reuses protection rulesets (Enterprise)'
+			},
+			{
 				name: 'Infrastructure as code & Kubernetes operator',
 				tiers: {
 					'tier-free-selfhost': true,

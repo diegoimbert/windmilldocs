@@ -136,6 +136,7 @@ Every docs page below is available as raw markdown by appending `.md` to its URL
 - [Workspace settings](https://www.windmill.dev/docs/core_concepts/workspace_settings.md): What are workspace settings and how do I configure users, Git sync, storage, and other workspace options?
 - [Pipelines](https://www.windmill.dev/docs/core_concepts/pipelines.md): How do I build pipelines in Windmill? Connect scripts with asset lineage, schedules, partitions, joins, debounce, managed DuckLake materialization, column-level lineage and data tests using comment annotations.
 - [States resources shared directory](https://www.windmill.dev/docs/core_concepts/persistent_storage/states_resources_shared_directory.md): What are states and resources for transient data storage within Windmill, and why are external databases preferred?
+- [Dev workspaces](https://www.windmill.dev/docs/advanced/dev_workspaces.md): How do I pair a dev workspace with a lockable prod workspace in Windmill? Edit in dev, lock prod, and promote changes manually.
 
 ### Triggers
 - [Scheduling (cron)](https://www.windmill.dev/docs/core_concepts/scheduling.md): How do I schedule scripts in Windmill? Use CRON-like syntax with a visual interface and control panels for recurring jobs.

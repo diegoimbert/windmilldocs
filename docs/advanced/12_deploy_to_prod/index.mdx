@@ -23,6 +23,8 @@ Deployments in Windmill are commonly done from the same workspace using the [Dra
 
 [Windmill workspaces](../20_workspace_forks/index.mdx) can be forked, creating a new copy of the workspace at that point in time. The forked workspace can be iterated on, tested, and once changes are ready, merged back to the original workspace, thus deploying the new versions of the scripts, flows, or apps. The workflow will be familiar to anyone who has used branches in version control tools such as git. The analogy can be further reinforced if [Git Sync](../11_git_sync/index.mdx) is setup: Windmill will autmatically create branches for each of the forks, and merging can be controlled direclty through git.
 
+For a long-lived dev/prod pair instead of throwaway branches, use a [dev workspace](../26_dev_workspaces/index.mdx): a persistent fork that is the standing editable environment, paired with a prod workspace that can be locked so changes only reach it through promotion.
+
 ## Option 3. Git Promotion workflow: deploying through git - Multi workspace (possible cross-instance)
 
 This is a more complex but very reliable setup that leverages [Git Sync](../11_git_sync/index.mdx) to deploy from one workspace to another through git. When changes are done to the Staging workspace, they are pushed to a branch in the Prod repo. Once merge to the main branch of the Prod repo, the Prod workspace is updated with the changes.

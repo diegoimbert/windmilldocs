@@ -1,0 +1,150 @@
+---
+description: How do I pair a dev workspace with a lockable prod workspace in Windmill? Edit in dev, lock prod, and promote changes manually.
+---
+
+import DocCard from '@site/src/components/DocCard';
+
+# Dev workspaces
+
+A dev workspace is a persistent [workspace fork](../20_workspace_forks/index.mdx) that holds the same code as another workspace but a different environment (its own [resource](../../core_concepts/3_resources_and_types/index.mdx) and [variable](../../core_concepts/2_variables_and_secrets/index.mdx) values). It is paired with a "prod" workspace (labelled the *root* workspace in the dev-workspace UI): the dev workspace is the standing editable environment, and the prod workspace can be locked so that changes only reach it through promotion.
+
+This lets a team edit safely in dev and keep prod stable, without the throwaway lifecycle of an ordinary fork.
+
+:::info Edition
+
+Dev workspaces build on [workspace forks](../20_workspace_forks/index.mdx), which are available on all self-hosted editions but count toward the global 3-workspace limit on Community Edition. Locking the prod workspace reuses [protection rulesets](../../core_concepts/56_protection_rulesets/index.mdx), an [Enterprise Edition](/pricing) feature.
+
+:::
+
+## Dev workspace vs. ordinary fork
+
+A dev workspace is a special kind of fork. Compared to an ordinary fork:
+
+- **Persistent**: it is the team's standing editable environment, not a short-lived branch you create, merge, and delete.
+- **No `wm-fork-` prefix**: a dev workspace keeps a plain, git-branch-safe workspace ID that you choose, instead of the auto-generated `wm-fork-` ID. An ordinary fork is still prefixed.
+- **One per workspace**: a workspace has at most one active dev workspace, and dev workspaces do not nest (you cannot create a dev of a dev).
+- **Identified as dev**: dev workspaces show a "dev" badge, sort ahead of ordinary forks in the workspace menu, auto-expand under their prod workspace, and are labelled "Dev workspace of \<prod\>".
+
+Like ordinary forks, promotion stays manual through the [Compare & Deploy](#promoting-changes-to-prod) flow. Auto-sync from dev to prod is not available.
+
+## Creating a dev workspace
+
+Create a dev workspace from the fork creation form (workspace menu → **Fork current workspace**, or **Workspace settings** → **Dev workspace** → **Create a new dev workspace**). Creating a dev workspace requires being an admin of the workspace you are forking.
+
+In the fork form:
+
+1. Enable the **Persistent dev workspace** toggle ("Dev workspace"). This creates the fork as a standing dev workspace with no `wm-fork-` prefix.
+2. Set the **Workspace ID** (shown under the fork name). It must be git-branch-safe.
+3. Optionally configure the **Protect \<root\>** options to lock the prod workspace (see [Locking the prod workspace](#locking-the-prod-workspace)):
+   - **Block direct edits (deploy via the dev workspace)**
+   - **Prevent forking**
+4. Optionally enable **Copy members** to copy the source workspace's members (and their roles, including service-account type) into the dev workspace, so the whole team can work in it. This is only offered when creating a dev workspace, not when attaching an existing one.
+
+{/* TODO: screenshot of the fork creation form with the "Persistent dev workspace" toggle, "Protect <root>" sub-card, Workspace ID field, and "Copy members" toggle. */}
+
+## Pairing an existing workspace as dev
+
+If you already have a workspace you want to use as the dev environment, attach it from **Workspace settings** → **Dev workspace**. This tab is shown on root workspaces (to pair and manage a dev) and on dev workspaces (to see their prod workspace and detach); it is hidden on ordinary forks.
+
+### Attach
+
+1. On the prod workspace, open **Workspace settings** → **Dev workspace**.
+2. Under **Attach an existing workspace as dev**, select a workspace. You can attach a standalone workspace or an existing fork of this same workspace (a fork parented to a different workspace cannot be attached).
+3. Optionally enable the lock toggles (**Block direct edits in this workspace** and **Prevent forking this workspace**).
+4. Click **Attach dev workspace**.
+
+Attaching requires being an admin of both the prod workspace and the workspace being attached (or a superadmin). A workspace that already has its own dev workspace cannot be attached.
+
+### Detach
+
+From the same tab, click **Detach** to break the pairing. Detaching removes the prod lock that was applied when the pairing was created (see below). A protection rule you added manually is left in place.
+
+{/* TODO: screenshot of the Dev workspace settings tab showing the attach form and, when paired, the "Go to dev workspace" / "Detach" controls. */}
+
+## Locking the prod workspace
+
+When you pair a dev workspace, you can lock the prod workspace so changes can only land through promotion. The lock reuses [protection rulesets](../../core_concepts/56_protection_rulesets/index.mdx) under a reserved rule named `dev_workspace_lock`, applied automatically on pairing and removed when you detach, delete, or archive the dev workspace.
+
+The two lock options map to the existing protection rules:
+
+- **Block direct edits** uses [Disable direct deployment](../../core_concepts/56_protection_rulesets/index.mdx) so items cannot be deployed straight to prod.
+- **Prevent forking** uses [Disable workspace forking](../../core_concepts/56_protection_rulesets/index.mdx) so the only editable copy stays the canonical dev workspace.
+
+On a locked prod workspace, the **Edit** action on a script, flow, or app is redirected into the dev workspace: the affordance reads "Edit in \<dev\>" and opens the item's page in the dev workspace instead of the prod editor. Workspace admins keep their usual bypass: a user who can bypass the deploy rule still sees the normal editor.
+
+:::caution CLI git-sync and locked prod
+
+A git-synced prod workspace that is locked still receives [CLI](../3_cli/index.mdx) `wmill sync push` only through a token that has deploy bypass (the same as any deploy to a locked workspace). Don't lock a prod workspace whose source of truth is a CI [git sync](../11_git_sync/index.mdx), or give that token bypass.
+
+:::
+
+## Promoting changes to prod
+
+Promotion is manual and uses the existing fork promotion flow. From the dev workspace, open the home page banner or the **Compare & Deploy** page to review the diff with the prod workspace and deploy the selected items. This is the same flow as [merging a workspace fork](../20_workspace_forks/index.mdx#merge-workspaces-from-the-ui-merge-ui).
+
+## Per-environment resources and variables
+
+A dev and a prod workspace usually need different values for the same resource or variable (for example, a database URL or an API key). You can mark a resource or variable as workspace-specific so each environment keeps its own value.
+
+A workspace-specific item is excluded from the diff entirely, so promoting code never overwrites the per-environment value on either side.
+
+### Mark an item workspace-specific
+
+On the **Compare & Deploy** page, use **Make workspace specific** on a resource or variable diff row. Marking an item:
+
+- Keeps its value per environment and removes it from the diff.
+- Is authorized like editing the item (you must be an owner, folder writer, or item writer, and pass the workspace's deploy rules).
+
+To revert, open the **Workspace-specific items** panel and choose **Make shared**. The item re-enters the diff and is compared again.
+
+### Seed a missing copy with "Create in \<other\>"
+
+When a workspace-specific item exists on only one side, the **Workspace-specific items** panel shows a **Create in \<other\>** action to seed a copy into the other environment. This action:
+
+- Is strictly create-only. It re-checks whether the target already exists and never overwrites it; if the target is already there, it is marked workspace-specific instead.
+- Copies the current value, including secrets, authorized against the target workspace.
+- For a resource, also seeds any linked `$var:` variables the target is missing, so references resolve and secrets stay per environment.
+- Shows a confirmation before running.
+
+{/* TODO: screenshot of the Compare & Deploy "Workspace-specific items" panel with the "Make shared" and "Create in <other>" actions. */}
+
+## AI chat sessions
+
+The AI chat session "Run in" picker shows the "dev" badge on dev workspaces. A new session defaults to the workspace you are currently in, and steers to the dev workspace only when you are in a prod workspace you cannot deploy to (read from the prod workspace's own protection rules, with admin bypass recognized).
+
+The "Create new fork" entry defaults to **Fork from \<dev\>**; an admin-only **Fork from \<root\>** entry appears when you can fork the root workspace. Options you cannot use are hidden, and persistent dev workspaces are never offered for deletion.
+
+## Lifecycle and limitations
+
+- Renaming a dev workspace keeps it the canonical dev workspace, and renaming the prod (root) workspace updates the dev workspace's promotion target to follow.
+- Deleting or archiving an attached dev workspace requires being an admin of the prod workspace; it clears the prod lock. Deleting a prod workspace that still has a dev workspace is blocked - detach first.
+- A prod admin who still has write access to a locked prod sees the normal editor (rather than the "Edit in \<dev\>" redirect) and is stopped by the backend deploy block instead.
+- Auto-sync from dev to prod, and special handling of triggers and schedules, are not part of this workflow. Triggers are not copied into a fork on creation - see [triggers and schedules](../20_workspace_forks/index.mdx#triggers-and-schedules).
+
+## Related documentation
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	<DocCard
+		title="Workspace forks"
+		description="Create independent copies of a workspace for parallel development."
+		href="/docs/advanced/workspace_forks"
+	/>
+	<DocCard
+		title="Protection rulesets"
+		description="Enforce governance policies that control how changes reach a workspace."
+		href="/docs/core_concepts/protection_rulesets"
+	/>
+</div>
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	<DocCard
+		title="Deploy to prod"
+		description="Overview of all deployment methods in Windmill."
+		href="/docs/advanced/deploy_to_prod"
+	/>
+	<DocCard
+		title="Collaboration and deployment stages"
+		description="A staged progression from a shared workspace to forks and multi-workspace promotion."
+		href="/docs/advanced/canonical_deployment_setups"
+	/>
+</div>

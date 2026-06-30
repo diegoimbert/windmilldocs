@@ -91,6 +91,10 @@ If you are on a workspace fork, the first thing to know is that it will be preco
 
 Learn more about [merging forks through Merge UI](../../advanced/20_workspace_forks/index.mdx#merge-workspaces-from-the-ui-merge-ui)
 
+### Workspace-specific resources and variables
+
+From the Compare & Deploy page, you can mark a resource or variable as workspace-specific so each environment keeps its own value. A workspace-specific item is excluded from the diff entirely, so promoting code never overwrites the per-environment value. When the item exists on only one side, a strictly create-only "Create in \<other\>" action seeds a copy (including secrets) without overwriting an existing target. This is most useful with a [dev workspace](../../advanced/26_dev_workspaces/index.mdx) paired with a prod workspace.
+
 
 ## Run on behalf of
 

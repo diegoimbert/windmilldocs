@@ -144,6 +144,16 @@ Workspace forks do not copy over triggers when being created. This avoids unnece
 
 When git sync is properly setup, the workspace is synchronized with one of the branches in your repo, and the forks are also synchronized with their own branches. It is then possible your preferred git workflow to merge into or out of these branches to sync, so you can update the fork, or deploy changes into the parent workspace.
 
+## Dev workspaces
+
+A dev workspace is a persistent fork that serves as a team's standing editable environment, paired with a "prod" workspace that can be locked so changes only reach it through promotion. Unlike an ordinary fork, a dev workspace keeps a plain, git-branch-safe workspace ID (no `wm-fork-` prefix), and there is at most one per workspace. Use a dev workspace when you want a long-lived dev/prod pair rather than the create-merge-delete lifecycle of an ordinary fork.
+
+<DocCard
+	title="Dev workspaces"
+	description="Pair a persistent dev workspace with a lockable prod workspace and promote changes manually."
+	href="/docs/advanced/dev_workspaces"
+/>
+
 ## Related features
 
 ### Workspace-specific tags and forks

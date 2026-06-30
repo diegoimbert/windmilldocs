@@ -53,3 +53,7 @@ Use "Disable Workspace Forking" when you want developers to work exclusively thr
 **Compliance Requirements**
 
 Protection rulesets help meet compliance requirements that mandate separation of duties or change approval processes. The bypass permissions feature allows you to document and control exceptions.
+
+**Locking a prod workspace paired with a dev workspace**
+
+When you pair a [dev workspace](../../advanced/26_dev_workspaces/index.mdx) with a prod workspace, the lock options reuse these rules under a reserved rule named `dev_workspace_lock`. "Block direct edits" applies "Disable direct deployment" and "Prevent forking" applies "Disable workspace forking". The rule is added on pairing and removed when the dev workspace is detached, deleted, or archived.
