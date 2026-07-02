@@ -134,7 +134,7 @@ Every docs page below is available as raw markdown by appending `.md` to its URL
 - [Workspace forks](https://www.windmill.dev/docs/advanced/workspace_forks.md): How do I create workspace forks for parallel development workflows in Windmill?
 - [Workspace secret encryption](https://www.windmill.dev/docs/core_concepts/workspace_secret_encryption.md): How does Windmill encrypt workspace secrets, and how do I update the encryption key?
 - [Workspace settings](https://www.windmill.dev/docs/core_concepts/workspace_settings.md): What are workspace settings and how do I configure users, Git sync, storage, and other workspace options?
-- [Pipelines](https://www.windmill.dev/docs/core_concepts/pipelines.md): How do I build pipelines in Windmill? Connect scripts with asset lineage, schedules, partitions, joins, debounce, managed DuckLake materialization, column-level lineage and data tests using comment annotations.
+- [Pipelines](https://www.windmill.dev/docs/core_concepts/pipelines.md): How do I build pipelines in Windmill? Connect scripts with asset lineage, partitions, joins, managed DuckLake materialization (including SCD2 history), data tests, macro libraries and local development.
 - [States resources shared directory](https://www.windmill.dev/docs/core_concepts/persistent_storage/states_resources_shared_directory.md): What are states and resources for transient data storage within Windmill, and why are external databases preferred?
 - [Dev workspaces](https://www.windmill.dev/docs/advanced/dev_workspaces.md): How do I pair a dev workspace with a lockable prod workspace in Windmill? Edit in dev, lock prod, and promote changes manually.
 
