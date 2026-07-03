@@ -14,9 +14,23 @@ Pipelines are in alpha. The entry points are deliberately kept out of the way wh
 
 A pipeline is a set of scripts in the same [folder](../8_groups_and_folders/index.mdx) that are wired together by the data they read and write. Instead of assembling steps by hand in a [flow](../../flows/1_flow_editor.mdx), you declare a few comment annotations at the top of each script and Windmill infers the execution graph from [asset](../52_assets/index.mdx) lineage: when a script writes an asset, every script that reads that asset is triggered automatically.
 
-Pipelines are a modern take on asset-based data orchestration, in the spirit of [dbt](https://www.getdbt.com/) and [Dagster](https://dagster.io/): you describe assets and their lineage rather than wiring tasks by hand. The difference is what powers them - [DuckDB](https://duckdb.org/) (and managed [DuckLake](#materialization) tables) as the analytics engine for transformations and materializations, and Windmill itself for orchestration, scheduling and compute, so every step is an ordinary Windmill script in the language of your choice and runs on your own workers.
+Pipelines are a modern take on asset-based data orchestration, in the spirit of [dbt](https://www.getdbt.com/) and [Dagster](https://dagster.io/): you describe assets and their lineage rather than wiring tasks by hand. The difference is what powers them - [DuckDB](https://duckdb.org/) (and managed [DuckLake](../11_persistent_storage/ducklake.mdx) tables) as the analytics engine for transformations and materializations, and Windmill itself for orchestration, scheduling and compute, so every step is an ordinary Windmill script that runs on your own workers.
 
-Pipelines are well suited to event-driven and data-engineering workloads where steps are owned independently, run on their own cadence, and are connected only by the datasets they exchange (S3 objects, resources, data tables, volumes). For data-processing recipes (S3 streaming, Polars and DuckDB) assembled step by step in a single editor, see [ETL and data processing](../27_data_pipelines/index.mdx) instead.
+### The canonical stack: DuckDB + DuckLake + materialize
+
+Any language works through the same annotations - a `// pipeline` Python, TypeScript or Bash script that reads and writes [assets](../52_assets/index.mdx) is a first-class step. But the way to build a *powerful* pipeline is [DuckDB](../../integrations/duckdb.md) transformations that [materialize](#materialization) into a managed [DuckLake](../11_persistent_storage/ducklake.mdx) table: you write the query for one slice and Windmill owns the write. That single choice unlocks the rest of the feature set:
+
+- [Managed, idempotent materialization](#materialization) into DuckLake - Windmill generates the write (replace / merge / append), captures a snapshot and tracks the row count, so re-runs, retries and backfills are safe by construction.
+- [Versioning and time-travel](#versioning-and-time-travel) on every write, for free - read a table as of a past snapshot, roll back, reproduce a past run.
+- [SCD2 history](#scd2-history-slowly-changing-dimensions) - keep every version of every row and do effective-dated as-of joins.
+- [Column-level lineage](#column-level-lineage) inferred automatically from the SQL - no annotation needed in the common case.
+- [Data tests](#data-tests) (`unique`, `not_null`, `accepted_values`, `relationships`) that run against the freshly-materialized slice and fail the run on violation.
+- [One-click backfill](#partition-status-and-backfill) over a range of [partitions](#partitioned-pipelines) from the pipeline graph.
+- [Macro libraries](#macro-libraries-duckdb) - shared, engine-native DuckDB macros callable from every script in the workspace.
+
+Materialization, column lineage, data tests and macros are DuckDB-specific; from Python or TypeScript you get the same managed DuckLake write through the `wmill.ducklake` helpers.
+
+Pipelines are well suited to event-driven and data-engineering workloads where steps are owned independently, run on their own cadence, and are connected only by the datasets they exchange (S3 objects, resources, data tables, volumes). For the underlying data-processing recipes (efficient S3 streaming, DuckDB connection settings, benchmarks), see [ETL and data processing](../27_data_pipelines/index.mdx).
 
 This page is the full reference for every pipeline annotation and option, with an example for each case. Annotations are plain comment lines, so they use the comment prefix of the script language. Any of the three prefixes below is accepted by the parser; use the one that is a comment in your language.
 
@@ -59,6 +73,8 @@ export async function main() {
 3. Open the folder and select the pipeline view. You will see `ingest → s3://demo/raw.json → transform → s3://demo/sum.json`. Run `ingest` with "Run + downstream": `transform` fires automatically once `raw.json` is written.
 
 That is the whole model: mark scripts with `// pipeline`, declare inputs with `// on`, and Windmill wires the rest from asset lineage. The sections below cover every option. For a guided walkthrough see the [pipeline quickstart](../../getting_started/10_pipeline_quickstart/index.mdx).
+
+This minimal example uses TypeScript and a plain S3 file to keep the wiring model in focus. In practice, the canonical step is a DuckDB query that [materializes](#materialization) into a managed [DuckLake](../11_persistent_storage/ducklake.mdx) table - that is what unlocks idempotent writes, time-travel, column lineage, data tests and backfill (see [the canonical stack](#the-canonical-stack-duckdb--ducklake--materialize)).
 
 ## Marking a script as part of a pipeline
 
@@ -364,7 +380,7 @@ For materialized assets, this is surfaced as a one-click [backfill](#partition-s
 
 ## Materialization
 
-A DuckDB script can declare that it **produces** a managed [DuckLake](/docs/core_concepts/data_pipelines) table with `// materialize`. Instead of writing the table yourself, you write the query for one *slice* and Windmill owns the write: it is idempotent, captured as a DuckLake snapshot, and tracked. A **slice** is one [partition](#partitioned-pipelines) when the script is also `// partitioned`, or the **whole table** when it isn't — `materialize` works either way (`// partitioned` is optional and independent; see [Strategy and unit](#strategy-and-unit) below).
+A DuckDB script can declare that it **produces** a managed [DuckLake](../11_persistent_storage/ducklake.mdx) table with `// materialize`. This is the canonical, most powerful way to build a pipeline step (see [the canonical stack](#the-canonical-stack-duckdb--ducklake--materialize) above). Instead of writing the table yourself, you write the query for one *slice* and Windmill owns the write: it is idempotent, captured as a DuckLake snapshot, and tracked. A **slice** is one [partition](#partitioned-pipelines) when the script is also `// partitioned`, or the **whole table** when it isn't — `materialize` works either way (`// partitioned` is optional and independent; see [Strategy and unit](#strategy-and-unit) below).
 
 ```sql
 // pipeline
@@ -785,6 +801,17 @@ wmill pipeline docs <folder>             # write PIPELINE.md describing the grap
 
 The `{partition}` token is used inside asset paths (in `// on` and in the paths your code writes) and is resolved at run time. Unknown annotations and unknown option values are ignored (the default is kept) rather than failing the deploy.
 
+## How this compares to dbt and Dagster
+
+Pipelines borrow the asset-and-lineage model that [dbt](https://www.getdbt.com/) and [Dagster](https://dagster.io/) popularized, but fold several tools into one platform:
+
+- **dbt** transforms data with SQL and tracks lineage, but it is transform-only: it needs a separate orchestrator to run it on a schedule and a separate warehouse to run against. Windmill runs the transforms (DuckDB), owns the store and versioning ([DuckLake](../11_persistent_storage/ducklake.mdx)), and schedules and triggers them natively.
+- **Dagster** orchestrates assets and tracks metadata, but it relies on dbt (or your own code) for the transforms and a warehouse for compute. Windmill is the orchestrator, the compute (your own workers), and the transform engine at once.
+
+The equivalents map closely: [materializations](#materialization), [data tests](#data-tests), [macros](#macro-libraries-duckdb), [column lineage](#column-level-lineage), [selective runs](#selective-execution-run-up-to-here) and [backfill](#partition-status-and-backfill) all have counterparts, while the compute, scheduling and [triggers](../../getting_started/8_triggers/index.mdx) come from the same platform and run on your own infrastructure, in any language.
+
+Pipelines are in alpha and do not yet cover everything those tools do: [freshness](#freshness) policies are parsed but not enforced yet, and dbt's docs-site generation, seeds and semantic layer have no direct equivalent. The goal is not feature-for-feature parity but doing the whole asset-based workflow (transform, orchestrate, test, materialize, version) in a single platform, on your own compute.
+
 ## Related
 
 <div className="grid grid-cols-2 gap-6 mb-4">
@@ -795,7 +822,7 @@ The `{partition}` token is used inside asset paths (in `// on` and in the paths 
 	/>
 	<DocCard
 		title="ETL & data processing"
-		description="Efficient data-processing recipes: S3 streaming, Polars and DuckDB, SQL-to-S3."
+		description="Efficient data-processing recipes: S3 streaming, DuckDB, SQL-to-S3, and single-node benchmarks."
 		href="/docs/core_concepts/data_pipelines"
 	/>
 	<DocCard

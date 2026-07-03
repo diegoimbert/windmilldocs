@@ -45,7 +45,7 @@ Every docs page below is available as raw markdown by appending `.md` to its URL
 - [Dependency management](https://www.windmill.dev/docs/advanced/imports.md): How do I manage dependencies and imports across languages in Windmill?
 - [Persistent storage and databases](https://www.windmill.dev/docs/core_concepts/persistent_storage.md): What are the storage options in Windmill? S3/R2/MinIO object storage, Postgres, DuckDB, data tables and key-value stores.
 - [Object storage (S3)](https://www.windmill.dev/docs/core_concepts/object_storage_in_windmill.md): How do I connect Windmill to S3, Azure Blob, or Google Cloud Storage for workspace and instance object storage?
-- [Data pipelines](https://www.windmill.dev/docs/core_concepts/data_pipelines.md): How do I run efficient ETL and data processing in Windmill? DAG-based processing with S3 streaming, Polars and DuckDB, and SQL-to-S3.
+- [Data pipelines](https://www.windmill.dev/docs/core_concepts/data_pipelines.md): How do I run efficient ETL and data processing in Windmill? DAG-based processing with S3 streaming, DuckDB, and SQL-to-S3.
 - [Roles and permissions](https://www.windmill.dev/docs/core_concepts/roles_and_permissions.md): How do I manage permissions in Windmill? Control access to scripts, flows, apps and resources at instance and workspace level.
 - [Authentication](https://www.windmill.dev/docs/core_concepts/authentification.md): How do I configure authentication in Windmill using SSO, restricted domains, or manual user management?
 - [Error handling](https://www.windmill.dev/docs/core_concepts/error_handling.md): How do I handle errors in Windmill? Use error handlers, retries, custom error messages and recovery strategies.
