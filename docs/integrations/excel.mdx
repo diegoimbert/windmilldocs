@@ -11,11 +11,11 @@ import DocCard from '@site/src/components/DocCard';
 Windmill doesn't have a direct API integration with Microsoft Excel, but it provides powerful ways to work with Excel files through file uploads and processing. You can handle Excel files (.xlsx, .xls) using two main approaches: [base64 encoded strings](#base64-encoded-strings) for smaller files or [S3 object storage](#s3-object-storage-recommended-for-larger-files) for larger files and better performance.
 
 Excel files in Windmill can be:
-- **Uploaded directly** in [apps](../apps/0_app_editor/index.mdx) using [file input components](../apps/4_app_configuration_settings/file_input.mdx) or within scripts and flows' [auto-generated UIs](../core_concepts/6_auto_generated_uis/index.mdx).
+- **Uploaded directly** in [low-code apps](../apps/0_app_editor/index.mdx) (legacy) using [file input components](../apps/4_app_configuration_settings/file_input.mdx) or within scripts and flows' [auto-generated UIs](../core_concepts/6_auto_generated_uis/index.mdx).
 - **Stored and processed** using [workspace object storage (S3)](../core_concepts/38_object_storage_in_windmill/index.mdx).
 - **Parsed and manipulated** using popular libraries like [pandas](https://pandas.pydata.org/) ([Python](../getting_started/0_scripts_quickstart/2_python_quickstart/index.mdx)) or [xlsx](https://www.npmjs.com/package/xlsx) ([TypeScript](../getting_started/0_scripts_quickstart/1_typescript_quickstart/index.mdx)).
 - **Processed in batch** through [flows](../flows/1_flow_editor.mdx) for multiple files.
-- **Visualized** in scripts and flows using [rich-rendering](../core_concepts/19_rich_display_rendering/index.mdx) or in [apps](../apps/0_app_editor/index.mdx) using tables and charts using file input and display components (AgGrid Table, Text, etc.)
+- **Visualized** in scripts and flows using [rich-rendering](../core_concepts/19_rich_display_rendering/index.mdx) or in [low-code apps](../apps/0_app_editor/index.mdx) (legacy) using tables and charts using file input and display components (AgGrid Table, Text, etc.)
 
 ## Base64 encoded strings
 

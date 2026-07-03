@@ -115,7 +115,7 @@ const sidebars = {
 						{
 							type: 'doc',
 							id: 'getting_started/apps_quickstart/index',
-							label: 'Apps (low-code)'
+							label: 'Apps (low-code, legacy)'
 						},
 						{
 							type: 'category',
@@ -835,7 +835,7 @@ const sidebars = {
 				},
 				{
 					type: 'category',
-					label: 'Low-code app editor',
+					label: 'Low-code app editor (legacy)',
 					link: {
 						type: 'doc',
 						id: 'apps/app_editor/index'

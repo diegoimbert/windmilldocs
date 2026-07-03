@@ -17,7 +17,7 @@ Every docs page below is available as raw markdown by appending `.md` to its URL
 - [Getting started](https://www.windmill.dev/docs/getting_started/how_to_use_windmill.md): How do I get started with Windmill? Set up your workspace, create your first script, flow or app, and deploy it in minutes.
 - [Scripts quickstart](https://www.windmill.dev/docs/getting_started/scripts_quickstart.md): How do I write and run scripts in Windmill? Quickstart guides for TypeScript, Python, Go, PHP, Bash, SQL, Rust, C#, Java, Ruby, R and Docker.
 - [Flows quickstart](https://www.windmill.dev/docs/getting_started/flows_quickstart.md): How do I build a workflow in Windmill? Step-by-step guide to create, test and deploy a multi-step flow.
-- [Apps quickstart](https://www.windmill.dev/docs/getting_started/apps_quickstart.md): How do I build an internal tool with Windmill? Create data-driven apps and dashboards with drag-and-drop components and code.
+- [Apps quickstart](https://www.windmill.dev/docs/getting_started/apps_quickstart.md): How do I build an internal tool with the legacy low-code app editor in Windmill? Create data-driven apps and dashboards with drag-and-drop components. For new apps, use full-code apps.
 - [Full code apps quickstart](https://www.windmill.dev/docs/getting_started/full_code_apps_quickstart.md): How do I build a full-code app with Windmill? Step-by-step guide to create a React or Svelte app with backend runnables.
 - [Triggers](https://www.windmill.dev/docs/getting_started/triggers.md): How do I trigger scripts and flows in Windmill? Use schedules, webhooks, emails, HTTP routes, websockets, Kafka, Postgres, NATS, SQS, MQTT, GCP, Azure Event Grid and more.
 - [Pipeline quickstart](https://www.windmill.dev/docs/getting_started/pipeline_quickstart.md): How do I build my first pipeline in Windmill? Step-by-step guide to connect scripts with asset lineage and run them as a pipeline.
@@ -157,7 +157,7 @@ Every docs page below is available as raw markdown by appending `.md` to its URL
 ### Editors
 - [Script editor](https://www.windmill.dev/docs/script_editor.md): How do I write scripts in Windmill? Use the script editor with support for TypeScript, Python, Go, PHP, Bash, SQL, Rust, Ruby, R and Docker.
 - [Flow editor](https://www.windmill.dev/docs/flows/flow_editor.md): How do I build flows in Windmill? Use the flow editor with branching, loops, error handling, approval steps and retries.
-- [App editor](https://www.windmill.dev/docs/apps/app_editor.md): How do I build apps in Windmill? Use the low-code app editor with drag-and-drop components, custom CSS and React components.
+- [App editor](https://www.windmill.dev/docs/apps/app_editor.md): How do I build apps with the legacy low-code app editor in Windmill? Drag-and-drop components, custom CSS and React components. For new apps, use full-code apps.
 - [Code editor](https://www.windmill.dev/docs/code_editor.md): How do I write code in Windmill? Use the integrated code editor with AI-assisted generation, autocompletion and parameter inference.
 
 ### Hosting and deployment

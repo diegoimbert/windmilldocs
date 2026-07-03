@@ -44,7 +44,7 @@ If you're looking for a way to self-host Windmill using AWS, see [Self-Host Wind
 Your AWS or AWS OIDC resource can be:
 
 - [Passed as parameters](../core_concepts/3_resources_and_types/index.mdx#passing-resources-as-parameters-to-scripts-preferred) to scripts
-- [Fetched programmatically](../core_concepts/3_resources_and_types/index.mdx#fetching-them-from-within-a-script-by-using-the-wmill-client-in-the-respective-language) within [scripts](../script_editor/index.mdx), [flows](../flows/1_flow_editor.mdx), or [apps](../apps/0_app_editor/index.mdx)
+- [Fetched programmatically](../core_concepts/3_resources_and_types/index.mdx#fetching-them-from-within-a-script-by-using-the-wmill-client-in-the-respective-language) within [scripts](../script_editor/index.mdx), [flows](../flows/1_flow_editor.mdx), or [apps](../full_code_apps/index.mdx)
 
 <iframe
 	style={{ aspectRatio: '16/9' }}

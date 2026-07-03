@@ -4,6 +4,12 @@ description: How do I build a Windmill app that sends emails using an SMTP resou
 
 # Build an App that sends email with SMTP
 
+:::info Legacy
+
+This guide uses the legacy low-code app editor. For new apps, we recommend [full-code apps](../../../full_code_apps/index.mdx) with React or Svelte.
+
+:::
+
 Watch this video on how building a Windmill [App](../../../apps/0_app_editor/index.mdx) that uses a [SMTP resource](../../../integrations/smtp.md) to send an email [connecting components](../../../apps/2_connecting_components/index.mdx) ([Button](../../../apps/4_app_configuration_settings/button.mdx) & [Text input](../../../apps/4_app_configuration_settings/text_input.mdx)).
 
 <iframe
