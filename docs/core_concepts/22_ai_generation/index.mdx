@@ -218,7 +218,7 @@ Just describe what you want to achieve, and the AI will build the app for you, s
 	<DocCard
 		title="Full-code app builder"
 		description="Build full-code apps with AI."
-		href="/docs/full_code_apps/index.mdx"
+		href="/docs/full_code_apps"
 	/>
 </div>
 
@@ -248,6 +248,8 @@ Windmill AI supports:
 - OpenAI's [models](https://platform.openai.com/docs/models) (o1 currently not supported)
 - Azure OpenAI's [models](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models)
 	- Base URL format: `https://{your-resource-name}.openai.azure.com/openai`
+- Azure AI Foundry's [models](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/foundry-models-overview): the broader Foundry catalog beyond Azure OpenAI, including OpenAI models plus Llama, DeepSeek, Mistral, Phi and more
+	- Base URL format: `https://{your-resource-name}.services.ai.azure.com/openai`
 - Anthropic's [models](https://docs.anthropic.com/en/docs/about-claude/models/all-models) (including Claude 3.7 Sonnet in extended thinking mode)
 - Mistral's [Codestral](https://mistral.ai/technology/#models)
 - DeepSeek's [models](https://api-docs.deepseek.com/quick_start/pricing)
@@ -306,6 +308,15 @@ In addition to `base_url` and `api_key`, the `customai` resource accepts a `head
 ```
 
 Resource-level `headers` are applied after the instance-wide `AI_HTTP_HEADERS` env var, so they take precedence on conflicting keys.
+
+#### Azure OpenAI (`azure_openai`) and Azure AI Foundry (`azure_foundry`)
+
+Both providers use the same Azure conventions: they authenticate with the `api-key` header and require a `base_url` on the resource (Windmill builds the Azure-style request path from it).
+
+- `azure_openai` is limited to the [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models) model catalog. Base URL format: `https://{your-resource-name}.openai.azure.com/openai`.
+- `azure_foundry` exposes the broader [Azure AI Foundry](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/foundry-models-overview) catalog over an OpenAI-compatible chat completions API: the OpenAI models plus Llama, DeepSeek, Mistral, Phi and more. Base URL format: `https://{your-resource-name}.services.ai.azure.com/openai`.
+
+Pick the model from your Foundry deployment by typing its name in the model input (e.g. `Llama-3.3-70B-Instruct`, `DeepSeek-R1`, `Phi-4`, `Mistral-Large-2411`) or select one of the defaults in the dropdown.
 
 ### Instance-wide AI HTTP headers
 
