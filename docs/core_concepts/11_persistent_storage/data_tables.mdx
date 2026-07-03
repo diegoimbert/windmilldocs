@@ -197,6 +197,38 @@ wmill.datatable()
 
 ---
 
+## Migrations
+
+You can version a data table's schema with SQL migrations. A migration is a pair of SQL statements - an `up` migration that applies a change (for example `CREATE TABLE`) and an optional `down` migration that reverts it. Applied migrations are tracked in a `_wm_migrations` table inside each data table, so a migration is never applied twice, and migrations run in timestamp order.
+
+Each migration runs as a normal user-permissioned Windmill `postgresql` job (labelled `datatable_migration`), so applications and rollbacks show up in the [runs history](../20_jobs/index.mdx) and failures surface the underlying Postgres error.
+
+### From the UI
+
+Go to `workspace settings` -> `Data Tables` and click **Migrations** next to a data table to open the migrations modal. From there you can:
+
+- Create a **New** migration with `Up` / `Down` SQL editors, and optionally **Create and run** it in one step (the insert is reverted if the run fails).
+- **Run** or **Revert** an individual migration, or **Run all** pending migrations. A status dot shows whether each migration has been applied (green), is not yet applied (orange), or has an unknown state (grey).
+- **Generate initial migration**, which snapshots the data table's current schema into a first migration and marks it as already applied (with no `down`), so it is never re-run. This is useful to bring an existing data table under migration control.
+
+Running or reverting a migration out of order (one that has earlier un-run migrations, or later applied ones) asks for confirmation first, and deletions always confirm.
+
+{/* TODO: screenshot of the Migrations modal (workspace settings → Data Tables → Migrations) showing the per-migration status dots and Run / Revert / Delete actions. */}
+
+### From the CLI
+
+Migrations are stored as [workspace files](../../advanced/3_cli/sync.mdx) under `migrations/datatable/<datatable>/` and can be scaffolded, applied and rolled back with the `wmill datatable migrate` commands:
+
+```bash
+wmill datatable migrate new add_users_table   # scaffold .up.sql / .down.sql files
+wmill datatable migrate up                     # apply all pending migrations
+wmill datatable migrate down                   # roll back the most recent migration
+```
+
+See the [CLI datatable reference](../../advanced/3_cli/datatable.md#managing-migrations) for the full command reference and sync behavior.
+
+---
+
 ## Database types
 
 Windmill currently supports two backend database types for Data Tables:
