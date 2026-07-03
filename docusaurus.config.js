@@ -119,6 +119,10 @@ const config = {
           {
 						to: '/docs/advanced/cli/environment-specific-items',
 						from: '/docs/advanced/cli/branch-specific-items'
+					},
+					{
+						to: '/docs/core_concepts/pipelines',
+						from: ['/docs/pipelines', '/docs/pipelines/annotations']
 					}
 				]
 			}
