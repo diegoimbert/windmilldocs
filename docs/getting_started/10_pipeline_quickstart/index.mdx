@@ -1,5 +1,5 @@
 ---
-description: How do I build my first pipeline in Windmill? Step-by-step guide to connect scripts with asset lineage and run them as a pipeline.
+description: How do I build my first pipeline in Windmill? A step-by-step guide to DuckDB scripts that materialize DuckLake tables, wired automatically by asset lineage.
 ---
 
 import DocCard from '@site/src/components/DocCard';
@@ -10,7 +10,11 @@ import DocCard from '@site/src/components/DocCard';
 Pipelines are in alpha. The entry point is deliberately tucked away while we develop the feature, and the annotation syntax and behavior described in this guide are still evolving and may change in future releases. We would love your feedback - share it on [Discord](https://discord.com/invite/V7PM2YHsPB) or [GitHub](https://github.com/windmill-labs/windmill).
 :::
 
-This guide builds your first [pipeline](../../core_concepts/63_pipelines/index.mdx): a set of scripts in a folder wired together automatically by the data they read and write, no manual orchestration. It takes about five minutes.
+This guide builds your first [pipeline](../../core_concepts/63_pipelines/index.mdx): a set of [DuckDB](../../integrations/duckdb.md) scripts in a folder wired together automatically by the data they read and write, no manual orchestration. Each step materializes a [DuckLake](../../core_concepts/11_persistent_storage/ducklake.mdx) table, which is what makes the writes idempotent, versioned and testable. It takes about five minutes.
+
+:::info Prerequisite
+You need a [workspace storage and a DuckLake](../../core_concepts/11_persistent_storage/ducklake.mdx) configured. The default DuckLake is named `main`; this guide uses it.
+:::
 
 ## 1. Create a pipeline
 
@@ -26,53 +30,61 @@ Pipelines live in a [folder](../../core_concepts/8_groups_and_folders/index.mdx)
 
 ## 2. Add a producer script
 
-Create a script `f/demo/ingest`. The `// pipeline` line places it in the folder's pipeline; the S3 write is detected automatically as the script's output.
+Create a DuckDB script `f/demo/ingest`. The `-- pipeline` line places it in the folder's pipeline, and `-- materialize` tells Windmill to own the write: it creates the `ducklake://main/events` table from the trailing `SELECT` and records a snapshot and row count.
 
-```ts
-// pipeline
-import * as wmill from 'windmill-client';
+```sql
+-- pipeline
+-- materialize ducklake://main/events
 
-export async function main() {
-	await wmill.writeS3File({ s3: 'demo/raw.json' }, JSON.stringify([{ n: 1 }, { n: 2 }]));
-}
+SELECT * FROM (VALUES
+  (1, 'click', TIMESTAMP '2026-01-01 10:00'),
+  (2, 'view',  TIMESTAMP '2026-01-01 10:05'),
+  (3, 'click', TIMESTAMP '2026-01-01 11:00')
+) AS t(id, kind, ts);
 ```
 
 ## 3. Add a consumer script
 
-Create `f/demo/transform`. The `// on` annotation declares the asset it reads, which becomes an incoming edge: this script runs automatically whenever `demo/raw.json` is written.
+Create a DuckDB script `f/demo/rollup`. The `-- on ducklake://main/events` annotation declares the table it reads, which becomes an incoming edge: this script runs automatically whenever `events` is materialized. It materializes its own aggregate table.
 
-```ts
-// pipeline
-// on s3://demo/raw.json
-import * as wmill from 'windmill-client';
+```sql
+-- pipeline
+-- on ducklake://main/events
+-- materialize ducklake://main/events_by_kind
 
-export async function main() {
-	const rows = JSON.parse(await wmill.loadS3File({ s3: 'demo/raw.json' }));
-	await wmill.writeS3File({ s3: 'demo/sum.json' }, JSON.stringify({ count: rows.length }));
-}
+ATTACH 'ducklake://main' AS dl;
+
+SELECT kind, count(*) AS n
+FROM dl.events
+GROUP BY kind;
 ```
 
 ## 4. Open the pipeline graph
 
 Open the folder and select the pipeline view. You will see the lineage:
 
-`ingest` → `s3://demo/raw.json` → `transform` → `s3://demo/sum.json`
+`ingest` → `ducklake://main/events` → `rollup` → `ducklake://main/events_by_kind`
 
 ## 5. Run it
 
-On the `ingest` node, choose "Run + downstream". `ingest` runs, writes `raw.json`, and the asset cascade automatically fires `transform`, which writes `sum.json`. Each node shows live status as the run progresses.
+On the `ingest` node, choose "Run + downstream". `ingest` materializes `events`, and the asset cascade automatically fires `rollup`, which materializes `events_by_kind`. Each node shows live status, its DuckLake snapshot and row count as the run progresses, and the result panel previews the materialized table.
 
-That is the whole model: mark scripts with `// pipeline`, declare inputs with `// on`, and Windmill infers and runs the graph from asset lineage.
+That is the whole model: mark scripts with `-- pipeline`, declare inputs with `-- on`, produce tables with `-- materialize`, and Windmill infers and runs the graph from asset lineage. Because each write is a managed DuckLake snapshot, you also get idempotent re-runs, time-travel, [data tests](../../core_concepts/63_pipelines/index.mdx#data-tests) and [backfill](../../core_concepts/63_pipelines/index.mdx#partition-status-and-backfill) with no extra work.
 
 ## Next steps
 
-Add schedules, partitions, AND/OR joins and debounce. Every annotation and option is documented, with examples, on the concept page.
+Add materialization strategies (merge, append, SCD2 history), partitions, schedules, AND/OR joins, data tests and debounce. Every annotation and option is documented, with examples, on the concept page.
 
 <div className="grid grid-cols-2 gap-6 mb-4">
 	<DocCard
 		title="Pipelines"
-		description="Full reference: every annotation and option with examples (schedules, partitions, joins, debounce)."
+		description="Full reference: every annotation and option with examples (materialize, partitions, joins, data tests, debounce)."
 		href="/docs/core_concepts/pipelines"
+	/>
+	<DocCard
+		title="DuckLake"
+		description="The managed lakehouse tables your pipeline steps materialize into: catalog, versioning and ACID transactions on S3."
+		href="/docs/core_concepts/persistent_storage/ducklake"
 	/>
 	<DocCard
 		title="Assets"

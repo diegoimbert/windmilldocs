@@ -40,41 +40,46 @@ This page is the full reference for every pipeline annotation and option, with a
 | `#` | Python, Bash, PowerShell, and other `#`-comment languages |
 | `--` | SQL (DuckDB, PostgreSQL, MySQL, BigQuery, Snowflake, MS SQL) |
 
-All examples below use TypeScript (`//`); substitute `#` or `--` for other languages. Annotations may appear anywhere in the file, one per line.
+The quickstart below uses DuckDB (`--`), the canonical pipeline language; the reference sections that follow use the `//` (TypeScript) prefix for the generic annotation examples. Substitute the prefix that is a comment in your language; annotations may appear anywhere in the file, one per line.
 
 ## Quickstart
 
-Build a two-step pipeline in a folder. The first script writes an S3 dataset; the second declares it as an input and runs automatically when it is written.
+Build a two-step [DuckLake](../11_persistent_storage/ducklake.mdx) pipeline in a folder. The first DuckDB script materializes a table; the second declares it as an input and materializes an aggregate whenever it changes. This needs a [workspace storage and a DuckLake](../11_persistent_storage/ducklake.mdx) configured (the default DuckLake is named `main`).
 
-1. Create a folder (for example `f/demo`) and add a script `f/demo/ingest`:
+1. Create a folder (for example `f/demo`) and add a DuckDB script `f/demo/ingest`:
 
-```ts
-// pipeline
-import * as wmill from 'windmill-client';
+```sql
+-- pipeline
+-- materialize ducklake://main/events
 
-export async function main() {
-	await wmill.writeS3File({ s3: 'demo/raw.json' }, JSON.stringify([{ n: 1 }, { n: 2 }]));
-}
+SELECT * FROM (VALUES
+  (1, 'click', TIMESTAMP '2026-01-01 10:00'),
+  (2, 'view',  TIMESTAMP '2026-01-01 10:05'),
+  (3, 'click', TIMESTAMP '2026-01-01 11:00')
+) AS t(id, kind, ts);
 ```
 
-2. Add a second script `f/demo/transform` that reads it:
+`-- materialize` makes Windmill own the write: it creates `ducklake://main/events`, writes the trailing `SELECT` into it, and records a snapshot id and row count.
 
-```ts
-// pipeline
-// on s3://demo/raw.json
-import * as wmill from 'windmill-client';
+2. Add a second DuckDB script `f/demo/rollup` that reads it:
 
-export async function main() {
-	const rows = JSON.parse(await wmill.loadS3File({ s3: 'demo/raw.json' }));
-	await wmill.writeS3File({ s3: 'demo/sum.json' }, JSON.stringify({ sum: rows.length }));
-}
+```sql
+-- pipeline
+-- on ducklake://main/events
+-- materialize ducklake://main/events_by_kind
+
+ATTACH 'ducklake://main' AS dl;
+
+SELECT kind, count(*) AS n
+FROM dl.events
+GROUP BY kind;
 ```
 
-3. Open the folder and select the pipeline view. You will see `ingest → s3://demo/raw.json → transform → s3://demo/sum.json`. Run `ingest` with "Run + downstream": `transform` fires automatically once `raw.json` is written.
+3. Open the folder and select the pipeline view. You will see `ingest → ducklake://main/events → rollup → ducklake://main/events_by_kind`. Run `ingest` with "Run + downstream": `rollup` fires automatically once `events` is materialized, and each node shows its snapshot and row count.
 
-That is the whole model: mark scripts with `// pipeline`, declare inputs with `// on`, and Windmill wires the rest from asset lineage. The sections below cover every option. For a guided walkthrough see the [pipeline quickstart](../../getting_started/10_pipeline_quickstart/index.mdx).
+That is the whole model: mark scripts with `-- pipeline`, declare inputs with `-- on`, produce tables with `-- materialize`, and Windmill wires the rest from [asset](../52_assets/index.mdx) lineage. Because every write is a managed DuckLake snapshot, you get idempotent re-runs, time-travel, column lineage, data tests and backfill for free (see [the canonical stack](#the-canonical-stack-duckdb--ducklake--materialize)). The sections below cover every option. For a guided walkthrough see the [pipeline quickstart](../../getting_started/10_pipeline_quickstart/index.mdx).
 
-This minimal example uses TypeScript and a plain S3 file to keep the wiring model in focus. In practice, the canonical step is a DuckDB query that [materializes](#materialization) into a managed [DuckLake](../11_persistent_storage/ducklake.mdx) table - that is what unlocks idempotent writes, time-travel, column lineage, data tests and backfill (see [the canonical stack](#the-canonical-stack-duckdb--ducklake--materialize)).
+Materialization is optional. The base model is any-language scripts (`-- pipeline`, `// pipeline`, `# pipeline`) that read and write [assets](../52_assets/index.mdx) - S3 objects, resources, data tables or volumes - wired by the datasets they exchange; a Python or TypeScript step that just reads and writes an S3 file is a first-class pipeline member. `-- materialize` (and the DuckDB-only [data tests](#data-tests), [column lineage](#column-level-lineage) and [macros](#macro-libraries-duckdb)) is a managed layer you add on top when a step produces a DuckLake table. Everything below - [marking a script](#marking-a-script-as-part-of-a-pipeline), [inputs and outputs](#inputs-and-outputs-assets), [triggers](#triggering-a-pipeline), [joins](#joining-inputs-any-vs-all), [debounce](#debounce), [partitions](#partitioned-pipelines) - applies to both, with or without materialization.
 
 ## Marking a script as part of a pipeline
 
