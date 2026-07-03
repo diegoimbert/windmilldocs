@@ -20,7 +20,7 @@ Every docs page below is available as raw markdown by appending `.md` to its URL
 - [Apps quickstart](https://www.windmill.dev/docs/getting_started/apps_quickstart.md): How do I build an internal tool with the legacy low-code app editor in Windmill? Create data-driven apps and dashboards with drag-and-drop components. For new apps, use full-code apps.
 - [Full code apps quickstart](https://www.windmill.dev/docs/getting_started/full_code_apps_quickstart.md): How do I build a full-code app with Windmill? Step-by-step guide to create a React or Svelte app with backend runnables.
 - [Triggers](https://www.windmill.dev/docs/getting_started/triggers.md): How do I trigger scripts and flows in Windmill? Use schedules, webhooks, emails, HTTP routes, websockets, Kafka, Postgres, NATS, SQS, MQTT, GCP, Azure Event Grid and more.
-- [Pipeline quickstart](https://www.windmill.dev/docs/getting_started/pipeline_quickstart.md): How do I build my first pipeline in Windmill? Step-by-step guide to connect scripts with asset lineage and run them as a pipeline.
+- [Pipeline quickstart](https://www.windmill.dev/docs/getting_started/pipeline_quickstart.md): How do I build my first pipeline in Windmill? A step-by-step guide to DuckDB scripts that materialize DuckLake tables, wired automatically by asset lineage.
 
 ### Script languages
 - [SQL](https://www.windmill.dev/docs/getting_started/scripts_quickstart/sql.md): How do I run SQL queries in Windmill? Connect to PostgreSQL, MySQL, BigQuery, Snowflake and other databases.
