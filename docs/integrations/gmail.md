@@ -40,7 +40,7 @@ Your resource can be used [passed as parameters](../core_concepts/3_resources_an
 
 :::tip
 
-Find some pre-set interactions with Gmail on the [Hub](https://hub.windmill.dev/integrations/gmail).
+Find some pre-set interactions with Gmail on the [Hub](https://hub.windmill.dev/?app=gmail).
 
 Feel free to create your own Gmail scripts on [Windmill](../getting_started/00_how_to_use_windmill/index.mdx).
 

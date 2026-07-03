@@ -31,7 +31,7 @@ const organizationSchema = {
 		'https://github.com/windmill-labs/windmill',
 		'https://discord.com/invite/V7PM2YHsPB',
 		'https://twitter.com/WindmillDev',
-		'https://www.youtube.com/@windaborern',
+		'https://www.youtube.com/@WindmillDev',
 		'https://www.linkedin.com/company/windmill-dev'
 	],
 	address: {

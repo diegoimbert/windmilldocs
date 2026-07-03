@@ -853,7 +853,7 @@ export default function TemporalCompareContent({ title, description }) {
 						),
 						temporal: (
 							<p>
-								Two native primitives: <a href="https://docs.temporal.io/schedules" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Schedules</a> (cron-style triggering of workflows) and{' '}
+								Two native primitives: <a href="https://docs.temporal.io/schedule" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Schedules</a> (cron-style triggering of workflows) and{' '}
 								<a href="https://docs.temporal.io/encyclopedia/workflow-message-passing" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Signals</a> (external events sent into a running workflow via gRPC). No native
 								Kafka, Postgres CDC, SQS, MQTT or webhook trigger: you write a worker that consumes
 								from those sources and starts workflows or signals existing ones.

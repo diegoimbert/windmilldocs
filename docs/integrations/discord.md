@@ -56,7 +56,7 @@ Your resource can be used [passed as parameters](../core_concepts/3_resources_an
 
 :::tip
 
-Find some pre-set interactions with Discord on the [Hub](https://hub.windmill.dev/integrations/discord).
+Find some pre-set interactions with Discord on the [Hub](https://hub.windmill.dev/?app=discord).
 
 Feel free to create your own Discord scripts on [Windmill](../getting_started/00_how_to_use_windmill/index.mdx).
 

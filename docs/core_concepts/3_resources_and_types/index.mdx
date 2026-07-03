@@ -19,7 +19,7 @@ Each Resource has a **Resource Type** (RT for short) - for example [MySQL](https
 needs to implement. Schemas implement the
 [JSON Schema specification](https://json-schema.org/).
 
-This is how Windmill connects to any third-party system: pick one of the 200+ resource types available on the [Hub](https://hub.windmill.dev/resources), or [define your own](#create-a-resource-type) for anything internal or not yet covered. There are no vendor-branded connectors - the resource type is the integration.
+This is how Windmill connects to any third-party system: pick one of the 200+ resource types available on the [Hub](https://hub.windmill.dev/resource_types), or [define your own](#create-a-resource-type) for anything internal or not yet covered. There are no vendor-branded connectors - the resource type is the integration.
 
 ![Recap Resources and Types](./recap_resources_and_types.png 'Recap Resources and Types')
 
@@ -97,7 +97,7 @@ a link, for example:
 
 ## Create a resource type
 
-Windmill comes preloaded with some common Resource types, such as databases, apps, SMTP, etc. You can see the full list on [Windmill Hub](https://hub.windmill.dev/resources).
+Windmill comes preloaded with some common Resource types, such as databases, apps, SMTP, etc. You can see the full list on [Windmill Hub](https://hub.windmill.dev/resource_types).
 You can also add custom Resource types by clicking "Add a resource type" on the Resources page.
 
 ![Create resource type](./add_resource_type.png.webp)
@@ -112,7 +112,7 @@ The resources types created from the [Admins workspace](../../advanced/18_instan
 
 ### Share resource type on Hub
 
-You can contribute to the [Windmill Hub](https://hub.windmill.dev/) by sharing your Resource Type. To do so, add a Resource Type on the [Resources section](https://hub.windmill.dev/resources) of the Hub.
+You can contribute to the [Windmill Hub](https://hub.windmill.dev/) by sharing your Resource Type. To do so, add a Resource Type on the [Resources section](https://hub.windmill.dev/resource_types) of the Hub.
 
 You will be asked to fill Name, Integration (the corresponding service it interacts with) and Schema (the JSON Schema of the Resource Type).
 
@@ -122,7 +122,7 @@ Verified Resource types on the Hub are directly added to the list of available R
 
 ### Sync resource types with WindmillHub
 
-When creating a [self-hosted](../../advanced/1_self_host/index.mdx) instance, you are offered to set a [schedule](../1_scheduling/index.mdx) to regularly sync all resource types from [WindmillHub](https://hub.windmill.dev/). This will ensure that all the approved resource types are available in your instance. On Windmill cloud, it is done regularly by the Windmill team. Ask us if you need a specific [resource type from Hub](https://hub.windmill.dev/resources) to be added.
+When creating a [self-hosted](../../advanced/1_self_host/index.mdx) instance, you are offered to set a [schedule](../1_scheduling/index.mdx) to regularly sync all resource types from [WindmillHub](https://hub.windmill.dev/). This will ensure that all the approved resource types are available in your instance. On Windmill cloud, it is done regularly by the Windmill team. Ask us if you need a specific [resource type from Hub](https://hub.windmill.dev/resource_types) to be added.
 
 The [Bun](../../getting_started/0_scripts_quickstart/1_typescript_quickstart/index.mdx) script executed from the admin workspace is:
 

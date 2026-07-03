@@ -3,7 +3,7 @@ slug: ruby-support
 version: v1.527.0
 title: Ruby support
 tags: ['Ruby', 'Script editor']
-video: ./videos/ruby.mp4
+video: /videos/ruby.mp4
 description: Windmill now supports Ruby scripts with bundler-compatible dependency management.
 features:
   [

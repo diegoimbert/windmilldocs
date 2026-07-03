@@ -52,9 +52,6 @@ At last, it's a community-driven project, so you'll have the advantages and disa
 
 Airflow is a great tool, but with the advent of more modern solutions (see below), the main reason to use Airflow is due to legacy issues and sunk costs.
 
-![Airflow dashboard](https://airflow.apache.org/docs/apache-airflow/stable/_images/demo_grid_view.png "Airflow dashboard")
-> Airflow dashboard ([source](https://airflow.apache.org/docs/apache-airflow/stable/_images/demo_grid_view.png))
-
 ## Alternatives
 
 ### Luigi
@@ -81,9 +78,6 @@ Prefect also goes further than Airflow in monitoring your tasks, but it's import
 In terms of performance, Prefect is the second slowest job orchestrator we have [benchmarked](/docs/misc/benchmarks/competitors) (alongside Airflow, Temporal, and Windmill) but it is much faster than Airflow and closer to the best-in-class (taking 4.872 seconds to complete 40 lightweight tasks, compared to 56 for Airflow and 2.429 for Windmill Dedicated worker).
 
 To learn more about Prefect, you can check out our [comparison between Prefect and Windmill](/docs/compared_to/prefect).
-
-![Prefect Flow runs](https://orion-docs.prefect.io/2.6/img/tutorials/first-steps-ui.png "Prefect Flow runs")
-> Prefect Flow runs ([source](https://orion-docs.prefect.io/2.6/img/tutorials/first-steps-ui.png))
 
 ### Dagster
 
@@ -127,9 +121,6 @@ Kedro facilitates data versioning, supports incremental computations, and automa
 Asked if it's an orchestrator, Kedro replies:
 
 > "Orchestrators like Airflow, Luigi, Prefect, Dagster, Flyte, and Kubeflow focus on running, scheduling, and monitoring pipelines. Meanwhile, Kedro is all about the process of authoring pipelines. So, if you're looking for a solution that takes care of questions like "What time will this task run?" or "How do I manage my compute?", Kedro might not be what you need." <br/>[...]<br/> Kedro provides a set of deployment guidelines for using orchestrators as deployment targets. If you're looking for a partner to help you production-ready data science code, Kedro is the perfect solution for you."
-
-![Kedro graphs](https://raw.githubusercontent.com/kedro-org/kedro-viz/main/banner.gif "Kedro graphs")
-> Kedro graphs ([source](https://raw.githubusercontent.com/kedro-org/kedro-viz/main/banner.gif))
 
 ### Windmill
 
@@ -197,4 +188,4 @@ The good thing is that all these alternatives are open source and easily self-ho
 
 At last, your internal infrastructure constraints will be an important criterion, for example, Prefect, Dagster, and Kestra might be used for the same purposes, but they have different infrastructures. I suggest you take a look at the documentation for each software to find out more.
 
-Please note that one of the solutions shown (Windmill) presented you with this article, with all that that implies in terms of subjectivity. Please [contact us](/docs/misc/getting_help) if you find any inaccuracies or would like to contribute. Feel free to make a PR on [windmilldocs](https://github.com/windmill-labs/windmilldocs) (open source to the end).
+Please note that one of the solutions shown (Windmill) presented you with this article, with all that that implies in terms of subjectivity. Please [contact us](/docs/misc/getting_help) if you find any inaccuracies or would like to contribute. Feel free to make a PR on [Windmill](https://github.com/windmill-labs/windmill) (open source to the end).

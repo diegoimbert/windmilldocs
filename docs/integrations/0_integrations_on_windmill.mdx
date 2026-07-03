@@ -10,13 +10,13 @@ Integrations are key on Windmill as they allow databases (internal & external) a
 
 Using Windmill, integrations are referred to as [resources and resource types](../core_concepts/3_resources_and_types/index.mdx). Each Resource has a Resource Type (RT for short) - for example MySQL, MongoDB, Slack, etc. - that defines the schema that the resource needs to implement.
 
-We already have pre-set integrations (or resource types), the list is available on our [Hub](https://hub.windmill.dev/resources) (200+ resource types), [using Windmill](../intro.mdx) (most up-to-date version), and at the end of this article.
+We already have pre-set integrations (or resource types), the list is available on our [Hub](https://hub.windmill.dev/resource_types) (200+ resource types), [using Windmill](../intro.mdx) (most up-to-date version), and at the end of this article.
 
 ## How third-party systems connect
 
 Windmill does not ship vendor-branded connectors. Any external system - database, SaaS API, queue, internal service, network device, cloud provider - is reached the same way:
 
-- A [resource type](../core_concepts/3_resources_and_types/index.mdx#create-a-resource-type) defines the JSON schema (host, credentials, options) for that system. Pick one of the 200+ resource types on the [Hub](https://hub.windmill.dev/resources), or define your own.
+- A [resource type](../core_concepts/3_resources_and_types/index.mdx#create-a-resource-type) defines the JSON schema (host, credentials, options) for that system. Pick one of the 200+ resource types on the [Hub](https://hub.windmill.dev/resource_types), or define your own.
 - A resource holds an instance of that schema, with [variables and secrets](../core_concepts/2_variables_and_secrets/index.mdx) inlined for credentials.
 - Scripts in any [supported language](../getting_started/0_scripts_quickstart/index.mdx) receive the resource as a typed parameter and call the system using whatever client library or CLI is appropriate.
 

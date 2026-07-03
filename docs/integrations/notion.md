@@ -45,7 +45,7 @@ Your resource can then be used [passed as parameters](../core_concepts/3_resourc
 
 :::tip
 
-Find some pre-set interactions with Notion on the [Hub](https://hub.windmill.dev/integrations/notion).
+Find some pre-set interactions with Notion on the [Hub](https://hub.windmill.dev/?app=notion).
 
 Feel free to create your own Notion scripts on [Windmill](../getting_started/00_how_to_use_windmill/index.mdx).
 

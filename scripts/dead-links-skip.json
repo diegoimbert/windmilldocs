@@ -1,5 +1,5 @@
 {
-	"_comment": "Regex patterns for links the dead-link checker should ignore. Tuned from a full-site sweep. Only false positives belong here: documentation placeholder/example URLs, and hosts that block crawlers (return 403/408/429 to bots but resolve fine in a browser). Do NOT add hosts that genuinely 404 - those are real dead links worth fixing. Merged with the built-in defaults in scripts/check-dead-links.mjs.",
+	"_comment": "Regex patterns for links the dead-link checker should ignore. Tuned from a full-site sweep. Only false positives belong here: documentation placeholder/example URLs, and hosts that block crawlers (return 403/408/429 to bots but resolve fine in a browser). The ',https?://' pattern skips Docusaurus-generated 'article:author' meta tags, which join multiple author profile URLs with a comma into a single value the crawler misreads as one URL. Do NOT add hosts that genuinely 404 - those are real dead links worth fixing. Merged with the built-in defaults in scripts/check-dead-links.mjs.",
 	"skip": [
 		"\\.example\\.com",
 		"^https?://localhost(:8000)?/?$",
@@ -15,6 +15,13 @@
 		"^https?://media\\.licdn\\.com",
 		"^https?://(www\\.)?fema\\.gov",
 		"^https?://(www\\.)?kobotoolbox\\.org",
-		"^https?://(www\\.)?consumercal\\.org"
+		"^https?://(www\\.)?consumercal\\.org",
+		"^https?://(www\\.)?hhs\\.gov",
+		"^https?://portal\\.azure\\.com",
+		"^https?://(www\\.)?airtable\\.com",
+		"^https?://docs\\.redhat\\.com",
+		"readthedocs\\.io",
+		"^https?://community\\.neon\\.tech",
+		",https?://"
 	]
 }

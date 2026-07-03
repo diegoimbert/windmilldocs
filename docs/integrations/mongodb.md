@@ -195,8 +195,8 @@ standalone.
 
 [wm-app-resources]: https://app.windmill.dev/resources
 [wm-app-home]: https://app.windmill.dev
-[hub-resources]: https://hub.windmill.dev/resources
-[hub-mongo]: https://hub.windmill.dev/integrations/mongodb
+[hub-resources]: https://hub.windmill.dev/resource_types
+[hub-mongo]: https://hub.windmill.dev/?app=mongodb
 [docs-resources]: /docs/core_concepts/resources_and_types
 [docs-path]: /docs/core_concepts/roles_and_permissions#path
 [docs-flows]: /docs/getting_started/flows_quickstart

@@ -44,7 +44,7 @@ You can use [native triggers](../core_concepts/52_native_triggers/index.mdx) to 
 
 :::tip
 
-Find some pre-set interactions with Google Calendar on the [Hub](https://hub.windmill.dev/integrations/gcal).
+Find some pre-set interactions with Google Calendar on the [Hub](https://hub.windmill.dev/?app=gcal).
 
 Feel free to create your own Google Calendar scripts on [Windmill](../getting_started/00_how_to_use_windmill/index.mdx).
 

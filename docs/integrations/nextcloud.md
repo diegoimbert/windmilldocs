@@ -40,7 +40,7 @@ You can use [native triggers](../core_concepts/52_native_triggers/index.mdx) to 
 
 :::tip
 
-Find some pre-set interactions with Nextcloud on the [Hub](https://hub.windmill.dev/integrations/nextcloud).
+Find some pre-set interactions with Nextcloud on the [Hub](https://hub.windmill.dev/?app=nextcloud).
 
 Feel free to create your own Nextcloud scripts on [Windmill](../getting_started/00_how_to_use_windmill/index.mdx).
 

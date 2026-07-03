@@ -4,7 +4,7 @@ description: How do I connect FaunaDB to Windmill? Query and manage Fauna databa
 
 # FaunaDB integration
 
-[FaunaDB](https://fauna.com/) is a serverless, document-oriented database for modern applications.
+FaunaDB is a serverless, document-oriented database for modern applications.
 
 To integrate Fauna to Windmill, you need to save the following elements as a [resource](../core_concepts/3_resources_and_types/index.mdx).
 
@@ -12,7 +12,7 @@ To integrate Fauna to Windmill, you need to save the following elements as a [re
 
 | Property | Type   | Description                                                                                                                    | Default | Required | Where to Find                                            |
 | -------- | ------ | ------------------------------------------------------------------------------------------------------------------------------ | ------- | -------- | -------------------------------------------------------- |
-| region   | string | Region of your database (us, eu, classic). [More info](https://docs.fauna.com/fauna/current/learn/understanding/region_groups) |         | true     | FaunaDB Dashboard > Database Settings                    |
+| region   | string | Region of your database (us, eu, classic). |         | true     | FaunaDB Dashboard > Database Settings                    |
 | secret   | string | FaunaDB secret key for authentication                                                                                          |         | true     | FaunaDB Dashboard > Security > Manage API Keys > New Key |
 
 <br/><br/>
@@ -36,7 +36,7 @@ Your resource can be used [passed as parameters](../core_concepts/3_resources_an
 
 :::tip
 
-Find some pre-set interactions with Fauna on the [Hub](https://hub.windmill.dev/integrations/faunadb).
+Find some pre-set interactions with Fauna on the [Hub](https://hub.windmill.dev/?app=faunadb).
 
 Feel free to create your own Fauna scripts on [Windmill](../getting_started/00_how_to_use_windmill/index.mdx).
 

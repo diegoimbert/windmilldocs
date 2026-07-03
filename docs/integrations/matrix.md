@@ -36,7 +36,7 @@ Your resource can be used [passed as parameters](../core_concepts/3_resources_an
 
 :::tip
 
-Find some pre-set interactions with Matrix on the [Hub](https://hub.windmill.dev/integrations/matrix).
+Find some pre-set interactions with Matrix on the [Hub](https://hub.windmill.dev/?app=matrix).
 
 Feel free to create your own Matrix scripts on [Windmill](../getting_started/00_how_to_use_windmill/index.mdx).
 

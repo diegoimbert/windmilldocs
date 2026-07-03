@@ -40,7 +40,7 @@ Your resource can be used [passed as parameters](../core_concepts/3_resources_an
 
 :::tip
 
-Find some pre-set interactions with Google Sheets on the [Hub](https://hub.windmill.dev/integrations/gsheets).
+Find some pre-set interactions with Google Sheets on the [Hub](https://hub.windmill.dev/?app=gsheets).
 
 Feel free to create your own Google Sheets scripts on [Windmill](../getting_started/00_how_to_use_windmill/index.mdx).
 

@@ -527,10 +527,6 @@ For example, in a web application, you might use AWS SQS to queue user requests 
 
 Similarly, Google Cloud Pub/Sub is ideal for building event-driven systems where messages published to a topic are delivered to one or more subscribers. This allows for scalable and flexible processing of background tasks, such as updating search indexes, sending notifications, or processing data streams.
 
-![Overview of the Sub/Pub service](https://cloud.google.com/static/pubsub/images/pubsub-components.png "Overview of the Sub/Pub service")
-
-> Overview of the Sub/Pub service ([source](https://cloud.google.com/pubsub/docs/overview))
-
 <br/>
 
 Message queue services like AWS SQS and Google Cloud Pub/Sub might be preferable over serverless functions like AWS Lambda, Google Cloud Functions, and Azure Functions in scenarios where task decoupling, durability, and reliability are crucial. These messaging services allow you to handle a large volume of tasks asynchronously, ensuring that tasks are processed without overwhelming your backend. They offer better control over task execution order, retry mechanisms, and error handling, providing assurance that no messages are lost even if a consumer fails.

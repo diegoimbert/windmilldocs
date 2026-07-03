@@ -198,9 +198,9 @@ The present example is a very simple use case: when an email is transfered to a 
 However, you could go with much more complex workflows:
 
 - Play with branches [branches](../flows/13_flow_branches.md) and have this flow report on different media depending of the content of the e-mail.
-- The email could be dealt with to automatically update a CRM (e.g. [Hubspot](https://hub.windmill.dev/integrations/hubspot), [Salesforce](https://hub.windmill.dev/integrations/salesforce), [Airtable](https://hub.windmill.dev/integrations/airtable)).
+- The email could be dealt with to automatically update a CRM (e.g. [Hubspot](https://hub.windmill.dev/?app=hubspot), [Salesforce](https://hub.windmill.dev/?app=salesforce), [Airtable](https://hub.windmill.dev/?app=airtable)).
 - Use the parsed details to [branch the execution of your flow](../flows/13_flow_branches.md) on a condition.
-- Have [OpenAI](https://hub.windmill.dev/integrations/openai) summarize the content of the email.
+- Have [OpenAI](https://hub.windmill.dev/?app=openai) summarize the content of the email.
 - Invoicing and Accounting: If your business receives invoices or receipts via email, you can parse these emails to extract relevant information and automatically update your accounting software or database.
 - Monitoring and Alerting: If you're receiving system or application alerts via email, you can parse these emails and trigger specific workflows based on the type of alert. For example, you could automatically create a task in a project management tool, send a message in a Slack channel, or even trigger a script to attempt to resolve the issue automatically.
 

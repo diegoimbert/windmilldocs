@@ -73,7 +73,7 @@ The technics we have used here should be applicable to those as well.
 We interact with GPT-4 (8K context) using the OpenAI Node API v4 library (currently in beta).
 You can explore all our code on GitHub [here](https://github.com/windmill-labs/windmill/blob/main/frontend/src/lib/components/copilot/lib.ts).
 Additionally, we have implemented a backend service in Rust to proxy the user's request and add the OpenAI API key without revealing it in the frontend.
-You can find the relevant code [here](https://github.com/windmill-labs/windmill/blob/main/backend/windmill-api/src/openai.rs).
+You can find the relevant code [here](https://github.com/windmill-labs/windmill/blob/main/backend/windmill-api/src/ai.rs).
 
 ## Generating code from instructions
 
@@ -388,7 +388,7 @@ Watch our Copilot fix a bug in a Python script:
 You can find all of our prompts templates [here](https://github.com/windmill-labs/windmill/tree/main/frontend/src/lib/components/copilot/prompts).
 We store them in yaml files, making it easy to read and edit.
 In order to evaluate the evolution of our Copilot's performance, each time we modify the prompts we (re)generate answers to sample questions.
-The samples can be found [here](https://github.com/windmill-labs/windmill/tree/main/llm).
+The samples can be found [here](https://github.com/windmill-labs/windmill/tree/main/frontend/src/lib/components/copilot/prompts).
 
 :::info A small note about tokens and costs
 Whether it is for code generation, editing, or bug fixing, we only send one request to the OpenAI endpoint.

@@ -35,7 +35,7 @@ Your resource can be used [passed as parameters](../core_concepts/3_resources_an
 
 :::tip
 
-Find some pre-set interactions with RSS on the [Hub](https://hub.windmill.dev/integrations/RSS).
+Find some pre-set interactions with RSS on the [Hub](https://hub.windmill.dev/?app=RSS).
 
 Feel free to create your own RSS scripts on [Windmill](../getting_started/00_how_to_use_windmill/index.mdx).
 

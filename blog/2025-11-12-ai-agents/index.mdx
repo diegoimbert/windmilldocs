@@ -53,7 +53,7 @@ This post explores how AI agent steps make sense in the specific context of Wind
 
 ### Tool integration
 
-To sum up roughly, [workflows](/docs/flows/flow_editor) in Windmill are state machines represented as DAGs (Directed Acyclic Graphs) to compose scripts together. With AI agent steps, any Windmill [script](/docs/getting_started/scripts_quickstart) becomes a tool the AI agent can invoke. Write your tools in any of the 20+ [languages](//docs/getting_started/scripts_quickstart) Windmill supports - Python, TypeScript, Go, Rust, PHP, Bash, SQL, and more. You can also use tools from the [Windmill Hub](https://hub.windmill.dev).
+To sum up roughly, [workflows](/docs/flows/flow_editor) in Windmill are state machines represented as DAGs (Directed Acyclic Graphs) to compose scripts together. With AI agent steps, any Windmill [script](/docs/getting_started/scripts_quickstart) becomes a tool the AI agent can invoke. Write your tools in any of the 20+ [languages](/docs/getting_started/scripts_quickstart) Windmill supports - Python, TypeScript, Go, Rust, PHP, Bash, SQL, and more. You can also use tools from the [Windmill Hub](https://hub.windmill.dev).
 
 Because every Windmill script already defines its inputs through a [JSON schema](/docs/core_concepts/json_schema_and_parsing), they naturally become tool definitions that AI agents can understand. The agent examines each tool's schema, understands its capabilities and required parameters, then reasons about which tools to use based on the user's request. No separate tool registration or documentation needed - the schema that defines how a script works is the same schema that tells the agent what the tool does.
 

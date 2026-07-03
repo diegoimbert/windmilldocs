@@ -54,7 +54,7 @@ directly.
 To safely use secret values throughout Windmill, you can save them in
 `reources`. We are regularly updating the list of approved resources but if you
 want an integration to be supported by Windmill directly, please submit a new
-`resource type` on [Windmill Hub](https://hub.windmill.dev/resources).
+`resource type` on [Windmill Hub](https://hub.windmill.dev/resource_types).
 
 **Navigate to the <a href="https://app.windmill.dev/resources" rel="nofollow">Resources page</a> page**
 ![Resources page](../assets/integrations/sb-2-1-resources.png.webp)
@@ -87,7 +87,7 @@ export async function main(auth: Supabase) {
 
 :::tip
 
-You can find more examples and premade Supabase scripts on [Windmill Hub](https://hub.windmill.dev/integrations/supabase).
+You can find more examples and premade Supabase scripts on [Windmill Hub](https://hub.windmill.dev/?app=supabase).
 
 <br/>
 

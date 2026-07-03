@@ -1,6 +1,6 @@
 ---
 slug: branch-specific-items
-version: v1.535.1
+version: v1.535.0
 title: Branch-specific items
 tags: ['CLI', 'Git sync']
 video: https://asciinema.org/a/VVRLx41ul5MP1UF2ubNC0KDBt

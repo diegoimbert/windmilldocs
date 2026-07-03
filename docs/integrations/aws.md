@@ -64,7 +64,7 @@ Your AWS or AWS OIDC resource can be:
 
 :::tip
 
-Find some pre-set interactions with AWS on the [Hub](https://hub.windmill.dev/integrations/aws_ecr).
+Find some pre-set interactions with AWS on the [Hub](https://hub.windmill.dev/?app=aws_ecr).
 
 Feel free to create your own AWS scripts on [Windmill](../getting_started/00_how_to_use_windmill/index.mdx).
 

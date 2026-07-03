@@ -40,7 +40,7 @@ The `gworkspace` resource type is also used by Google [native triggers](../core_
 
 :::tip
 
-Find some pre-set interactions with Google Workspace on the [Hub](https://hub.windmill.dev/integrations/gworkspace).
+Find some pre-set interactions with Google Workspace on the [Hub](https://hub.windmill.dev/?app=gworkspace).
 
 Feel free to create your own Google Workspace scripts on [Windmill](../getting_started/00_how_to_use_windmill/index.mdx).
 
