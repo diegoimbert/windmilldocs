@@ -653,6 +653,34 @@ When a script declares several `// on` inputs, `// trigger` controls how they co
 
 An input is partition-bearing when its declared path contains the `{partition}` token. Only partition-bearing inputs are tracked by the AND barrier. Inputs without the token (a reference or dimension dataset refreshed on its own cadence) are not part of the barrier at all: they do not define the partition and, on their own, do not fire the join — a write to one of them while `// trigger all` is set is simply skipped. Read such reference data at run time when a partition-bearing input completes the join.
 
+<Tabs className="unique-tabs">
+<TabItem value="duckdb" label="DuckDB" attributes={{className: "text-xs p-4 !mt-0 !ml-0"}}>
+
+```sql
+-- Daily enriched table: join the day's events with the day's sessions
+-- (both partitioned, must agree on the day) plus the current customers
+-- dimension (unpartitioned reference).
+--
+-- pipeline
+-- on s3://lake/raw/events/{partition}/events.parquet
+-- on s3://lake/raw/sessions/{partition}/sessions.parquet
+-- on s3://lake/dim/customers/current.parquet
+-- trigger all
+-- partitioned daily
+-- materialize ducklake://lake/enriched
+
+-- `{partition}` in the input paths is substituted at run time; the AND barrier
+-- guarantees both partition-bearing inputs exist for this partition. The
+-- unpartitioned customers dimension is read as-is.
+SELECT e.*, s.session_id, c.tier
+FROM read_parquet('s3://lake/raw/events/{partition}/events.parquet') e
+JOIN read_parquet('s3://lake/raw/sessions/{partition}/sessions.parquet') s USING (user_id)
+JOIN read_parquet('s3://lake/dim/customers/current.parquet') c USING (customer_id);
+```
+
+</TabItem>
+<TabItem value="ts" label="TypeScript" attributes={{className: "text-xs p-4 !mt-0 !ml-0"}}>
+
 ```ts
 // Daily enriched table: join the day's events with the day's sessions
 // (both partitioned, must agree on the day) plus the current customers
@@ -677,6 +705,9 @@ export async function main(partition: string) {
 	);
 }
 ```
+
+</TabItem>
+</Tabs>
 
 With this declaration, writing `events` for `2026-05-15` does not run the script yet (one of two partition-bearing inputs present). When `sessions` for `2026-05-15` is also written, the script runs exactly once for `2026-05-15`. Writing `events` for `2026-05-16` opens a separate, independent slot. Refreshing the unpartitioned `customers` reference does not fire past partitions.
 

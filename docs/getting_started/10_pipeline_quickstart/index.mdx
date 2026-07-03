@@ -10,10 +10,12 @@ import DocCard from '@site/src/components/DocCard';
 Pipelines are in alpha. The entry point is deliberately tucked away while we develop the feature, and the annotation syntax and behavior described in this guide are still evolving and may change in future releases. We would love your feedback - share it on [Discord](https://discord.com/invite/V7PM2YHsPB) or [GitHub](https://github.com/windmill-labs/windmill).
 :::
 
-This guide builds your first [pipeline](../../core_concepts/63_pipelines/index.mdx): a set of [DuckDB](../../integrations/duckdb.md) scripts in a folder wired together automatically by the data they read and write, no manual orchestration. Each step materializes a [DuckLake](../../core_concepts/11_persistent_storage/ducklake.mdx) table, which is what makes the writes idempotent, versioned and testable. It takes about five minutes.
+This guide builds your first [pipeline](../../core_concepts/63_pipelines/index.mdx): a set of scripts in a folder wired together automatically by the data they read and write, no manual orchestration. It uses the recommended [DuckDB](../../integrations/duckdb.md) + [DuckLake](../../core_concepts/11_persistent_storage/ducklake.mdx) path, where each step materializes a table (this is what makes the writes idempotent, versioned and testable). It takes about five minutes.
+
+DuckLake is not required, though. Pipelines wire scripts in any language (Python, TypeScript, ...) by the plain [assets](../../core_concepts/52_assets/index.mdx) they exchange - S3 objects, resources, data tables or volumes - with the same `-- on` model and no materialization. See [inputs and outputs](../../core_concepts/63_pipelines/index.mdx#inputs-and-outputs-assets) for that path; this guide shows DuckLake because it is the most powerful default.
 
 :::info Prerequisite
-You need a [workspace storage and a DuckLake](../../core_concepts/11_persistent_storage/ducklake.mdx) configured. The default DuckLake is named `main`; this guide uses it.
+Because this guide uses DuckLake, you need a [workspace storage and a DuckLake](../../core_concepts/11_persistent_storage/ducklake.mdx) configured. The default DuckLake is named `main`; this guide uses it. (A plain S3-based pipeline needs only the [workspace storage](../../core_concepts/38_object_storage_in_windmill/index.mdx#workspace-object-storage).)
 :::
 
 ## 1. Create a pipeline
@@ -69,7 +71,7 @@ Open the folder and select the pipeline view. You will see the lineage:
 
 On the `ingest` node, choose "Run + downstream". `ingest` materializes `events`, and the asset cascade automatically fires `rollup`, which materializes `events_by_kind`. Each node shows live status, its DuckLake snapshot and row count as the run progresses, and the result panel previews the materialized table.
 
-That is the whole model: mark scripts with `-- pipeline`, declare inputs with `-- on`, produce tables with `-- materialize`, and Windmill infers and runs the graph from asset lineage. Because each write is a managed DuckLake snapshot, you also get idempotent re-runs, time-travel, [data tests](../../core_concepts/63_pipelines/index.mdx#data-tests) and [backfill](../../core_concepts/63_pipelines/index.mdx#partition-status-and-backfill) with no extra work.
+That is the whole model: mark scripts with `-- pipeline`, declare inputs with `-- on`, and Windmill infers and runs the graph from asset lineage. Adding `-- materialize` (the optional DuckLake layer used here) is what also gives you idempotent re-runs, time-travel, [data tests](../../core_concepts/63_pipelines/index.mdx#data-tests) and [backfill](../../core_concepts/63_pipelines/index.mdx#partition-status-and-backfill) with no extra work.
 
 ## Next steps
 
