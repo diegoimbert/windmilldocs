@@ -46,9 +46,24 @@ Key features:
 
 ### Prerequisites
 
-- Self-hosted Windmill. On Community Edition, forks count toward the global 3-workspace limit; [Enterprise Edition](/pricing) removes that cap.
+- On self-hosted Windmill, forks work on any edition. On Community Edition, forks count toward the global 3-workspace limit; [Enterprise Edition](/pricing) removes that cap.
+- On [Windmill Cloud](https://app.windmill.dev/), forking is available for workspaces on a paid (Team or Enterprise) plan only. See [Forks on Windmill Cloud](#forks-on-windmill-cloud) below.
 - [Git sync](../11_git_sync/index.mdx) configured (optional, required only for git-based workflows)
 - [CI/CD actions ](../9_deploy_gh_gl/index.mdx#github-actions-setup) to merge back from the git remote to Windmill (only required for git sync workflows)
+
+### Forks on Windmill Cloud
+
+On [Windmill Cloud](https://app.windmill.dev/), forking is available for workspaces on a paid (Team or Enterprise) plan. Free-tier workspaces cannot create forks - upgrade the workspace to a paid plan first (see [plans & how to upgrade](../../misc/7_plans_details/index.mdx#upgrading-to-team-edition)).
+
+A fork inherits its parent (root) workspace's plan and usage limits rather than getting its own:
+
+- **Shared plan**: a fork takes on the premium status of its root workspace. You don't subscribe a fork separately.
+- **Shared usage limits**: a fork's executions are metered into the root workspace's usage, so all forks in a family draw from the same pool and count toward the root's usage-based bill. Billing stays with the parent - a fork never has its own invoice.
+- **Per-seat fork cap**: the number of forks a workspace family can have is capped at 5 per paid (developer) seat of the root workspace (for example, 2 seats allow up to 10 forks). Delete a fork or add seats to free up capacity.
+
+If a workspace is later downgraded to the free tier, its existing forks keep working under the root's shared free-tier limits, but no new forks can be created until it is upgraded again.
+
+On self-hosted Windmill, none of these cloud limits apply - forks are governed only by your edition's workspace limit (see [prerequisites](#prerequisites) above).
 
 ### Fork creation
 
@@ -85,6 +100,8 @@ Just press the cogwheel on the sidebar and select the option to delete the works
 ### Permissions and access
 
 Forks can be created by any user of the workspace. Roles and access will be the same as in the original workspace. All users of the original workspace can join the fork at any time, which will make it appear as another workspace on their menu.
+
+On [Windmill Cloud](https://app.windmill.dev/), creating a fork additionally requires the workspace to be on a paid plan and to have fork capacity left under the [per-seat cap](#forks-on-windmill-cloud).
 
 ## Git sync integration
 

@@ -23,6 +23,10 @@ The only distinctions will be around the number of users, number of computations
 
 All details on the [Pricing page](/pricing).
 
+### Workspace forks and billing
+
+On [Windmill Cloud](https://app.windmill.dev/), [workspace forks](../../advanced/20_workspace_forks/index.mdx) are available for workspaces on a paid (Team or Enterprise) plan. A fork does not carry its own subscription: it inherits the plan and usage limits of its parent (root) workspace, and its executions are metered into the root workspace's usage so they draw from the same pool and count toward the root's usage-based bill. The number of forks a workspace family can have is capped at 5 per paid (developer) seat of the root workspace. Free-tier workspaces cannot create forks. See [Forks on Windmill Cloud](../../advanced/20_workspace_forks/index.mdx#forks-on-windmill-cloud) for details.
+
 <div className="grid grid-cols-2 gap-6 mb-4">
 	<DocCard
 		title="Upgrading to Team Edition"
