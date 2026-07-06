@@ -145,23 +145,23 @@ Apply every pending migration, in timestamp order, to a datatable.
 wmill datatable migrate up [options]
 ```
 
-With no `--datatable` flag, `up` targets **all** datatables in the workspace. Any migration files created or edited locally are pushed to the workspace first, so `migrate up` works even before a `wmill sync push`.
+Without a `--datatable` flag, `up` targets the `main` datatable. Any migration files created or edited locally are pushed to the workspace first, so `migrate up` works even before a `wmill sync push`.
 
 #### Options
 
-| Option              | Parameters   | Description                                                        |
-| ------------------- | ------------ | ----------------------------------------------------------------- |
-| `-d, --datatable`   | `datatable`  | Target a specific datatable (default: all datatables in the workspace) |
+| Option              | Parameters   | Description                                |
+| ------------------- | ------------ | ------------------------------------------ |
+| `-d, --datatable`   | `datatable`  | Target datatable (default: `main`)         |
 
 #### Examples
 
-1. Apply pending migrations to every datatable:
+1. Apply pending migrations to the `main` datatable:
 
 ```bash
 wmill datatable migrate up
 ```
 
-2. Apply pending migrations to a single datatable:
+2. Apply pending migrations to a specific datatable:
 
 ```bash
 wmill datatable migrate up -d analytics
@@ -175,13 +175,13 @@ Roll back the most recently applied migration (one step), running its `.down.sql
 wmill datatable migrate down [options]
 ```
 
-With no `--datatable` flag, `down` rolls back the latest migration on **all** datatables in the workspace.
+Without a `--datatable` flag, `down` rolls back the latest migration on the `main` datatable.
 
 #### Options
 
-| Option              | Parameters   | Description                                                        |
-| ------------------- | ------------ | ----------------------------------------------------------------- |
-| `-d, --datatable`   | `datatable`  | Target a specific datatable (default: all datatables in the workspace) |
+| Option              | Parameters   | Description                                |
+| ------------------- | ------------ | ------------------------------------------ |
+| `-d, --datatable`   | `datatable`  | Target datatable (default: `main`)         |
 
 #### Example
 
